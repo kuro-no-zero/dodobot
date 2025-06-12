@@ -9,6 +9,7 @@ from flask import Flask
 from threading import Thread
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from discord import ButtonStyle
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -380,7 +381,7 @@ class AchievementDropdownView(View):
         self.add_item(self.select)
 
         # Bottone per descrizione completa
-        self.show_desc_btn = Button(label="Mostra descrizione completa", style=2)  # style=2 è grigio
+        self.show_desc_btn = Button(label="Mostra descrizione completa", style=ButtonStyle.secondary)
         self.show_desc_btn.callback = self.show_desc_callback
         self.add_item(self.show_desc_btn)
 
