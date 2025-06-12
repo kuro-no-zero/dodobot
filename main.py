@@ -1008,11 +1008,9 @@ async def regole_achievement(interaction: discord.Interaction):
 async def lista_achievements(interaction: Interaction):
 
     await interaction.response.defer(thinking=True, ephemeral=True)
-
     default_cat = sorted(all_achievement_lists.keys())[0]
     achievements, _, _ = all_achievement_lists[default_cat]
-    desc = format_achievements_table(achievements, default_cat)
-
+    desc = format_achievements_page(achievements, default_cat, page=0)
     view = AchievementDropdownView()
     
     if len(desc) > 2000:
