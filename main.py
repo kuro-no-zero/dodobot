@@ -21,7 +21,7 @@ redeemable_dinos = {
     "Blood Crystal Wyvern": {
         "livello": 115, 
         "punti": 300, 
-        "img": "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fm8aiey0ekgl51.jpg"
+        "img": "https://i.redd.it/m8aiey0ekgl51.jpg"
     },
     "Bloodstalker": {
         "livello": 150, 
