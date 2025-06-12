@@ -370,52 +370,81 @@ def format_dino_table(dinos: dict) -> str:
     return "```\n" + "\n".join(rows) + "\n```"
 
 class DinoDropdownView(View):
-    def __init__(self, dinos):
+    def __init__(self, dinos: dict, page: int = 0):
         super().__init__(timeout=None)
         self.dinos = dinos
+        self.page = page
+        self.dino_names = list(dinos.keys())
+        self.per_page = 25
+
+        self.total_pages = (len(self.dino_names) - 1) // self.per_page + 1
+        self.current_dino = None
+
+        self.update_select_menu()
+        self.add_navigation_buttons()
+
+    def update_select_menu(self):
+        start = self.page * self.per_page
+        end = start + self.per_page
         options = [
             SelectOption(label=nome, value=nome)
-            for nome in self.dinos.keys()
+            for nome in self.dino_names[start:end]
         ]
+
         self.select = Select(
-            placeholder="Seleziona un dinosauro",
+            placeholder=f"Seleziona un dinosauro (pagina {self.page + 1}/{self.total_pages})",
             options=options,
             custom_id="select_dino"
         )
         self.select.callback = self.select_callback
         self.add_item(self.select)
 
-        self.back_button = Button(
-            label="Torna alla tabella", 
-            style=discord.ButtonStyle.secondary, 
-            disabled=True
-        )
+    def add_navigation_buttons(self):
+        # Bottone indietro
+        self.prev_button = Button(label="⬅️", style=ButtonStyle.primary, disabled=self.page == 0)
+        self.prev_button.callback = self.go_previous
+        self.add_item(self.prev_button)
+
+        # Bottone avanti
+        self.next_button = Button(label="➡️", style=ButtonStyle.primary, disabled=self.page >= self.total_pages - 1)
+        self.next_button.callback = self.go_next
+        self.add_item(self.next_button)
+
+        # Bottone "torna alla tabella"
+        self.back_button = Button(label="Torna alla tabella", style=ButtonStyle.secondary, disabled=True)
         self.back_button.callback = self.back_callback
         self.add_item(self.back_button)
-
-        self.current_dino = None
 
     async def select_callback(self, interaction: Interaction):
         self.current_dino = self.select.values[0]
         dati = self.dinos[self.current_dino]
 
-        embed = discord.Embed(
+        embed = Embed(
             title=self.current_dino,
             description=f"Livello: {dati['livello']}\nPunti: {dati['punti']}",
             color=0x00ff00
         )
-        embed.set_image(url=dati["image_url"])
+        if "image_url" in dati:
+            embed.set_image(url=dati["image_url"])
 
         self.back_button.disabled = False
-        self.select.disabled = True  # disabilito la select quando mostro il dettaglio
 
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
         desc = format_dino_table(self.dinos)
         self.back_button.disabled = True
-        self.select.disabled = False
         await interaction.response.edit_message(content=desc, embed=None, view=self)
+
+    async def go_previous(self, interaction: Interaction):
+        new_view = DinoDropdownView(self.dinos, page=self.page - 1)
+        desc = format_dino_table(self.dinos)
+        await interaction.response.edit_message(content=desc, embed=None, view=new_view)
+
+    async def go_next(self, interaction: Interaction):
+        new_view = DinoDropdownView(self.dinos, page=self.page + 1)
+        desc = format_dino_table(self.dinos)
+        await interaction.response.edit_message(content=desc, embed=None, view=new_view)
 
 class AchievementsRedeemView(View):
     def __init__(self):
