@@ -359,7 +359,7 @@ sent_messages = []
 sent_messages_redeem = []
 PAGE_SIZE = 25
 ITEMS_PER_PAGE = 25
-MAX_OPTIONS_PER_PAGE = 20
+MAX_OPTIONS_PER_PAGE = 15
 
 # === FLASK: mini server web per Replit/UptimeRobot ===
 app = Flask('')
