@@ -75,7 +75,6 @@ sent_messages = []
 sent_messages_redeem = []
 PAGE_SIZE = 25
 ITEMS_PER_PAGE = 25
-MAX_DESC_LENGTH = 50
 
 # === FLASK: mini server web per Replit/UptimeRobot ===
 app = Flask('')
@@ -350,11 +349,6 @@ class AchievementsRedeemView(View):
             ephemeral=True
         )
 
-def truncate_descr(text: str) -> str:
-    if len(text) > MAX_DESC_LENGTH:
-        return text[:MAX_DESC_LENGTH - 3] + "..."
-    return text.ljust(MAX_DESC_LENGTH)
-
 def format_achievements_table(achievements: dict) -> str:
     header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<50} |"
     separator = f"|{'-'*22}|{'-'*8}|{'-'*52}|"
@@ -370,59 +364,94 @@ def format_achievements_table(achievements: dict) -> str:
     return "```\n" + "\n".join(rows) + "\n```"
 
 
-class AchievementView(View):
+class AchievementDropdownView(View):
     def __init__(self):
         super().__init__(timeout=None)
-
-        # Dropdown per categoria
-        options = [SelectOption(label=nome, value=nome) for nome in all_achievement_lists]
-        self.category_select = Select(
-            placeholder="Seleziona categoria achievements",
+        options = [
+            SelectOption(label=nome, value=nome)
+            for nome in all_achievement_lists
+        ]
+        self.select = Select(
+            placeholder="Seleziona una categoria",
             options=options,
             custom_id="select_category"
         )
-        self.category_select.callback = self.category_callback
-        self.add_item(self.category_select)
+        self.select.callback = self.select_callback
+        self.add_item(self.select)
 
-        # Dropdown per achievement (popolato dinamicamente)
+        # Dropdown per scegliere achievement nella categoria selezionata (inizialmente vuoto)
         self.achievement_select = Select(
-            placeholder="Seleziona un achievement per descrizione completa",
+            placeholder="Seleziona un achievement",
             options=[],
-            custom_id="select_achievement"
+            custom_id="select_achievement",
+            disabled=True
         )
         self.achievement_select.callback = self.achievement_callback
         self.add_item(self.achievement_select)
 
-        # Stato iniziale: seleziona prima categoria e popola achievement_select
-        self.current_category = list(all_achievement_lists.keys())[0]
-        self.update_achievement_options()
+        # Bottone per tornare alla tabella principale (inizialmente disabilitato)
+        self.back_button = Button(label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True)
+        self.back_button.callback = self.back_callback
+        self.add_item(self.back_button)
 
-    def update_achievement_options(self):
-        achievements, _, _ = all_achievement_lists[self.current_category]
+        self.current_category = None
+
+    async def select_callback(self, interaction: Interaction):
+        self.current_category = self.select.values[0]
+        achievements, _, color = all_achievement_lists[self.current_category]
+
+        # Aggiorna tabella markdown con la categoria scelta
+        desc = format_achievements(achievements)
+
+        # Aggiorna dropdown achievement con gli achievement della categoria
         self.achievement_select.options = [
             SelectOption(label=nome, value=nome)
-            for nome in achievements
+            for nome in achievements.keys()
         ]
+        self.achievement_select.disabled = False
 
-    async def category_callback(self, interaction: Interaction):
-        self.current_category = self.category_select.values[0]
-        self.update_achievement_options()
+        # Disabilita il bottone torna alla tabella perché siamo già lì
+        self.back_button.disabled = True
 
-        achievements, _, _ = all_achievement_lists[self.current_category]
-        desc = format_achievements_table(achievements)
-
-        # Aggiorna messaggio con nuova tabella e resettare dropdown achievement
-        await interaction.response.edit_message(content=desc, view=self)
+        embed = Embed(
+            title=f"Achievements - {self.current_category}",
+            description=desc,
+            color=color
+        )
+        await interaction.response.edit_message(embed=embed, view=self)
 
     async def achievement_callback(self, interaction: Interaction):
         selected_ach = self.achievement_select.values[0]
-        achievements, _, _ = all_achievement_lists[self.current_category]
+        achievements, _, color = all_achievement_lists[self.current_category]
 
         dati = achievements[selected_ach]
-        full_desc = f"**{selected_ach}**\nPunti: {dati['punti']}\nDescrizione: {dati['descrizione']}"
 
-        # Rispondi editando il messaggio con descrizione completa dell'achievement selezionato
-        await interaction.response.edit_message(content=full_desc, view=self)
+        embed = Embed(
+            title=selected_ach,
+            description=dati["descrizione"],
+            color=color
+        )
+        embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
+
+        # Abilita il bottone per tornare alla tabella
+        self.back_button.disabled = False
+
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def back_callback(self, interaction: Interaction):
+        # Torna a mostrare la tabella markdown della categoria corrente
+        achievements, _, color = all_achievement_lists[self.current_category]
+        desc = format_achievements(achievements)
+
+        # Disabilita il bottone perché siamo già nella tabella
+        self.back_button.disabled = True
+
+        embed = Embed(
+            title=f"Achievements - {self.current_category}",
+            description=desc,
+            color=color
+        )
+        await interaction.response.edit_message(embed=embed, view=self)
         
 # === BOT SETUP ===
 intents = discord.Intents.default()
