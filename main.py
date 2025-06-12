@@ -297,36 +297,32 @@ class AchievementsMenuView(View):
         return options
 
     async def update_view(self, interaction: Interaction):
-    # Ricrea una nuova view mantenendo lo stato
-    new_view = AchievementsMenuView()
-    new_view.list_page = self.list_page
-    new_view.ach_page = self.ach_page
-    new_view.selected_list_name = self.selected_list_name
-    new_view.selected_ach_name = self.selected_ach_name
+        new_view = AchievementsMenuView()
+        new_view.list_page = self.list_page
+        new_view.ach_page = self.ach_page
+        new_view.selected_list_name = self.selected_list_name
+        new_view.selected_ach_name = self.selected_ach_name
 
-    # Aggiorna i dropdown della nuova view (utile per default_values)
-    new_view.list_select.options = new_view.get_list_options()
-    new_view.ach_select.options = new_view.get_achievement_options()
+        new_view.list_select.options = new_view.get_list_options()
+        new_view.ach_select.options = new_view.get_achievement_options()
 
-    # Verifica che l'achievement selezionato sia nella pagina, altrimenti aggiorna
-    ach_options = [opt.value for opt in new_view.ach_select.options]
-    if new_view.selected_ach_name not in ach_options:
-        new_view.selected_ach_name = ach_options[0] if ach_options else None
+        ach_options = [opt.value for opt in new_view.ach_select.options]
+        if new_view.selected_ach_name not in ach_options:
+            new_view.selected_ach_name = ach_options[0] if ach_options else None
 
-    new_view.list_select.default_values = [new_view.selected_list_name]
-    new_view.ach_select.default_values = [new_view.selected_ach_name] if new_view.selected_ach_name else []
+        new_view.list_select.default_values = [new_view.selected_list_name]
+        new_view.ach_select.default_values = [new_view.selected_ach_name] if new_view.selected_ach_name else []
 
-    # Crea l'embed aggiornato
-    ach_dict, one_shot, color = all_achievement_lists[new_view.selected_list_name]
-    if new_view.selected_ach_name in ach_dict:
-        dati = ach_dict[new_view.selected_ach_name]
-        embed = Embed(title=new_view.selected_ach_name, color=color)
-        embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
-        embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
-    else:
-        embed = Embed(title="Seleziona un achievement", description="Nessun achievement selezionato", color=discord.Color.dark_gray())
+       ach_dict, one_shot, color = all_achievement_lists[new_view.selected_list_name]
+        if new_view.selected_ach_name in ach_dict:
+            dati = ach_dict[new_view.selected_ach_name]
+            embed = Embed(title=new_view.selected_ach_name, color=color)
+            embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
+            embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
+        else:
+            embed = Embed(title="Seleziona un achievement", description="Nessun achievement selezionato", color=discord.Color.dark_gray())
 
-    await interaction.response.edit_message(embed=embed, view=new_view)
+        await interaction.response.edit_message(embed=embed, view=new_view)
 
     async def list_select_callback(self, interaction: Interaction):
         self.selected_list_name = interaction.data["values"][0]
