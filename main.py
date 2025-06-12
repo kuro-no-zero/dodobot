@@ -373,64 +373,56 @@ def format_achievements_table(achievements: dict) -> str:
 class AchievementView(View):
     def __init__(self):
         super().__init__(timeout=None)
-        self.current_category = list(all_achievement_lists.keys())[0]
 
-        # Dropdown categorie
-        options = [SelectOption(label=cat, value=cat) for cat in all_achievement_lists]
+        # Dropdown per categoria
+        options = [SelectOption(label=nome, value=nome) for nome in all_achievement_lists]
         self.category_select = Select(
-            placeholder="Seleziona una categoria",
+            placeholder="Seleziona categoria achievements",
             options=options,
             custom_id="select_category"
         )
         self.category_select.callback = self.category_callback
         self.add_item(self.category_select)
 
-        # Dropdown achievements (aggiornato dinamicamente)
+        # Dropdown per achievement (popolato dinamicamente)
         self.achievement_select = Select(
-            placeholder="Seleziona un achievement per la descrizione completa",
+            placeholder="Seleziona un achievement per descrizione completa",
             options=[],
             custom_id="select_achievement"
         )
         self.achievement_select.callback = self.achievement_callback
         self.add_item(self.achievement_select)
 
+        # Stato iniziale: seleziona prima categoria e popola achievement_select
+        self.current_category = list(all_achievement_lists.keys())[0]
         self.update_achievement_options()
 
     def update_achievement_options(self):
         achievements, _, _ = all_achievement_lists[self.current_category]
-        opts = [
+        self.achievement_select.options = [
             SelectOption(label=nome, value=nome)
             for nome in achievements
         ]
-        self.achievement_select.options = opts
 
     async def category_callback(self, interaction: Interaction):
         self.current_category = self.category_select.values[0]
         self.update_achievement_options()
 
-        achievements, _, color = all_achievement_lists[self.current_category]
+        achievements, _, _ = all_achievement_lists[self.current_category]
         desc = format_achievements_table(achievements)
 
-        embed = Embed(
-            title=f"Achievements - {self.current_category}",
-            description=desc,
-            color=color
-        )
-        # Aggiorna il messaggio editando embed e view
-        await interaction.response.edit_message(embed=embed, view=self)
+        # Aggiorna messaggio con nuova tabella e resettare dropdown achievement
+        await interaction.response.edit_message(content=desc, view=self)
 
     async def achievement_callback(self, interaction: Interaction):
-        selected_achievement = self.achievement_select.values[0]
-        achievements, _, color = all_achievement_lists[self.current_category]
-        data = achievements[selected_achievement]
+        selected_ach = self.achievement_select.values[0]
+        achievements, _, _ = all_achievement_lists[self.current_category]
 
-        # Embed con descrizione completa dell'achievement
-        embed = Embed(
-            title=f"Achievement: {selected_achievement}",
-            description=f"Punti: {data['punti']}\n\nDescrizione completa:\n{data['descrizione']}",
-            color=color
-        )
-        await interaction.response.edit_message(embed=embed, view=self)
+        dati = achievements[selected_ach]
+        full_desc = f"**{selected_ach}**\nPunti: {dati['punti']}\nDescrizione: {dati['descrizione']}"
+
+        # Rispondi editando il messaggio con descrizione completa dell'achievement selezionato
+        await interaction.response.edit_message(content=full_desc, view=self)
         
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -597,16 +589,11 @@ async def regole_achievement(interaction: discord.Interaction):
 @bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili.")
 async def lista_achievements(interaction: Interaction):
     default_cat = list(all_achievement_lists.keys())[0]
-    achievements, _, color = all_achievement_lists[default_cat]
+    achievements, _, _ = all_achievement_lists[default_cat]
     desc = format_achievements_table(achievements)
 
-    embed = Embed(
-        title=f"Achievements - {default_cat}",
-        description=desc,
-        color=color
-    )
     view = AchievementView()
-    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+    await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
 @bot.tree.command(name="redeem_achievements", description="Completa uno o piu achievement")
 async def redeem_achievements(interaction: Interaction):
