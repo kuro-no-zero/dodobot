@@ -18,38 +18,166 @@ AUTHORIZED_ROLE_IDS = [1380464896520486922, 1380514524871786607]
 # === Lista Dinos ===
 
 redeemable_dinos = {
-    "Blood Crystal Wyvern": {"livello": 115, "punti": 300},
-    "Bloodstalker": {"livello": 150, "punti": 150},
-    "Ember Crystal Wyvern": {"livello": 115, "punti": 300},
-    "Enforcer": {"livello": 150, "punti": 100},
-    "Managarmr": {"livello": 150, "punti": 320},
-    "Noglin": {"livello": 150, "punti": 450},
-    "Phoenix": {"livello": 150, "punti": 300},
-    "Reaper-King": {"livello": 150, "punti": 400},
-    "Tek Stryder (random)": {"livello": 150, "punti": 270},
-    "Tropical Crystal Wyvern": {"livello": 115, "punti": 300},
-    "Voidwyrm": {"livello": 115, "punti": 400},
-    "Zombie-Wyvern": {"livello": 115, "punti": 350},
-    "Rock Drake": {"livello": 115, "punti": 300},
-    "Andrewsarchus": {"livello": 150, "punti": 170},
-    "Desmodus": {"livello": 150, "punti": 270},
-    "Fjordhawk": {"livello": 150, "punti": 100},
-    "Deinonychus": {"livello": 75, "punti": 200},
-    "Gacha (Random)": {"livello": 150, "punti": 150},
-    "Gasbags": {"livello": 150, "punti": 100},
-    "Velonasaur": {"livello": 150, "punti": 170},
-    "Desert Titan": {"livello": "-", "punti": 1000},
-    "Forest Titan": {"livello": "-", "punti": 900},
-    "Ice Titan": {"livello": "-", "punti": 1200},
-    "Bulbdog": {"livello": 150, "punti": 30},
-    "Featherlight": {"livello": 150, "punti": 30},
-    "Glowtail": {"livello": 150, "punti": 30},
-    "Shinehorn": {"livello": 150, "punti": 30},
-    "Karkinos": {"livello": 150, "punti": 250},
-    "Roll Rat": {"livello": 150, "punti": 150},
-    "Shadowmane": {"livello": 150, "punti": 350},
-    "Megachelon": {"livello": 150, "punti": 150},
-    "Carcharodontosaurus": {"livello": 150, "punti": 400}
+    "Blood Crystal Wyvern": {
+        "livello": 115, 
+        "punti": 300, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/3/3e/Blood_Crystal_Wyvern.png"
+    },
+    "Bloodstalker": {
+        "livello": 150, 
+        "punti": 150, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/1/1d/Bloodstalker.png"
+    },
+    "Ember Crystal Wyvern": {
+        "livello": 115, 
+        "punti": 300, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/4/4d/Ember_Crystal_Wyvern.png"
+    },
+    "Enforcer": {
+        "livello": 150, 
+        "punti": 100, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/6/6d/Enforcer.png"
+    },
+    "Managarmr": {
+        "livello": 150, 
+        "punti": 320, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/1/1b/Managarmr.png"
+    },
+    "Noglin": {
+        "livello": 150, 
+        "punti": 450, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/8/8e/Noglin.png"
+    },
+    "Phoenix": {
+        "livello": 150, 
+        "punti": 300, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/9/9d/Phoenix.png"
+    },
+    "Reaper-King": {
+        "livello": 150, 
+        "punti": 400, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/7/7f/Reaper-King.png"
+    },
+    "Tek Stryder (random)": {
+        "livello": 150, 
+        "punti": 270, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/7/7e/Tek_Stryder.png"
+    },
+    "Tropical Crystal Wyvern": {
+        "livello": 115, 
+        "punti": 300, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/2/2a/Tropical_Crystal_Wyvern.png"
+    },
+    "Voidwyrm": {
+        "livello": 115, 
+        "punti": 400, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/5/5e/Voidwyrm.png"
+    },
+    "Zombie-Wyvern": {
+        "livello": 115, 
+        "punti": 350, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/3/3d/Zombie-Wyvern.png"
+    },
+    "Rock Drake": {
+        "livello": 115, 
+        "punti": 300, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/3/3a/Rock_Drake.png"
+    },
+    "Andrewsarchus": {
+        "livello": 150, 
+        "punti": 170, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/2/2e/Andrewsarchus.png"
+    },
+    "Desmodus": {
+        "livello": 150, 
+        "punti": 270, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/0/0b/Desmodus.png"
+    },
+    "Fjordhawk": {
+        "livello": 150, 
+        "punti": 100, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/1/1d/Fjordhawk.png"
+    },
+    "Deinonychus": {
+        "livello": 75, 
+        "punti": 200, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/6/6d/Deinonychus.png"
+    },
+    "Gacha (Random)": {
+        "livello": 150, 
+        "punti": 150, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/1/1f/Gacha.png"
+    },
+    "Gasbags": {
+        "livello": 150, 
+        "punti": 100, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/6/6e/Gasbags.png"
+    },
+    "Velonasaur": {
+        "livello": 150, 
+        "punti": 170, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/2/2d/Velonasaur.png"
+    },
+    "Desert Titan": {
+        "livello": "-", 
+        "punti": 1000, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/7/7b/Desert_Titan.png"
+    },
+    "Forest Titan": {
+        "livello": "-", 
+        "punti": 900, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/5/5f/Forest_Titan.png"
+    },
+    "Ice Titan": {
+        "livello": "-", 
+        "punti": 1200, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/8/8b/Ice_Titan.png"
+    },
+    "Bulbdog": {
+        "livello": 150, 
+        "punti": 30, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/2/2b/Bulbdog.png"
+    },
+    "Featherlight": {
+        "livello": 150, 
+        "punti": 30, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/0/0e/Featherlight.png"
+    },
+    "Glowtail": {
+        "livello": 150, 
+        "punti": 30, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/2/2e/Glowtail.png"
+    },
+    "Shinehorn": {
+        "livello": 150, 
+        "punti": 30, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/0/0f/Shinehorn.png"
+    },
+    "Karkinos": {
+        "livello": 150, 
+        "punti": 250, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/1/1e/Karkinos.png"
+    },
+    "Roll Rat": {
+        "livello": 150, 
+        "punti": 150, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/4/4b/Roll_Rat.png"
+    },
+    "Shadowmane": {
+        "livello": 150, 
+        "punti": 350, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/7/7e/Shadowmane.png"
+    },
+    "Megachelon": {
+        "livello": 150, 
+        "punti": 150, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/5/5f/Megachelon.png"
+    },
+    "Carcharodontosaurus": {
+        "livello": 150, 
+        "punti": 400, 
+        "img": "https://static.wikia.nocookie.net/ark_survival_evolved/images/6/6b/Carcharodontosaurus.png"
+    }
 }
 
 # === Liste Achievements ===
@@ -227,6 +355,60 @@ class DinoRedeemView(discord.ui.View):
         if (self.page + 1) * PAGE_SIZE < len(self.dinos):
             self.page += 1
             await self.update_select(interaction)
+
+def format_dino_table(dinos: dict) -> str:
+    header = f"| {'Nome':<20} | {'Livello':^7} | {'Punti':^6} |"
+    separator = f"|{'-'*22}|{'-'*9}|{'-'*8}|"
+    rows = [header, separator]
+
+    for nome, dati in dinos.items():
+        nome_fmt = nome[:20].ljust(20)
+        livello = str(dati["livello"]).center(7)
+        punti = str(dati["punti"]).center(6)
+        rows.append(f"| {nome_fmt} | {livello} | {punti} |")
+
+    return "```\n" + "\n".join(rows) + "\n```"
+
+class DinoDropdownView(View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        options = [
+            SelectOption(label=nome, value=nome)
+            for nome in dinos.keys()
+        ]
+        self.select = Select(
+            placeholder="Seleziona un dinosauro",
+            options=options,
+            custom_id="select_dino"
+        )
+        self.select.callback = self.select_callback
+        self.add_item(self.select)
+
+        self.back_button = Button(label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True)
+        self.back_button.callback = self.back_callback
+        self.add_item(self.back_button)
+
+        self.current_dino = None
+
+    async def select_callback(self, interaction: Interaction):
+        self.current_dino = self.select.values[0]
+        dati = dinos[self.current_dino]
+
+        embed = Embed(
+            title=self.current_dino,
+            description=f"Livello: {dati['livello']}\nPunti: {dati['punti']}",
+            color=0x00ff00
+        )
+        embed.set_image(url=dati["image_url"])
+
+        self.back_button.disabled = False
+
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
+
+    async def back_callback(self, interaction: Interaction):
+        desc = format_dino_table(dinos)
+        self.back_button.disabled = True
+        await interaction.response.edit_message(content=desc, embed=None, view=self)
 
 class AchievementsRedeemView(View):
     def __init__(self):
@@ -530,7 +712,12 @@ async def redeem_dino(interaction: discord.Interaction):
     user_id = interaction.user.id
     view = DinoRedeemView(user_id, redeemable_dinos)
     await interaction.response.send_message("Scegli il dino da redeemare:", view=view, ephemeral=True)
-    
+
+@bot.tree.command(name="lista_dino", description="Mostra i dinosauri disponibili.")
+async def lista_dino(interaction: Interaction):
+    desc = format_dino_table(dinos)
+    view = DinoDropdownView()
+    await interaction.response.send_message(content=desc, view=view, ephemeral=True) 
 
 @bot.tree.command(name="mostra_redeem", description="Mostra log redeem dinos (admin)")
 async def mostra_redeem(interaction: discord.Interaction):
