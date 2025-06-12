@@ -367,10 +367,8 @@ def format_achievements_table(achievements: dict) -> str:
 class AchievementDropdownView(View):
     def __init__(self):
         super().__init__(timeout=None)
-        options = [
-            SelectOption(label=nome, value=nome)
-            for nome in all_achievement_lists
-        ]
+        # Select categoria
+        options = [SelectOption(label=nome, value=nome) for nome in all_achievement_lists]
         self.select = Select(
             placeholder="Seleziona una categoria",
             options=options,
@@ -379,6 +377,7 @@ class AchievementDropdownView(View):
         self.select.callback = self.select_callback
         self.add_item(self.select)
 
+        # NON aggiungiamo subito achievement_select, lo aggiungeremo dopo
         self.achievement_select = Select(
             placeholder="Seleziona un achievement",
             options=[],
@@ -386,7 +385,6 @@ class AchievementDropdownView(View):
             disabled=True
         )
         self.achievement_select.callback = self.achievement_callback
-        self.add_item(self.achievement_select)
 
         self.back_button = Button(
             label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True
@@ -402,17 +400,19 @@ class AchievementDropdownView(View):
         achievements, _, _ = all_achievement_lists[self.current_category]
         self.current_achievements = achievements
 
-        # Tabella in markdown plain text
         desc = format_achievements_table(achievements)
 
-        # Aggiorna dropdown achievements
+        # Aggiorna opzioni achievement_select
         self.achievement_select.options = [
             SelectOption(label=nome, value=nome)
             for nome in achievements.keys()
         ]
         self.achievement_select.disabled = False
 
-        # Bottone torna alla tabella disabilitato perché già lì
+        # Se non è già in view, aggiungiamo achievement_select
+        if self.achievement_select not in self.children:
+            self.add_item(self.achievement_select)
+
         self.back_button.disabled = True
 
         await interaction.response.edit_message(content=desc, embed=None, view=self)
@@ -424,14 +424,12 @@ class AchievementDropdownView(View):
         embed = Embed(
             title=selected_ach,
             description=dati["descrizione"],
-            color=0x00ff00  # metti il colore che vuoi o prendi da all_achievement_lists
+            color=0x00ff00
         )
         embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
 
-        # Bottone torna alla tabella abilitato
         self.back_button.disabled = False
 
-        # Qui mandiamo embed con view e senza contenuto plain text
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
@@ -439,7 +437,6 @@ class AchievementDropdownView(View):
 
         self.back_button.disabled = True
 
-        # Torna a mostrare tabella plain text markdown, nessun embed
         await interaction.response.edit_message(content=desc, embed=None, view=self)
         
 # === BOT SETUP ===
