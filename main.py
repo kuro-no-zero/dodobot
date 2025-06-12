@@ -621,7 +621,7 @@ async def lista_achievements(interaction: Interaction):
     achievements, _, _ = all_achievement_lists[default_cat]
     desc = format_achievements_table(achievements)
 
-    view = AchievementView()
+    view = AchievementDropdownView()
     await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
 @bot.tree.command(name="redeem_achievements", description="Completa uno o piu achievement")
