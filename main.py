@@ -67,8 +67,8 @@ achievements_infiniti = {
 }
 
 all_achievement_lists = {
-    "OneShot": (achievements_oneshot, True, discord.Color.green()),
-    "Infiniti": (achievements_infiniti, False, discord.Color.blue()),
+    "OneShot": (achievements_oneshot, True, 0x2ecc71),
+    "Infiniti": (achievements_infiniti, False, 0x3498db),
 }
 
 sent_messages = []
@@ -356,84 +356,82 @@ def truncate_descr(text: str) -> str:
     return text.ljust(MAX_DESC_LENGTH)
 
 def format_achievements(achievements: dict) -> str:
-    header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<{MAX_DESC_LENGTH}} |"
-    separator = f"|{'-'*22}|{'-'*8}|{'-'*(MAX_DESC_LENGTH+2)}|"
-
+    header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<50} |"
+    separator = f"|{'-'*22}|{'-'*8}|{'-'*52}|"
     rows = [header, separator]
 
     for nome, dati in achievements.items():
         titolo = nome[:20].ljust(20)
         punti = str(dati["punti"]).center(6)
-        descr = truncate_descr(dati["descrizione"])
-        rows.append(f"| {titolo} | {punti} | {descr} |")
+        desc = dati["descrizione"][:47] + "..." if len(dati["descrizione"]) > 50 else dati["descrizione"]
+        desc = desc.ljust(50)
+        rows.append(f"| {titolo} | {punti} | {desc} |")
+
+    return "```\n" + "\n".join(rows) + "\n```"
 
 
-class AchievementDropdownView(View):
+class AchievementView(View):
     def __init__(self):
         super().__init__(timeout=None)
-        options = [SelectOption(label=nome, value=nome) for nome in all_achievement_lists]
-        self.select = Select(
+        self.current_category = list(all_achievement_lists.keys())[0]
+
+        # Dropdown categorie
+        options = [SelectOption(label=cat, value=cat) for cat in all_achievement_lists]
+        self.category_select = Select(
             placeholder="Seleziona una categoria",
             options=options,
             custom_id="select_category"
         )
-        self.select.callback = self.select_callback
-        self.add_item(self.select)
+        self.category_select.callback = self.category_callback
+        self.add_item(self.category_select)
 
-        # Bottone per descrizione completa
-        self.show_desc_btn = Button(label="Mostra descrizione completa", style=ButtonStyle.secondary)
-        self.show_desc_btn.callback = self.show_desc_callback
-        self.add_item(self.show_desc_btn)
+        # Dropdown achievements (aggiornato dinamicamente)
+        self.achievement_select = Select(
+            placeholder="Seleziona un achievement per la descrizione completa",
+            options=[],
+            custom_id="select_achievement"
+        )
+        self.achievement_select.callback = self.achievement_callback
+        self.add_item(self.achievement_select)
 
-        # Store stato categoria corrente per poter mostrare gli achievements corretti
-        self.current_category = list(all_achievement_lists.keys())[0]
+        self.update_achievement_options()
 
-    async def select_callback(self, interaction: Interaction):
-        selected = self.select.values[0]
-        achievements, one_shot, color = all_achievement_lists[selected]
-        self.current_category = selected
+    def update_achievement_options(self):
+        achievements, _, _ = all_achievement_lists[self.current_category]
+        opts = [
+            SelectOption(label=nome, value=nome)
+            for nome in achievements
+        ]
+        self.achievement_select.options = opts
+
+    async def category_callback(self, interaction: Interaction):
+        self.current_category = self.category_select.values[0]
+        self.update_achievement_options()
+
+        achievements, _, color = all_achievement_lists[self.current_category]
+        desc = format_achievements_table(achievements)
 
         embed = Embed(
-            title=f"Achievements - {selected}",
-            description=format_achievements(achievements),
+            title=f"Achievements - {self.current_category}",
+            description=desc,
+            color=color
+        )
+        # Aggiorna il messaggio editando embed e view
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def achievement_callback(self, interaction: Interaction):
+        selected_achievement = self.achievement_select.values[0]
+        achievements, _, color = all_achievement_lists[self.current_category]
+        data = achievements[selected_achievement]
+
+        # Embed con descrizione completa dell'achievement
+        embed = Embed(
+            title=f"Achievement: {selected_achievement}",
+            description=f"Punti: {data['punti']}\n\nDescrizione completa:\n{data['descrizione']}",
             color=color
         )
         await interaction.response.edit_message(embed=embed, view=self)
-
-    async def show_desc_callback(self, interaction: Interaction):
-        # Prendo la lista achievements corrente
-        achievements, _, color = all_achievement_lists[self.current_category]
-
-        # Creo select con tutti gli achievements della categoria per scegliere quale vedere
-        options = [
-            SelectOption(label=nome, description=(achievements[nome]["descrizione"][:90] + ("..." if len(achievements[nome]["descrizione"]) > 90 else "")), value=nome)
-            for nome in achievements
-        ]
-
-        select = Select(
-            placeholder="Scegli achievement per vedere descrizione completa",
-            options=options,
-            custom_id="select_achievement_desc",
-            max_values=1
-        )
-
-        async def select_desc_callback(select_interaction: Interaction):
-            selected_ach = select.values[0]
-            desc = achievements[selected_ach]["descrizione"]
-            punti = achievements[selected_ach]["punti"]
-
-            embed = Embed(
-                title=f"{selected_ach} - Descrizione Completa",
-                description=f"Punti: {punti}\nDescrizione: {desc}",
-                color=color
-            )
-            await select_interaction.response.send_message(embed=embed, ephemeral=True)
-
-        select.callback = select_desc_callback
-
-        # Mando un nuovo messaggio con la select per scegliere l'achievement
-        await interaction.response.send_message("Seleziona un achievement per vedere la descrizione completa:", view=View().add_item(select), ephemeral=True)
-
+        
 # === BOT SETUP ===
 intents = discord.Intents.default()
 intents.message_content = True
@@ -600,13 +598,14 @@ async def regole_achievement(interaction: discord.Interaction):
 async def lista_achievements(interaction: Interaction):
     default_cat = list(all_achievement_lists.keys())[0]
     achievements, _, color = all_achievement_lists[default_cat]
+    desc = format_achievements_table(achievements)
 
     embed = Embed(
         title=f"Achievements - {default_cat}",
-        description=format_achievements(achievements),
+        description=desc,
         color=color
     )
-    view = AchievementDropdownView()
+    view = AchievementView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.tree.command(name="redeem_achievements", description="Completa uno o piu achievement")
