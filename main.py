@@ -349,25 +349,18 @@ class AchievementsRedeemView(View):
         )
         
 def format_achievements(achievements: dict) -> str:
-    max_descr_len = 50
-    max_title_len = 30
-    rows = []
-
-    header = f"{'Titolo'.ljust(max_title_len)} | {'Punti'.rjust(5)} | Descrizione"
-    rows.append(header)
-    rows.append("-" * len(header))
+    # Header della tabella
+    header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<50} |"
+    separator = f"|{'-'*22}|{'-'*8}|{'-'*52}|"
+    rows = [header, separator]
 
     for nome, dati in achievements.items():
-        titolo = (nome[:max_title_len] + "...") if len(nome) > max_title_len else nome
-        titolo = titolo.ljust(max_title_len)
-        punti = str(dati['punti']).rjust(5)
-        descr = dati['descrizione']
-        if len(descr) > max_descr_len:
-            descr = descr[:max_descr_len - 3] + "..."
-        rows.append(f"{titolo} | {punti} | {descr}")
-        rows.append("-" * len(header))
+        titolo = nome[:20].ljust(20)
+        punti = str(dati["punti"]).center(6)
+        descr = dati["descrizione"][:50].ljust(50)
+        rows.append(f"| {titolo} | {punti} | {descr} |")
 
-    return "```" + "\n".join(rows) + "```"
+    return "```\n" + "\n".join(rows) + "\n```"
 
 class AchievementDropdownView(View):
     def __init__(self):
@@ -388,12 +381,14 @@ class AchievementDropdownView(View):
         selected = self.select.values[0]
         achievements, one_shot, color = all_achievement_lists[selected]
 
-        embed = Embed(
-            title=f"Achievements - {selected}",
-            description=format_achievements(achievements),
-            color=color
+        # Messaggio semplice con tabella markdown (non embed)
+        tabella = format_achievements(achievements)
+
+        await interaction.response.edit_message(
+            content=f"**Achievements - {selected}**\n{tabella}",
+            embed=None,
+            view=self
         )
-        await interaction.response.edit_message(embed=embed, view=self)
 
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -560,15 +555,15 @@ async def regole_achievement(interaction: discord.Interaction):
 @bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili.")
 async def lista_achievements(interaction: Interaction):
     default_cat = list(all_achievement_lists.keys())[0]
-    achievements, _, color = all_achievement_lists[default_cat]
+    achievements, _, _ = all_achievement_lists[default_cat]
 
-    embed = Embed(
-        title=f"Achievements - {default_cat}",
-        description=format_achievements(achievements),
-        color=color
-    )
+    tabella = format_achievements(achievements)
     view = AchievementDropdownView()
-    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+    await interaction.response.send_message(
+        content=f"**Achievements - {default_cat}**\n{tabella}",
+        view=view,
+        ephemeral=True
+    )
 
 @bot.tree.command(name="redeem_achievements", description="Completa uno o piu achievement")
 async def redeem_achievements(interaction: Interaction):
