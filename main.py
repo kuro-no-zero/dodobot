@@ -348,51 +348,43 @@ class AchievementsRedeemView(View):
             ephemeral=True
         )
         
-class AchievementTableView(View):
+def format_achievements(achievements: dict) -> str:
+    rows = []
+    header = f"{'Titolo'.ljust(25)} {'Punti'.rjust(5)}   Descrizione"
+    rows.append(header)
+    rows.append("-" * 70)
+    for nome, dati in achievements.items():
+        titolo = nome[:25].ljust(25)
+        punti = str(dati['punti']).rjust(5)
+        descrizione = dati['descrizione']
+        rows.append(f"{titolo} {punti}   {descrizione}")
+    return "```" + "\n".join(rows) + "```"
+
+class AchievementDropdownView(View):
     def __init__(self):
         super().__init__(timeout=None)
-
         options = [
             SelectOption(label=nome, value=nome)
-            for nome in all_achievement_lists.keys()
+            for nome in all_achievement_lists
         ]
-
-        self.select = Select(placeholder="Seleziona categoria", options=options)
+        self.select = Select(
+            placeholder="Seleziona una categoria",
+            options=options,
+            custom_id="select_category"
+        )
         self.select.callback = self.select_callback
         self.add_item(self.select)
 
     async def select_callback(self, interaction: Interaction):
-        categoria = interaction.data["values"][0]
-        embed = crea_embed_tabella_achievements(categoria)
+        selected = self.select.values[0]
+        achievements, one_shot, color = all_achievement_lists[selected]
+
+        embed = Embed(
+            title=f"Achievements - {selected}",
+            description=format_achievements(achievements),
+            color=color
+        )
         await interaction.response.edit_message(embed=embed, view=self)
-
-# Funzione per creare un embed con una tabella ordinata
-def crea_embed_tabella_achievements(nome_categoria: str) -> Embed:
-    ach_dict, one_shot, colore = all_achievement_lists[nome_categoria]
-
-    righe = ["```"]
-    righe.append(f"{'Nome':<22} {'Punti':<6} Descrizione")
-    righe.append("-" * 60)
-
-    for nome, dati in ach_dict.items():
-        punti = str(dati["punti"])
-        descrizione = dati["descrizione"]
-        # Taglia la descrizione se troppo lunga
-        max_descr = 40
-        if len(descrizione) > max_descr:
-            descrizione = descrizione[:max_descr - 3] + "..."
-        righe.append(f"{nome:<22} {punti:<6} {descrizione}")
-    
-    righe.append("```")
-    testo = "\n".join(righe)
-
-    embed = Embed(
-        title=f"🏅 Achievements: {nome_categoria}",
-        description=testo,
-        color=colore
-    )
-    return embed
-
 
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -556,11 +548,17 @@ async def regole_achievement(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="lista_achievements", description="Visualizza gli achievements in una tabella per categoria.")
+@bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili.")
 async def lista_achievements(interaction: Interaction):
-    prima_categoria = next(iter(all_achievement_lists))
-    embed = crea_embed_tabella_achievements(prima_categoria)
-    view = AchievementTableView()
+    default_cat = list(all_achievement_lists.keys())[0]
+    achievements, _, color = all_achievement_lists[default_cat]
+
+    embed = Embed(
+        title=f"Achievements - {default_cat}",
+        description=format_achievements(achievements),
+        color=color
+    )
+    view = AchievementDropdownView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.tree.command(name="redeem_achievement", description="Completa uno o piu achievement")
