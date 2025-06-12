@@ -203,6 +203,7 @@ sent_messages = []
 sent_messages_redeem = []
 PAGE_SIZE = 25
 ITEMS_PER_PAGE = 25
+MAX_OPTIONS_PER_PAGE = 25
 
 # === FLASK: mini server web per Replit/UptimeRobot ===
 app = Flask('')
@@ -357,6 +358,9 @@ class DinoRedeemView(discord.ui.View):
             await self.update_select(interaction)
 
 def format_dino_table(dinos: dict) -> str:
+
+    dino_names = sorted(dinos.keys())
+
     header = f"| {'Nome':<20} | {'Livello':^7} | {'Punti':^6} |"
     separator = f"|{'-'*22}|{'-'*9}|{'-'*8}|"
     rows = [header, separator]
@@ -374,7 +378,7 @@ class DinoDropdownView(View):
         super().__init__(timeout=None)
         self.dinos = dinos
         self.page = page
-        self.dino_names = list(dinos.keys())
+        self.dino_names = sorted(dinos.keys())
         self.per_page = 25
 
         self.total_pages = (len(self.dino_names) - 1) // self.per_page + 1
@@ -586,17 +590,33 @@ class AchievementDropdownView(View):
     def __init__(self):
         super().__init__(timeout=None)
 
-        # Select categoria, con tutte le categorie
-        options = [SelectOption(label=nome, value=nome) for nome in all_achievement_lists]
-        self.select = Select(
+        # Tutte le categorie ordinate
+        self.all_categories = sorted(all_achievement_lists.keys())
+        self.cat_page = 0
+
+        # Per gestione achievements della categoria selezionata
+        self.current_category = None
+        self.current_achievements = None
+        self.ach_page = 0
+
+        # Select categorie (max 25 opzioni per pagina)
+        self.category_select = Select(
             placeholder="Seleziona una categoria",
-            options=options,
+            options=self.get_category_options(),
             custom_id="select_category"
         )
-        self.select.callback = self.select_callback
-        self.add_item(self.select)
+        self.category_select.callback = self.select_category_callback
+        self.add_item(self.category_select)
 
-        # Select achievement, inizialmente disabilitato ma visibile con opzione dummy
+        # Pulsanti avanti/indietro categoria
+        self.cat_prev_btn = Button(label="⬅️", style=discord.ButtonStyle.secondary, disabled=True)
+        self.cat_next_btn = Button(label="➡️", style=discord.ButtonStyle.secondary, disabled=(len(self.all_categories) <= MAX_OPTIONS_PER_PAGE))
+        self.cat_prev_btn.callback = self.cat_prev_callback
+        self.cat_next_btn.callback = self.cat_next_callback
+        self.add_item(self.cat_prev_btn)
+        self.add_item(self.cat_next_btn)
+
+        # Select achievements, disabilitato finché non si sceglie categoria
         self.achievement_select = Select(
             placeholder="Seleziona un achievement",
             options=[SelectOption(label="Nessuna categoria selezionata", value="none")],
@@ -606,7 +626,15 @@ class AchievementDropdownView(View):
         self.achievement_select.callback = self.achievement_callback
         self.add_item(self.achievement_select)
 
-        # Bottone torna alla tabella, disabilitato all'inizio
+        # Pulsanti avanti/indietro achievements
+        self.ach_prev_btn = Button(label="⬅️", style=discord.ButtonStyle.secondary, disabled=True)
+        self.ach_next_btn = Button(label="➡️", style=discord.ButtonStyle.secondary, disabled=True)
+        self.ach_prev_btn.callback = self.ach_prev_callback
+        self.ach_next_btn.callback = self.ach_next_callback
+        self.add_item(self.ach_prev_btn)
+        self.add_item(self.ach_next_btn)
+
+        # Bottone torna alla tabella achievements (disabilitato all'inizio)
         self.back_button = Button(
             label="Torna alla tabella",
             style=discord.ButtonStyle.secondary,
@@ -615,30 +643,41 @@ class AchievementDropdownView(View):
         self.back_button.callback = self.back_callback
         self.add_item(self.back_button)
 
-        self.current_category = None
-        self.current_achievements = None
+    def get_category_options(self):
+        start = self.cat_page * MAX_OPTIONS_PER_PAGE
+        end = start + MAX_OPTIONS_PER_PAGE
+        sliced = self.all_categories[start:end]
+        return [SelectOption(label=cat, value=cat) for cat in sliced]
 
-    async def select_callback(self, interaction: Interaction):
-        self.current_category = self.select.values[0]
+    def get_achievement_options(self):
+        if not self.current_achievements:
+            return []
+        achievement_names = sorted(self.current_achievements.keys())
+        start = self.ach_page * MAX_OPTIONS_PER_PAGE
+        end = start + MAX_OPTIONS_PER_PAGE
+        sliced = achievement_names[start:end]
+        return [SelectOption(label=nome, value=nome) for nome in sliced]
+
+    async def select_category_callback(self, interaction: Interaction):
+        self.current_category = self.category_select.values[0]
         achievements, _, _ = all_achievement_lists[self.current_category]
         self.current_achievements = achievements
+        self.ach_page = 0
 
-        # Format tabella markdown
-        desc = format_achievements_table(achievements, self.current_category)
-
-        # Aggiorna opzioni del select achievements con tutte le chiavi
-        new_options = [
-            SelectOption(label=nome, value=nome)
-            for nome in achievements.keys()
-        ]
+        # Aggiorna select achievements
+        new_options = self.get_achievement_options()
         self.achievement_select.options = new_options
         self.achievement_select.disabled = False
 
-        # Seleziona il primo achievement di default
-        if new_options:
-            self.achievement_select.default_values = [new_options[0].value]
+        # Aggiorna bottoni paginazione achievements
+        self.ach_prev_btn.disabled = True
+        self.ach_next_btn.disabled = len(self.current_achievements) <= MAX_OPTIONS_PER_PAGE
 
+        # Disabilita back_button finché non si seleziona un achievement
         self.back_button.disabled = True
+
+        # Mostra tabella della categoria (non dettaglio singolo)
+        desc = format_achievements_table(self.current_achievements, self.current_category)
 
         await interaction.response.edit_message(content=desc, embed=None, view=self)
 
@@ -653,16 +692,73 @@ class AchievementDropdownView(View):
         )
         embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
 
+        # Abilita il bottone per tornare alla tabella degli achievements
         self.back_button.disabled = False
 
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
+        # Torna alla tabella achievements della categoria selezionata
         desc = format_achievements_table(self.current_achievements, self.current_category)
 
         self.back_button.disabled = True
-
         await interaction.response.edit_message(content=desc, embed=None, view=self)
+
+    async def cat_prev_callback(self, interaction: Interaction):
+        if self.cat_page > 0:
+            self.cat_page -= 1
+            self.category_select.options = self.get_category_options()
+            self.cat_next_btn.disabled = False
+            self.cat_prev_btn.disabled = self.cat_page == 0
+
+            # Reset selezione categoria e achievements
+            self.current_category = None
+            self.current_achievements = None
+            self.achievement_select.options = [SelectOption(label="Nessuna categoria selezionata", value="none")]
+            self.achievement_select.disabled = True
+            self.ach_prev_btn.disabled = True
+            self.ach_next_btn.disabled = True
+            self.back_button.disabled = True
+
+            await interaction.response.edit_message(content="Seleziona una categoria:", embed=None, view=self)
+
+    async def cat_next_callback(self, interaction: Interaction):
+        max_page = (len(self.all_categories) - 1) // MAX_OPTIONS_PER_PAGE
+        if self.cat_page < max_page:
+            self.cat_page += 1
+            self.category_select.options = self.get_category_options()
+            self.cat_prev_btn.disabled = False
+            self.cat_next_btn.disabled = self.cat_page == max_page
+
+            # Reset selezione categoria e achievements
+            self.current_category = None
+            self.current_achievements = None
+            self.achievement_select.options = [SelectOption(label="Nessuna categoria selezionata", value="none")]
+            self.achievement_select.disabled = True
+            self.ach_prev_btn.disabled = True
+            self.ach_next_btn.disabled = True
+            self.back_button.disabled = True
+
+            await interaction.response.edit_message(content="Seleziona una categoria:", embed=None, view=self)
+
+    async def ach_prev_callback(self, interaction: Interaction):
+        if self.ach_page > 0:
+            self.ach_page -= 1
+            self.achievement_select.options = self.get_achievement_options()
+            self.ach_next_btn.disabled = False
+            self.ach_prev_btn.disabled = self.ach_page == 0
+            self.back_button.disabled = True
+            await interaction.response.edit_message(content="Seleziona un achievement:", embed=None, view=self)
+
+    async def ach_next_callback(self, interaction: Interaction):
+        max_page = (len(self.current_achievements) - 1) // MAX_OPTIONS_PER_PAGE
+        if self.ach_page < max_page:
+            self.ach_page += 1
+            self.achievement_select.options = self.get_achievement_options()
+            self.ach_prev_btn.disabled = False
+            self.ach_next_btn.disabled = self.ach_page == max_page
+            self.back_button.disabled = True
+            await interaction.response.edit_message(content="Seleziona un achievement:", embed=None, view=self)
         
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -833,7 +929,7 @@ async def regole_achievement(interaction: discord.Interaction):
 
 @bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili.")
 async def lista_achievements(interaction: Interaction):
-    default_cat = list(all_achievement_lists.keys())[0]
+    default_cat = sorted(all_achievement_lists.keys())[0]
     achievements, _, _ = all_achievement_lists[default_cat]
     desc = format_achievements_table(achievements, default_cat)
 
