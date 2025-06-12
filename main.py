@@ -370,11 +370,12 @@ def format_dino_table(dinos: dict) -> str:
     return "```\n" + "\n".join(rows) + "\n```"
 
 class DinoDropdownView(View):
-    def __init__(self):
+    def __init__(self, dinos):
         super().__init__(timeout=None)
+        self.dinos = dinos
         options = [
             SelectOption(label=nome, value=nome)
-            for nome in dinos.keys()
+            for nome in self.dinos.keys()
         ]
         self.select = Select(
             placeholder="Seleziona un dinosauro",
@@ -384,7 +385,11 @@ class DinoDropdownView(View):
         self.select.callback = self.select_callback
         self.add_item(self.select)
 
-        self.back_button = Button(label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True)
+        self.back_button = Button(
+            label="Torna alla tabella", 
+            style=discord.ButtonStyle.secondary, 
+            disabled=True
+        )
         self.back_button.callback = self.back_callback
         self.add_item(self.back_button)
 
@@ -392,9 +397,9 @@ class DinoDropdownView(View):
 
     async def select_callback(self, interaction: Interaction):
         self.current_dino = self.select.values[0]
-        dati = dinos[self.current_dino]
+        dati = self.dinos[self.current_dino]
 
-        embed = Embed(
+        embed = discord.Embed(
             title=self.current_dino,
             description=f"Livello: {dati['livello']}\nPunti: {dati['punti']}",
             color=0x00ff00
@@ -402,12 +407,14 @@ class DinoDropdownView(View):
         embed.set_image(url=dati["image_url"])
 
         self.back_button.disabled = False
+        self.select.disabled = True  # disabilito la select quando mostro il dettaglio
 
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
-        desc = format_dino_table(dinos)
+        desc = format_dino_table(self.dinos)
         self.back_button.disabled = True
+        self.select.disabled = False
         await interaction.response.edit_message(content=desc, embed=None, view=self)
 
 class AchievementsRedeemView(View):
@@ -716,8 +723,8 @@ async def redeem_dino(interaction: discord.Interaction):
 @bot.tree.command(name="lista_dino", description="Mostra i dinosauri disponibili.")
 async def lista_dino(interaction: Interaction):
     desc = format_dino_table(redeemable_dinos)
-    view = DinoDropdownView()
-    await interaction.response.send_message(content=desc, view=view, ephemeral=True) 
+    view = DinoDropdownView(redeemable_dinos)
+    await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
 @bot.tree.command(name="mostra_redeem", description="Mostra log redeem dinos (admin)")
 async def mostra_redeem(interaction: discord.Interaction):
