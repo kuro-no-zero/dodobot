@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from discord.ui import View, Button, Select, SelectOption
+from discord import SelectOption
+from discord.ui import View, Button, Select
 from discord import Interaction, Embed
 import os
 from flask import Flask
