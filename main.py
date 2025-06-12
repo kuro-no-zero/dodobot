@@ -5,12 +5,12 @@ from discord import SelectOption
 from discord.ui import View, Button, Select
 from discord import Interaction, Embed
 import os
-import io
 from flask import Flask
 from threading import Thread
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from discord import ButtonStyle
+import io
 
 # === Lista degli ID dei ruoli autorizzati ===
 
