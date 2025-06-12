@@ -7,6 +7,7 @@ import os
 from flask import Flask
 from threading import Thread
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
 # === Lista degli ID dei ruoli autorizzati ===
 
