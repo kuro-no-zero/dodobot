@@ -355,7 +355,7 @@ def truncate_descr(text: str) -> str:
         return text[:MAX_DESC_LENGTH - 3] + "..."
     return text.ljust(MAX_DESC_LENGTH)
 
-def format_achievements(achievements: dict) -> str:
+def format_achievements_table(achievements: dict) -> str:
     header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<50} |"
     separator = f"|{'-'*22}|{'-'*8}|{'-'*52}|"
     rows = [header, separator]
