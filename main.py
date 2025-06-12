@@ -727,7 +727,7 @@ class AchievementsRedeemView(View):
             ephemeral=True
         )
 
-def format_achievements_table(achievements: dict, categoria: str, page: int, per_page: int = 10) -> str:
+def format_achievements_table(achievements: dict, categoria: str, page: int, per_page: int = MAX_OPTIONS_PER_PAGE) -> str:
     achievement_names = sorted(achievements.keys())
     start = page * per_page
     end = start + per_page
