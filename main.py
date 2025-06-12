@@ -379,7 +379,6 @@ class AchievementDropdownView(View):
         self.select.callback = self.select_callback
         self.add_item(self.select)
 
-        # Dropdown per scegliere achievement nella categoria selezionata (inizialmente vuoto)
         self.achievement_select = Select(
             placeholder="Seleziona un achievement",
             options=[],
@@ -389,69 +388,59 @@ class AchievementDropdownView(View):
         self.achievement_select.callback = self.achievement_callback
         self.add_item(self.achievement_select)
 
-        # Bottone per tornare alla tabella principale (inizialmente disabilitato)
-        self.back_button = Button(label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True)
+        self.back_button = Button(
+            label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True
+        )
         self.back_button.callback = self.back_callback
         self.add_item(self.back_button)
 
         self.current_category = None
+        self.current_achievements = None
 
     async def select_callback(self, interaction: Interaction):
         self.current_category = self.select.values[0]
-        achievements, _, color = all_achievement_lists[self.current_category]
+        achievements, _, _ = all_achievement_lists[self.current_category]
+        self.current_achievements = achievements
 
-        # Aggiorna tabella markdown con la categoria scelta
-        desc = format_achievements(achievements)
+        # Tabella in markdown plain text
+        desc = format_achievements_table(achievements)
 
-        # Aggiorna dropdown achievement con gli achievement della categoria
+        # Aggiorna dropdown achievements
         self.achievement_select.options = [
             SelectOption(label=nome, value=nome)
             for nome in achievements.keys()
         ]
         self.achievement_select.disabled = False
 
-        # Disabilita il bottone torna alla tabella perché siamo già lì
+        # Bottone torna alla tabella disabilitato perché già lì
         self.back_button.disabled = True
 
-        embed = Embed(
-            title=f"Achievements - {self.current_category}",
-            description=desc,
-            color=color
-        )
-        await interaction.response.edit_message(embed=embed, view=self)
+        await interaction.response.edit_message(content=desc, embed=None, view=self)
 
     async def achievement_callback(self, interaction: Interaction):
         selected_ach = self.achievement_select.values[0]
-        achievements, _, color = all_achievement_lists[self.current_category]
-
-        dati = achievements[selected_ach]
+        dati = self.current_achievements[selected_ach]
 
         embed = Embed(
             title=selected_ach,
             description=dati["descrizione"],
-            color=color
+            color=0x00ff00  # metti il colore che vuoi o prendi da all_achievement_lists
         )
         embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
 
-        # Abilita il bottone per tornare alla tabella
+        # Bottone torna alla tabella abilitato
         self.back_button.disabled = False
 
-        await interaction.response.edit_message(embed=embed, view=self)
+        # Qui mandiamo embed con view e senza contenuto plain text
+        await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
-        # Torna a mostrare la tabella markdown della categoria corrente
-        achievements, _, color = all_achievement_lists[self.current_category]
-        desc = format_achievements(achievements)
+        desc = format_achievements_table(self.current_achievements)
 
-        # Disabilita il bottone perché siamo già nella tabella
         self.back_button.disabled = True
 
-        embed = Embed(
-            title=f"Achievements - {self.current_category}",
-            description=desc,
-            color=color
-        )
-        await interaction.response.edit_message(embed=embed, view=self)
+        # Torna a mostrare tabella plain text markdown, nessun embed
+        await interaction.response.edit_message(content=desc, embed=None, view=self)
         
 # === BOT SETUP ===
 intents = discord.Intents.default()
