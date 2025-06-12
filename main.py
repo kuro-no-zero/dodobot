@@ -349,15 +349,24 @@ class AchievementsRedeemView(View):
         )
         
 def format_achievements(achievements: dict) -> str:
+    max_descr_len = 50
+    max_title_len = 30
     rows = []
-    header = f"{'Titolo'.ljust(25)} {'Punti'.rjust(5)}   Descrizione"
+
+    header = f"{'Titolo'.ljust(max_title_len)} | {'Punti'.rjust(5)} | Descrizione"
     rows.append(header)
-    rows.append("-" * 70)
+    rows.append("-" * len(header))
+
     for nome, dati in achievements.items():
-        titolo = nome[:25].ljust(25)
+        titolo = (nome[:max_title_len] + "...") if len(nome) > max_title_len else nome
+        titolo = titolo.ljust(max_title_len)
         punti = str(dati['punti']).rjust(5)
-        descrizione = dati['descrizione']
-        rows.append(f"{titolo} {punti}   {descrizione}")
+        descr = dati['descrizione']
+        if len(descr) > max_descr_len:
+            descr = descr[:max_descr_len - 3] + "..."
+        rows.append(f"{titolo} | {punti} | {descr}")
+        rows.append("-" * len(header))
+
     return "```" + "\n".join(rows) + "```"
 
 class AchievementDropdownView(View):
