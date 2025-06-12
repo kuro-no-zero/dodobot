@@ -87,6 +87,9 @@ def run_web():
 Thread(target=run_web).start()
 
 # === VARIABILI AMBIENTE ===
+
+load_dotenv()
+
 TOKEN = os.getenv("TOKEN")         # Token bot Discord
 MONGO_URI = os.getenv("MONGO_URI") # URI MongoDB Atlas
 print("MONGO_URI:", MONGO_URI)
