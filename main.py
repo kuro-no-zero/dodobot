@@ -642,12 +642,18 @@ class AchievementsRedeemView(View):
             ephemeral=True
         )
 
-def format_achievements_table(achievements: dict, categoria: str) -> str:
+def format_achievements_page(achievements: dict, categoria: str, page: int, per_page: int = 10) -> str:
+    achievement_names = sorted(achievements.keys())
+    start = page * per_page
+    end = start + per_page
+    paged_names = achievement_names[start:end]
+
     header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<50} |"
     separator = f"|{'-'*22}|{'-'*8}|{'-'*52}|"
-    rows = [f"**Categoria: {categoria}**\n", header, separator]
+    rows = [f"**Categoria: {categoria} (pagina {page+1})**\n", header, separator]
 
-    for nome, dati in achievements.items():
+    for nome in paged_names:
+        dati = achievements[nome]
         titolo = nome[:20].ljust(20)
         punti = str(dati["punti"]).center(6)
         desc = dati["descrizione"][:47] + "..." if len(dati["descrizione"]) > 50 else dati["descrizione"]
@@ -661,16 +667,14 @@ class AchievementDropdownView(View):
     def __init__(self):
         super().__init__(timeout=None)
 
-        # Tutte le categorie ordinate
         self.all_categories = sorted(all_achievement_lists.keys())
         self.cat_page = 0
 
-        # Per gestione achievements della categoria selezionata
         self.current_category = None
         self.current_achievements = None
         self.ach_page = 0
 
-        # Select categorie (max 25 opzioni per pagina)
+        # --- Select categoria ---
         self.category_select = Select(
             placeholder="Seleziona una categoria",
             options=self.get_category_options(),
@@ -679,7 +683,7 @@ class AchievementDropdownView(View):
         self.category_select.callback = self.select_category_callback
         self.add_item(self.category_select)
 
-        # Pulsanti avanti/indietro categoria
+        # --- Pulsanti paginazione categorie ---
         self.cat_prev_btn = Button(label="⬅️", style=discord.ButtonStyle.secondary, disabled=True)
         self.cat_next_btn = Button(label="➡️", style=discord.ButtonStyle.secondary, disabled=(len(self.all_categories) <= MAX_OPTIONS_PER_PAGE))
         self.cat_prev_btn.callback = self.cat_prev_callback
@@ -687,7 +691,7 @@ class AchievementDropdownView(View):
         self.add_item(self.cat_prev_btn)
         self.add_item(self.cat_next_btn)
 
-        # Select achievements, disabilitato finché non si sceglie categoria
+        # --- Select achievements ---
         self.achievement_select = Select(
             placeholder="Seleziona un achievement",
             options=[SelectOption(label="Nessuna categoria selezionata", value="none")],
@@ -697,7 +701,7 @@ class AchievementDropdownView(View):
         self.achievement_select.callback = self.achievement_callback
         self.add_item(self.achievement_select)
 
-        # Pulsanti avanti/indietro achievements
+        # --- Pulsanti paginazione achievements ---
         self.ach_prev_btn = Button(label="⬅️", style=discord.ButtonStyle.secondary, disabled=True)
         self.ach_next_btn = Button(label="➡️", style=discord.ButtonStyle.secondary, disabled=True)
         self.ach_prev_btn.callback = self.ach_prev_callback
@@ -705,7 +709,7 @@ class AchievementDropdownView(View):
         self.add_item(self.ach_prev_btn)
         self.add_item(self.ach_next_btn)
 
-        # Bottone torna alla tabella achievements (disabilitato all'inizio)
+        # --- Bottone torna alla tabella ---
         self.back_button = Button(
             label="Torna alla tabella",
             style=discord.ButtonStyle.secondary,
@@ -747,8 +751,8 @@ class AchievementDropdownView(View):
         # Disabilita back_button finché non si seleziona un achievement
         self.back_button.disabled = True
 
-        # Mostra tabella della categoria (non dettaglio singolo)
-        desc = format_achievements_table(self.current_achievements, self.current_category)
+        # Mostra tabella paginata della categoria (pagina 1)
+        desc = format_achievements_page(self.current_achievements, self.current_category, self.ach_page)
 
         await interaction.response.edit_message(content=desc, embed=None, view=self)
 
@@ -756,22 +760,19 @@ class AchievementDropdownView(View):
         selected_ach = self.achievement_select.values[0]
         dati = self.current_achievements[selected_ach]
 
-        embed = Embed(
+        embed = discord.Embed(
             title=selected_ach,
             description=dati["descrizione"],
             color=0x00ff00
         )
         embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
 
-        # Abilita il bottone per tornare alla tabella degli achievements
         self.back_button.disabled = False
 
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
-        # Torna alla tabella achievements della categoria selezionata
-        desc = format_achievements_table(self.current_achievements, self.current_category)
-
+        desc = format_achievements_page(self.current_achievements, self.current_category, self.ach_page)
         self.back_button.disabled = True
         await interaction.response.edit_message(content=desc, embed=None, view=self)
 
@@ -782,7 +783,7 @@ class AchievementDropdownView(View):
             self.cat_next_btn.disabled = False
             self.cat_prev_btn.disabled = self.cat_page == 0
 
-            # Reset selezione categoria e achievements
+            # Reset stato
             self.current_category = None
             self.current_achievements = None
             self.achievement_select.options = [SelectOption(label="Nessuna categoria selezionata", value="none")]
@@ -801,7 +802,7 @@ class AchievementDropdownView(View):
             self.cat_prev_btn.disabled = False
             self.cat_next_btn.disabled = self.cat_page == max_page
 
-            # Reset selezione categoria e achievements
+            # Reset stato
             self.current_category = None
             self.current_achievements = None
             self.achievement_select.options = [SelectOption(label="Nessuna categoria selezionata", value="none")]
@@ -819,7 +820,10 @@ class AchievementDropdownView(View):
             self.ach_next_btn.disabled = False
             self.ach_prev_btn.disabled = self.ach_page == 0
             self.back_button.disabled = True
-            await interaction.response.edit_message(content="Seleziona un achievement:", embed=None, view=self)
+
+            # Mostra pagina achievements aggiornata
+            desc = format_achievements_page(self.current_achievements, self.current_category, self.ach_page)
+            await interaction.response.edit_message(content=desc, embed=None, view=self)
 
     async def ach_next_callback(self, interaction: Interaction):
         max_page = (len(self.current_achievements) - 1) // MAX_OPTIONS_PER_PAGE
@@ -829,7 +833,9 @@ class AchievementDropdownView(View):
             self.ach_prev_btn.disabled = False
             self.ach_next_btn.disabled = self.ach_page == max_page
             self.back_button.disabled = True
-            await interaction.response.edit_message(content="Seleziona un achievement:", embed=None, view=self)
+
+            desc = format_achievements_page(self.current_achievements, self.current_category, self.ach_page)
+            await interaction.response.edit_message(content=desc, embed=None, view=self)
         
 # === BOT SETUP ===
 intents = discord.Intents.default()
