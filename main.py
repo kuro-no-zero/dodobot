@@ -349,10 +349,10 @@ class AchievementsRedeemView(View):
             ephemeral=True
         )
 
-def format_achievements_table(achievements: dict) -> str:
+def format_achievements_table(achievements: dict, categoria: str) -> str:
     header = f"| {'Titolo':<20} | {'Punti':^6} | {'Descrizione':<50} |"
     separator = f"|{'-'*22}|{'-'*8}|{'-'*52}|"
-    rows = [header, separator]
+    rows = [f"**Categoria: {categoria}**\n", header, separator]
 
     for nome, dati in achievements.items():
         titolo = nome[:20].ljust(20)
@@ -406,7 +406,7 @@ class AchievementDropdownView(View):
         self.current_achievements = achievements
 
         # Format tabella markdown
-        desc = format_achievements_table(achievements)
+        desc = format_achievements_table(achievements, self.current_category)
 
         # Aggiorna opzioni del select achievements con tutte le chiavi
         new_options = [
@@ -612,7 +612,7 @@ async def regole_achievement(interaction: discord.Interaction):
 async def lista_achievements(interaction: Interaction):
     default_cat = list(all_achievement_lists.keys())[0]
     achievements, _, _ = all_achievement_lists[default_cat]
-    desc = format_achievements_table(achievements)
+    desc = format_achievements_table(achievements, default_cat)
 
     view = AchievementDropdownView()
     await interaction.response.send_message(content=desc, view=view, ephemeral=True)
