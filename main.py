@@ -555,8 +555,8 @@ async def regole_achievement(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="achievements", description="Visualizza gli achievements in una tabella per categoria.")
-async def achievements(interaction: Interaction):
+@bot.tree.command(name="lista_achievements", description="Visualizza gli achievements in una tabella per categoria.")
+async def lista_achievements(interaction: Interaction):
     prima_categoria = next(iter(all_achievement_lists))
     embed = crea_embed_tabella_achievements(prima_categoria)
     view = AchievementTableView()
