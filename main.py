@@ -226,7 +226,7 @@ class DinoRedeemView(discord.ui.View):
             self.page += 1
             await self.update_select(interaction)
 
-class AchievementsMenuView(View):
+class AchievementsRedeemView(View):
     def __init__(self):
         super().__init__(timeout=None)
         self.list_names = list(all_achievement_lists.keys())
@@ -346,8 +346,6 @@ class AchievementsMenuView(View):
             f"Hai completato l'achievement **{self.selected_ach_name}** e guadagnato {dati['punti']} punti! 🎉",
             ephemeral=True
         )
-
-
         
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -367,7 +365,7 @@ async def punti(interaction: discord.Interaction, membro: discord.Member = None)
     punti = get_punti(membro.id)
     await interaction.response.send_message(f"{membro.display_name} ha {punti} punti.")
 
-@bot.tree.command(name="aggiungi", description="Aggiungi punti a un utente")
+@bot.tree.command(name="aggiungi", description="Aggiungi punti a un utente (admin)")
 @app_commands.describe(membro="L'utente a cui aggiungere punti", quantita="Numero di punti da aggiungere")
 async def aggiungi(interaction: discord.Interaction, membro: discord.Member, quantita: int):
     if not is_authorized(interaction):
@@ -377,7 +375,7 @@ async def aggiungi(interaction: discord.Interaction, membro: discord.Member, qua
     set_punti(membro.id, attuali + quantita)
     await interaction.response.send_message(f"{quantita} punti aggiunti a {membro.display_name}.")
 
-@bot.tree.command(name="togli", description="Togli punti a un utente")
+@bot.tree.command(name="togli", description="Togli punti a un utente (admin)")
 @app_commands.describe(membro="L'utente a cui togliere punti", quantita="Numero di punti da togliere")
 async def togli(interaction: discord.Interaction, membro: discord.Member, quantita: int):
     if not is_authorized(interaction):
@@ -411,9 +409,9 @@ async def classifica(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="rimuovi", description="Rimuove un utente dalla classifica")
+@bot.tree.command(name="clear_points", description="Rimuove un utente dal conteggio punti (admin)")
 @app_commands.describe(membro="L'utente da rimuovere")
-async def rimuovi(interaction: discord.Interaction, membro: discord.Member):
+async def clear_points(interaction: discord.Interaction, membro: discord.Member):
     # Verifica se l'utente ha i permessi di amministratore
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
@@ -428,14 +426,14 @@ async def rimuovi(interaction: discord.Interaction, membro: discord.Member):
         await interaction.response.send_message(f"{membro.display_name} non era presente nella classifica.")
 
     # Comando per far scegliere il dinosauro
-@bot.tree.command(name="lista_redeem")
-async def lista_redeem(interaction: discord.Interaction):
+@bot.tree.command(name="redeem_dino")
+async def redeem_dino(interaction: discord.Interaction):
     user_id = interaction.user.id
     view = DinoRedeemView(user_id, redeemable_dinos)
-    await interaction.response.send_message("Scegli il dinosauro da redeemare:", view=view, ephemeral=True)
+    await interaction.response.send_message("Scegli il dino da redeemare:", view=view, ephemeral=True)
     
 
-@bot.tree.command(name="mostra_redeem", description="Mostra log redeem dinosauri (solo admin)")
+@bot.tree.command(name="mostra_redeem", description="Mostra log redeem dinos (admin)")
 async def mostra_redeem(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
@@ -511,31 +509,38 @@ async def regole_achievement(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="lista_achievements_infiniti", description="Mostra gli achievement infiniti")
-async def lista_achievements_infiniti(interaction: discord.Interaction):
-    await interaction.response.defer(thinking=True, ephemeral=True)
-    for nome, dati in sorted(achievements_infiniti.items()):
-        embed = discord.Embed(title=nome, color=discord.Color.blue())
-        embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
-        embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
-        view = InfiniteAchievementView(nome, dati["punti"], dati["descrizione"], False)
-        msg = await interaction.followup.send(embed=embed, view=view)
-        sent_messages.append(msg)
+@bot.tree.command(name="lista_achievements", description="Mostra tutti gli achievement divisi per categoria")
+async def lista_achievements(interaction: discord.Interaction):
+    embed = Embed(title="🏆 Elenco Achievement", color=discord.Color.gold())
+    
+    for categoria, (ach_dict, _, _) in all_achievement_lists.items():
+        if not ach_dict:
+            continue
+        
+        # Prepara righe come tabella monospazio
+        righe = ["```", f"{'Nome':<20} {'Punti':<6} Descrizione", "-"*50]
+        for nome, dati in ach_dict.items():
+            punti = str(dati["punti"])
+            descrizione = dati["descrizione"]
+            # Taglia la descrizione se troppo lunga
+            max_descr_len = 50
+            if len(descrizione) > max_descr_len:
+                descrizione = descrizione[:max_descr_len - 3] + "..."
+            righe.append(f"{nome:<20} {punti:<6} {descrizione}")
+        righe.append("```")
+        
+        testo = "\n".join(righe)
+        # Discord impone un limite di 1024 caratteri per campo, tronca se troppo lungo
+        if len(testo) > 1024:
+            testo = testo[:1017] + "...\n```"
 
-@bot.tree.command(name="lista_achievements_oneshot", description="Mostra gli achievement one-shot")
-async def lista_achievements_oneshot(interaction: discord.Interaction):
-    await interaction.response.defer(thinking=True, ephemeral=True)
-    for nome, dati in sorted(achievements_oneshot.items()):
-        embed = discord.Embed(title=nome, color=discord.Color.green())
-        embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
-        embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
-        view = OneShotAchievementView(nome, dati["punti"], dati["descrizione"], True)
-        msg = await interaction.followup.send(embed=embed, view=view)
-        sent_messages.append(msg)
+        embed.add_field(name=f"📂 {categoria}", value=testo, inline=False)
 
-@bot.tree.command(name="lista_achievement", description="Naviga tra le liste e achievement")
-async def lista_achievement(interaction: Interaction):
-    view = AchievementsMenuView()
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.tree.command(name="redeem_achievement", description="Completa uno o piu achievement")
+async def redeem_achievement(interaction: Interaction):
+    view = AchievementsRedeemView()
     # Embed iniziale della prima lista e primo achievement
     ach_dict, one_shot, color = all_achievement_lists[view.selected_list_name]
     first_ach_name = sorted(ach_dict.keys())[0] if ach_dict else None
