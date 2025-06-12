@@ -715,7 +715,7 @@ async def redeem_dino(interaction: discord.Interaction):
 
 @bot.tree.command(name="lista_dino", description="Mostra i dinosauri disponibili.")
 async def lista_dino(interaction: Interaction):
-    desc = format_dino_table(dinos)
+    desc = format_dino_table(redeemable_dinos)
     view = DinoDropdownView()
     await interaction.response.send_message(content=desc, view=view, ephemeral=True) 
 
