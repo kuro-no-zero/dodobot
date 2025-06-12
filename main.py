@@ -440,7 +440,7 @@ class AchievementDropdownView(View):
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
-        desc = format_achievements_table(self.current_achievements)
+        desc = format_achievements_table(self.current_achievements, self.current_category)
 
         self.back_button.disabled = True
 
