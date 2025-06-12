@@ -347,6 +347,52 @@ class AchievementsRedeemView(View):
             ephemeral=True
         )
         
+class AchievementTableView(View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+        options = [
+            SelectOption(label=nome, value=nome)
+            for nome in all_achievement_lists.keys()
+        ]
+
+        self.select = Select(placeholder="Seleziona categoria", options=options)
+        self.select.callback = self.select_callback
+        self.add_item(self.select)
+
+    async def select_callback(self, interaction: Interaction):
+        categoria = interaction.data["values"][0]
+        embed = crea_embed_tabella_achievements(categoria)
+        await interaction.response.edit_message(embed=embed, view=self)
+
+# Funzione per creare un embed con una tabella ordinata
+def crea_embed_tabella_achievements(nome_categoria: str) -> Embed:
+    ach_dict, one_shot, colore = all_achievement_lists[nome_categoria]
+
+    righe = ["```"]
+    righe.append(f"{'Nome':<22} {'Punti':<6} Descrizione")
+    righe.append("-" * 60)
+
+    for nome, dati in ach_dict.items():
+        punti = str(dati["punti"])
+        descrizione = dati["descrizione"]
+        # Taglia la descrizione se troppo lunga
+        max_descr = 40
+        if len(descrizione) > max_descr:
+            descrizione = descrizione[:max_descr - 3] + "..."
+        righe.append(f"{nome:<22} {punti:<6} {descrizione}")
+    
+    righe.append("```")
+    testo = "\n".join(righe)
+
+    embed = Embed(
+        title=f"🏅 Achievements: {nome_categoria}",
+        description=testo,
+        color=colore
+    )
+    return embed
+
+
 # === BOT SETUP ===
 intents = discord.Intents.default()
 intents.message_content = True
@@ -509,34 +555,12 @@ async def regole_achievement(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="lista_achievements", description="Mostra tutti gli achievement divisi per categoria")
-async def lista_achievements(interaction: discord.Interaction):
-    embed = Embed(title="🏆 Elenco Achievement", color=discord.Color.gold())
-    
-    for categoria, (ach_dict, _, _) in all_achievement_lists.items():
-        if not ach_dict:
-            continue
-        
-        # Prepara righe come tabella monospazio
-        righe = ["```", f"{'Nome':<20} {'Punti':<6} Descrizione", "-"*50]
-        for nome, dati in ach_dict.items():
-            punti = str(dati["punti"])
-            descrizione = dati["descrizione"]
-            # Taglia la descrizione se troppo lunga
-            max_descr_len = 50
-            if len(descrizione) > max_descr_len:
-                descrizione = descrizione[:max_descr_len - 3] + "..."
-            righe.append(f"{nome:<20} {punti:<6} {descrizione}")
-        righe.append("```")
-        
-        testo = "\n".join(righe)
-        # Discord impone un limite di 1024 caratteri per campo, tronca se troppo lungo
-        if len(testo) > 1024:
-            testo = testo[:1017] + "...\n```"
-
-        embed.add_field(name=f"📂 {categoria}", value=testo, inline=False)
-
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+@bot.tree.command(name="achievements", description="Visualizza gli achievements in una tabella per categoria.")
+async def achievements(interaction: Interaction):
+    prima_categoria = next(iter(all_achievement_lists))
+    embed = crea_embed_tabella_achievements(prima_categoria)
+    view = AchievementTableView()
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.tree.command(name="redeem_achievement", description="Completa uno o piu achievement")
 async def redeem_achievement(interaction: Interaction):
