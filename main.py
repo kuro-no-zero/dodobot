@@ -752,7 +752,7 @@ class AchievementDropdownView(View):
         self.back_button.disabled = True
 
         # Mostra tabella paginata della categoria (pagina 1)
-        desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page)
+        desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
 
         await interaction.response.edit_message(content=desc, embed=None, view=self)
 
@@ -772,7 +772,7 @@ class AchievementDropdownView(View):
         await interaction.response.edit_message(content=None, embed=embed, view=self)
 
     async def back_callback(self, interaction: Interaction):
-        desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page)
+        desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
         self.back_button.disabled = True
         await interaction.response.edit_message(content=desc, embed=None, view=self)
 
@@ -822,7 +822,7 @@ class AchievementDropdownView(View):
             self.back_button.disabled = True
 
             # Mostra pagina achievements aggiornata
-            desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page)
+            desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
             await interaction.response.edit_message(content=desc, embed=None, view=self)
 
     async def ach_next_callback(self, interaction: Interaction):
@@ -834,7 +834,7 @@ class AchievementDropdownView(View):
             self.ach_next_btn.disabled = self.ach_page == max_page
             self.back_button.disabled = True
 
-            desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page)
+            desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
             await interaction.response.edit_message(content=desc, embed=None, view=self)
         
 # === BOT SETUP ===
