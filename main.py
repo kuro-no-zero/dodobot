@@ -424,8 +424,8 @@ class DinoDropdownView(View):
             description=f"Livello: {dati['livello']}\nPunti: {dati['punti']}",
             color=0x00ff00
         )
-        if "image_url" in dati:
-            embed.set_image(url=dati["image_url"])
+        if "url" in dati:
+            embed.set_image(url=dati["url"])
 
         self.back_button.disabled = False
 
