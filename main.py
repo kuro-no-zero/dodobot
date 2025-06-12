@@ -1000,19 +1000,29 @@ async def regole_achievement(interaction: discord.Interaction):
 
 @bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili.")
 async def lista_achievements(interaction: Interaction):
+
+    await interaction.response.defer(thinking=True, ephemeral=True)
+
     default_cat = sorted(all_achievement_lists.keys())[0]
     achievements, _, _ = all_achievement_lists[default_cat]
     desc = format_achievements_table(achievements, default_cat)
 
     view = AchievementDropdownView()
     
-    file = discord.File(io.StringIO(desc), filename="achievements.txt")
-    await interaction.response.send_message(
-        content=f"Ecco la lista degli achievement per la categoria **{default_cat}**:",
-        file=file,
-        view=view,
-        ephemeral=True
-    )
+    if len(desc) > 2000:
+        file = discord.File(io.StringIO(desc), filename="achievements.txt")
+        await interaction.followup.send(
+            content="Troppi achievement per mostrarli nel messaggio. Ecco il file:",
+            file=file,
+            view=view,
+            ephemeral=True
+        )
+    else:
+        await interaction.followup.send(
+            content=desc,
+            view=view,
+            ephemeral=True
+        )
 
 @bot.tree.command(name="redeem_achievement", description="Completa uno o piu achievement")
 async def redeem_achievement(interaction: Interaction):
