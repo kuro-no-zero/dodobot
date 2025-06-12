@@ -367,7 +367,8 @@ def format_achievements_table(achievements: dict) -> str:
 class AchievementDropdownView(View):
     def __init__(self):
         super().__init__(timeout=None)
-        # Select categoria
+
+        # Select categoria, con tutte le categorie
         options = [SelectOption(label=nome, value=nome) for nome in all_achievement_lists]
         self.select = Select(
             placeholder="Seleziona una categoria",
@@ -377,17 +378,21 @@ class AchievementDropdownView(View):
         self.select.callback = self.select_callback
         self.add_item(self.select)
 
-        # NON aggiungiamo subito achievement_select, lo aggiungeremo dopo
+        # Select achievement, inizialmente disabilitato ma visibile con opzione dummy
         self.achievement_select = Select(
             placeholder="Seleziona un achievement",
-            options=[],
+            options=[SelectOption(label="Nessuna categoria selezionata", value="none")],
             custom_id="select_achievement",
             disabled=True
         )
         self.achievement_select.callback = self.achievement_callback
+        self.add_item(self.achievement_select)
 
+        # Bottone torna alla tabella, disabilitato all'inizio
         self.back_button = Button(
-            label="Torna alla tabella", style=discord.ButtonStyle.secondary, disabled=True
+            label="Torna alla tabella",
+            style=discord.ButtonStyle.secondary,
+            disabled=True
         )
         self.back_button.callback = self.back_callback
         self.add_item(self.back_button)
@@ -400,18 +405,20 @@ class AchievementDropdownView(View):
         achievements, _, _ = all_achievement_lists[self.current_category]
         self.current_achievements = achievements
 
+        # Format tabella markdown
         desc = format_achievements_table(achievements)
 
-        # Aggiorna opzioni achievement_select
-        self.achievement_select.options = [
+        # Aggiorna opzioni del select achievements con tutte le chiavi
+        new_options = [
             SelectOption(label=nome, value=nome)
             for nome in achievements.keys()
         ]
+        self.achievement_select.options = new_options
         self.achievement_select.disabled = False
 
-        # Se non è già in view, aggiungiamo achievement_select
-        if self.achievement_select not in self.children:
-            self.add_item(self.achievement_select)
+        # Seleziona il primo achievement di default
+        if new_options:
+            self.achievement_select.default_values = [new_options[0].value]
 
         self.back_button.disabled = True
 
