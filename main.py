@@ -561,8 +561,8 @@ async def lista_achievements(interaction: Interaction):
     view = AchievementDropdownView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-@bot.tree.command(name="redeem_achievement", description="Completa uno o piu achievement")
-async def redeem_achievement(interaction: Interaction):
+@bot.tree.command(name="redeem_achievements", description="Completa uno o piu achievement")
+async def redeem_achievements(interaction: Interaction):
     view = AchievementsRedeemView()
     # Embed iniziale della prima lista e primo achievement
     ach_dict, one_shot, color = all_achievement_lists[view.selected_list_name]
