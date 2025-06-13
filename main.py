@@ -1236,74 +1236,81 @@ async def togli(interaction: discord.Interaction, membro: discord.Member, quanti
     set_punti(membro.id, nuovi)
     await interaction.response.send_message(f"{quantita} punti rimossi da {membro.display_name}.")
 
-@bot.tree.command(name="classifica", description="Mostra la classifica dei punti individuali o delle tribe")
-@app_commands.describe(tipo="Scegli se vuoi vedere la classifica generale o quella delle tribe")
-async def classifica(interaction: discord.Interaction, tipo: Literal["generale", "tribe"] = "generale"):
-    if tipo == "generale":
-        top = punti_collection.find().sort("punti", -1).limit(10)
-        embed = discord.Embed(
-            title="🏆 Classifica Generale",
-            description="Ecco i top 10 per **punti** e **achievement** sbloccati!",
-            color=discord.Color.gold()
-        )
+@bot.tree.command(name="classifica", description="Mostra la classifica dei punti e achievement")
+@app_commands.describe(tipo="Scrivi 'tribe' per vedere la classifica delle tribù")
+async def classifica(interaction: discord.Interaction, tipo: Optional[str] = None):
+    
+    global tribe_members  # opzionale ma esplicativo
 
-        posizione = 1
-        medaglie = {1: "🥇", 2: "🥈", 3: "🥉"}
+    if tipo == "tribe":
 
-        for doc in top:
-            user_id = str(doc["_id"])
-            punti = doc.get("punti", 0)
-            n_achievements = achievements_collection.count_documents({"user_id": user_id})
+        # Prepara contatori
+        tribe_counts = {tribe: 0 for tribe in tribe_members}
 
-            int_user_id = int(user_id)
-            membro = interaction.guild.get_member(int_user_id)
-            if membro:
-                nome = membro.display_name
-            else:
-                try:
-                    user = await bot.fetch_user(int_user_id)
-                    nome = user.name
-                except:
-                    nome = f"Utente ID {user_id}"
+        # Conta achievement per ciascun membro e assegna alla tribe
+        for tribe, members in tribe_members.items():
+            for user_id in members:
+                count = achievements_collection.count_documents({"user_id": str(user_id)})
+                tribe_counts[tribe] += count
 
-            medaglia = medaglie.get(posizione, f"#{posizione}")
-            embed.add_field(
-                name=f"{medaglia} {nome}",
-                value=f"✨ **{punti}** punti\n🎯 **{n_achievements}** achievement completati",
-                inline=False
-            )
-            posizione += 1
+        # Ordina le tribe per numero di achievement
+        sorted_tribes = sorted(tribe_counts.items(), key=lambda x: x[1], reverse=True)
 
-    elif tipo == "tribe":
-        # Ottieni tutti gli achievement che hanno un campo 'tribe'
-        pipeline = [
-            {"$match": {"tribe": {"$exists": True}}},
-            {"$group": {"_id": "$tribe", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}},
-            {"$limit": 10}
-        ]
-        top_tribe = list(achievements_collection.aggregate(pipeline))
-
+        # Crea embed
         embed = discord.Embed(
             title="🏕️ Classifica Tribe",
             description="Le tribe con più achievement completati!",
-            color=discord.Color.dark_green()
+            color=discord.Color.green()
         )
 
-        posizione = 1
-        medaglie = {1: "👑", 2: "💠", 3: "⚜️"}
+        medaglie = {0: "🥇", 1: "🥈", 2: "🥉"}
 
-        for entry in top_tribe:
-            tribe_name = entry["_id"]
-            count = entry["count"]
-
-            medaglia = medaglie.get(posizione, f"#{posizione}")
+        for i, (tribe, count) in enumerate(sorted_tribes):
+            medaglia = medaglie.get(i, f"#{i+1}")
             embed.add_field(
-                name=f"{medaglia} {tribe_name}",
-                value=f"🎯 **{count}** achievement completati",
+                name=f"{medaglia} {tribe}",
+                value=f"🎯 **{count}** achievement totali",
                 inline=False
             )
-            posizione += 1
+
+        await interaction.response.send_message(embed=embed)
+        return
+
+    # CLASSIFICA GENERALE
+    top = punti_collection.find().sort("punti", -1).limit(10)
+    embed = discord.Embed(
+        title="🏆 Classifica Generale",
+        description="Ecco i top 10 per **punti** e **achievement** sbloccati!",
+        color=discord.Color.gold()
+    )
+
+    posizione = 1
+    medaglie = {1: "🥇", 2: "🥈", 3: "🥉"}
+
+    for doc in top:
+        user_id = str(doc["_id"])
+        punti = doc.get("punti", 0)
+
+        n_achievements = achievements_collection.count_documents({"user_id": user_id})
+
+        int_user_id = int(user_id)
+        membro = interaction.guild.get_member(int_user_id)
+        if membro:
+            nome = membro.display_name
+        else:
+            try:
+                user = await bot.fetch_user(int_user_id)
+                nome = user.name
+            except:
+                nome = f"Utente ID {user_id}"
+
+        medaglia = medaglie.get(posizione, f"#{posizione}")
+        embed.add_field(
+            name=f"{medaglia} {nome}",
+            value=f"✨ **{punti}** punti\n🎯 **{n_achievements}** achievement completati",
+            inline=False
+        )
+        posizione += 1
 
     await interaction.response.send_message(embed=embed)
 
