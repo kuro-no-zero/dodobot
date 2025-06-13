@@ -1406,7 +1406,8 @@ async def clear_achievement_history(interaction: discord.Interaction):
         await interaction.response.send_message("Nessun achievement da eliminare.", ephemeral=True)
 
 @bot.tree.command(name="dodo", description="Mostra la lista dei comandi disponibili")
-async def dodo(interaction: discord.Interaction):
+@app_commands.describe(visibilita="Scrivi 'public' per renderlo visibile a tutti, altrimenti sarà privato.")
+async def dodo(interaction: discord.Interaction, visibilita: str = None):
     embed = Embed(
         title="📜 Lista Comandi Disponibili",
         description="Ecco un riepilogo di tutti i comandi disponibili con una breve descrizione.",
@@ -1452,7 +1453,11 @@ async def dodo(interaction: discord.Interaction):
     embed.add_field(name="/undo", value="↩️ Annulla una o piu azioni (entries) fra le ultime 10 di un utente (ADMIN)", inline=False)
 
     embed.set_footer(text="Per ulteriori dettagli, chiedi a kurous")
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    # Controlla la visibilità
+    if visibilita and visibilita.lower() == "public":
+        await interaction.response.send_message(embed=embed, ephemeral=False)
+    else:
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
 @app_commands.describe(membro="Utente a cui rimuovere gli achievement", numero="Numero di achievement da eliminare")
