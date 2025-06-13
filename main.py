@@ -1324,16 +1324,19 @@ class DuelResolutionView(discord.ui.View):
         if not self.duel_select.values:
             await interaction.response.defer()
             return
+
         selected_index = int(self.duel_select.values[0])
         selected_duel = self.duels[selected_index]
 
-        # Aggiorno il result_select con i nomi dei giocatori + annulla
+        # Salva il duello selezionato per usarlo nel metodo confirm
+        self.selected_duel = selected_duel
+
+        # Aggiorna le opzioni del menu per scegliere il vincitore
         self.result_select.options = [
             discord.SelectOption(label=selected_duel["challenger_name"], value="challenger"),
             discord.SelectOption(label=selected_duel["opponent_name"], value="opponent"),
             discord.SelectOption(label="❌ Duello annullato", value="cancel")
         ]
-        #self.result_select.values = []  # reset selezione precedente
 
         await interaction.response.edit_message(
             content=f"Duello selezionato: {selected_duel['challenger_name']} vs {selected_duel['opponent_name']}\nSeleziona il vincitore:",
@@ -1361,36 +1364,38 @@ class DuelResolutionView(discord.ui.View):
         if not self.duel_select.values or not self.result_select.values:
             return await interaction.response.send_message("⚠️ Devi selezionare un duello e un risultato.", ephemeral=True)
 
-        selected_index = int(self.duel_select.values[0])
-        selected_duel = self.duels[selected_index]
+        selected_duel = getattr(self, "selected_duel", None)
         winner = self.result_select.values[0]
 
+        if not selected_duel:
+            return await interaction.response.send_message("⚠️ Nessun duello selezionato.", ephemeral=True)
+
+        # Se il duello è stato annullato
         if winner == "cancel":
             duels_collection.delete_one({"_id": selected_duel["_id"]})
 
-        try:
-            channel = self.bot.get_channel(int(selected_duel["channel_id"]))
-            if channel:
-                event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
-                if event:
-                    await event.delete()
-        except Exception as e:
-            print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
+            try:
+                channel = self.bot.get_channel(int(selected_duel["channel_id"]))
+                if channel:
+                    event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
+                    if event:
+                        await event.delete()
+            except Exception as e:
+                print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
 
-            await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
-            return
+            return await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
 
+        # Determina la categoria e dimensione
         category = selected_duel["type"].lower()
+        size = selected_duel["category"].capitalize()
+
         category_map = {"land": 0, "flyers": 1, "aquatic": 2}
         index = category_map.get(category)
 
-        if index is None:
-            return await interaction.response.send_message(f"⚠️ Categoria non valida: `{selected_duel['type']}`", ephemeral=True)
+        if index is None or size not in ["Small", "Medium", "Big", "Mega"]:
+            return await interaction.response.send_message("⚠️ Categoria o dimensione del duello non valida.", ephemeral=True)
 
-        size = selected_duel["category"].capitalize()
-        if size not in ["Small", "Medium", "Big", "Mega"]:
-            return await interaction.response.send_message(f"⚠️ Dimensione non valida: `{selected_duel['category']}`", ephemeral=True)
-
+        # Tabelle punteggio
         win_points = {
             "Small": [50, 60, 70],
             "Medium": [80, 90, 100],
@@ -1407,15 +1412,20 @@ class DuelResolutionView(discord.ui.View):
         punti_win = win_points[size][index]
         punti_loss = loss_points[size][index]
 
+        # Assegna i punti
         if winner == "challenger":
             set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_win)
             set_punti(selected_duel["opponent_id"], get_punti(selected_duel["opponent_id"]) + punti_loss)
-        else:
+        elif winner == "opponent":
             set_punti(selected_duel["opponent_id"], get_punti(selected_duel["opponent_id"]) + punti_win)
             set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_loss)
+        else:
+            return await interaction.response.send_message("⚠️ Selezione vincitore non valida.", ephemeral=True)
 
+        # Rimuovi il duello dal DB
         duels_collection.delete_one({"_id": selected_duel["_id"]})
 
+        # Elimina l'evento Discord (se ancora esiste)
         try:
             channel = self.bot.get_channel(int(selected_duel["channel_id"]))
             if channel:
