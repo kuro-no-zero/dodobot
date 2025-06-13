@@ -1386,7 +1386,33 @@ class DuelResolutionView(discord.ui.View):
 
             return await interaction.followup.send("❌ Duello annullato con successo.", ephemeral=True)
 
-        # calcolo punti...
+        # --- Qui calcolo punti ---
+
+        # Assumendo che 'type' sia la categoria e 'category' la dimensione
+        category = selected_duel["type"].lower()    # "land", "flyers", "acquatic"
+        size = selected_duel["category"].capitalize()  # "Small", "Medium", "Big", "Mega"
+
+        category_map = {"land": 0, "flyers": 1, "acquatic": 2}
+        index = category_map.get(category)
+
+        if index is None or size not in ["Small", "Medium", "Big", "Mega"]:
+            return await interaction.followup.send("⚠️ Categoria o dimensione del duello non valida.", ephemeral=True)
+
+        win_points = {
+            "Small": [50, 60, 70],
+            "Medium": [80, 90, 100],
+            "Big": [120, 130, 140],
+            "Mega": [200, 0, 0]
+        }
+        loss_points = {
+            "Small": [40, 50, 60],
+            "Medium": [70, 80, 90],
+            "Big": [100, 110, 120],
+            "Mega": [150, 0, 0]
+        }
+
+        punti_win = win_points[size][index]
+        punti_loss = loss_points[size][index]
 
         # assegna punti
         if winner == "challenger":
