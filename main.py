@@ -1263,9 +1263,10 @@ class DuelResolutionView(discord.ui.View):
         self.duels = duels
         self.user_id = user_id
         self.page = 0
+
         self.duel_select = discord.ui.Select(placeholder="Scegli un duello da risolvere", min_values=1, max_values=1, options=[])
         self.add_item(self.duel_select)
-        self.build_duel_options()
+        #qua era prima
 
         self.result_select = discord.ui.Select(
             placeholder="Seleziona il vincitore",
@@ -1285,6 +1286,8 @@ class DuelResolutionView(discord.ui.View):
         self.next_button = ui.Button(label="➡️", style=discord.ButtonStyle.secondary)
         self.next_button.callback = self.next_page
         self.add_item(self.next_button)
+
+        self.build_duel_options()
 
     def build_duel_options(self):
         self.duel_select.options.clear()
