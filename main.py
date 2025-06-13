@@ -365,6 +365,7 @@ sent_messages_redeem = []
 PAGE_SIZE = 25
 ITEMS_PER_PAGE = 25
 MAX_OPTIONS_PER_PAGE = 15
+MAX_DESCRIPTION_LENGTH = 4000
 
 # === FLASK: mini server web per Replit/UptimeRobot ===
 app = Flask('')
@@ -1498,8 +1499,12 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         await interaction.followup.send(error, ephemeral=True)
         return
 
+    # Troncamento per non superare il limite Discord
+    if len(descrizione) > MAX_DESCRIPTION_LENGTH:
+        descrizione = descrizione[:MAX_DESCRIPTION_LENGTH].rsplit('\n', 1)[0] + "\n…"
+
     embed = discord.Embed(
-        title=f"{nome.title()} - Ruoli (Utility → Roles)",
+        title=f"{nome.title()} - Descrizione base",
         url=url,
         color=discord.Color.green()
     )
