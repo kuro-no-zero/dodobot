@@ -1092,35 +1092,32 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Cerca immagine dentro i blocchi con classi che iniziano per 'info-arkitex'
-    image_url = None
-    image_blocks = soup.find_all("div", class_=lambda x: x and x.startswith("info-arkitex"))
-    for block in image_blocks:
-        img_tag = block.find("img")
-        if img_tag:
-            src = img_tag.get("src")
-            if src:
-                if src.startswith("//"):
-                    image_url = "https:" + src
-                elif src.startswith("http"):
-                    image_url = src
-                else:
-                    image_url = "https://ark.fandom.com" + src
-            break  # Usa la prima immagine valida trovata
+    # Trova l'immagine nella tabella info a destra
+    image_tag = soup.select_one(".info-arkitex .info-module .info-unit a.image img")
+    if not image_tag:
+        image_tag = soup.find("img", class_="mw-file-element")
 
-    # Sezione Utility
+    image_url = None
+    if image_tag and image_tag.has_attr("src"):
+        image_url = image_tag["src"]
+        # Completa se manca schema
+        if image_url.startswith("//"):
+            image_url = "https:" + image_url
+        elif not image_url.startswith("http"):
+            image_url = "https://" + image_url.lstrip("/")
+
+    # Trova la sezione Utility → Roles
     utility_header = soup.find(id="Utility")
     if not utility_header:
-        return None, None, image_url, f"Sezione 'Utility' non trovata per '{nome_dino}'."
+        return None, url, image_url, f"Sezione 'Utility' non trovata per '{nome_dino}'."
 
-    # Sezione Roles
     roles_header = utility_header.find_next("span", id="Roles")
     if not roles_header:
-        return None, None, image_url, f"Sezione 'Roles' non trovata per '{nome_dino}'."
+        return None, url, image_url, f"Sezione 'Roles' non trovata per '{nome_dino}'."
 
     roles_list = roles_header.find_parent().find_next_sibling("ul")
     if not roles_list:
-        return None, None, image_url, f"Lista 'Roles' non trovata per '{nome_dino}'."
+        return None, url, image_url, f"Lista 'Roles' non trovata per '{nome_dino}'."
 
     items = [f"• {li.get_text(strip=True)}" for li in roles_list.find_all("li")]
     descrizione = "\n".join(items)
@@ -1498,7 +1495,7 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         color=discord.Color.green()
     )
 
-    if image_url:
+    if image_url and image_url.startswith("http"):
         embed.set_thumbnail(url=image_url)
 
     await interaction.followup.send(embed=embed, ephemeral=True)
