@@ -180,11 +180,6 @@ redeemable_dinos = {
         "livello": 150, 
         "punti": 150, 
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/4/48/Genesis_3.jpg/revision/latest/scale-to-width-down/1120?cb=20190807211131"
-    },
-    "Carcharodontosaurus": {
-        "livello": 150, 
-        "punti": 400, 
-        "img": "https://arkmag.rocks/wp-content/uploads/2022/11/carchar-R0.jpg"
     }
 }
 
@@ -211,43 +206,953 @@ tribe_members = {
 
 # === Liste Achievements ===
 
-achievements_survival = {
-    "Primo Passo": {
-        "punti": 50,
-        "descrizione": "Completa il tutorial iniziale.",
+achievement_survival = {
+    "Non è granchè, ma è casa": {
+        "punti": 10,
+        "descrizione": "Costruisci una struttura chiusa con un letto all'interno",
         "ripetibile": False
     },
-    "Esploratore": {
+    "Grazie coperte": {
+        "punti": 10,
+        "descrizione": "Indossa un indumento in ogni slot armatura",
+        "ripetibile": False
+    },
+    "Età del metallo": {
+        "punti": 20,
+        "descrizione": "Ottieni il tuo primo oggetto in metallo",
+        "ripetibile": False
+    },
+    "Come sei umano per essere un ark": {
+        "punti": 10,
+        "descrizione": "Ottieni del bottino dai beacons",
+        "ripetibile": False
+    },
+    "Pollice verde": {
+        "punti": 30,
+        "descrizione": "Coltiva tutte le piante coltivabili",
+        "ripetibile": False
+    },
+    "Ape maia": {
+        "punti": 30,
+        "descrizione": "Ottieni un alveare di api amichevoli",
+        "ripetibile": False
+    },
+    "Asilo nido": {
+        "punti": 50,
+        "descrizione": "Breeda con successo un dino (no wyv eggs)",
+        "ripetibile": False
+    },
+    "Scienziato della InGen": {
+        "punti": 60,
+        "descrizione": "Breeda con successo un ibrido",
+        "ripetibile": False
+    },
+    "Questo non mi sembra normale": {
         "punti": 100,
-        "descrizione": "Visita 10 diverse aree del server.",
+        "descrizione": "Ottieni una mutazione su un dino",
+        "ripetibile": False
+    },
+    "Mutante mutato": {
+        "punti": 120,
+        "descrizione": "Ottieni una mutazione su un ibrido",
+        "ripetibile": False
+    },
+    "Modern Warfare": {
+        "punti": 20,
+        "descrizione": "Ottieni la tua prima arma da fuoco",
+        "ripetibile": False
+    },
+    "100 lingotti a barile": {
+        "punti": 30,
+        "descrizione": "Piazza la tua prima pompa petrolifera",
+        "ripetibile": False
+    },
+    "Lumiere": {
+        "punti": 30,
+        "descrizione": "Alimenta delle luci elettriche con un generatore",
+        "ripetibile": False
+    },
+    "Brute Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
         "ripetibile": True
     },
+    "Clever Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Cunning Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Devious Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Devourer Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Hunter Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Immune Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Massive Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Pack Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Skylord Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Strong Artifact": {
+        "punti": 50,
+        "descrizione": "Ottieni l'artefatto",
+        "ripetibile": True
+    },
+    "Dinopithecus King Gamma": {
+        "punti": 100,
+        "descrizione": "Sconfiggi il boss a difficoltà gamma",
+        "ripetibile": True
+    },
+    "Dinopithecus King Beta": {
+        "punti": 150,
+        "descrizione": "Sconfiggi il boss a difficoltà beta",
+        "ripetibile": True
+    },
+    "Dinopithecus King Alpha": {
+        "punti": 200,
+        "descrizione": "Sconfiggi il boss a difficoltà alpha",
+        "ripetibile": True
+    },
+    "Acro Selvaggio": {
+        "punti": 200,
+        "descrizione": "Sconfiggi il boss Acro Selvaggio",
+        "ripetibile": True
+    },
+    "Back to the future": {
+        "punti": 100,
+        "descrizione": "Costruisci il tuo primo oggetto tek",
+        "ripetibile": False
+    },
+    "Abominio Definitivo": {
+        "punti": 400,
+        "descrizione": "Sconfiggi e ottieni EelBoss",
+        "ripetibile": True
+    },
+    "Cyber Dinosauro": {
+        "punti": 400,
+        "descrizione": "Sconfiggi e ottieni il Cyber Macrocercodraco",
+        "ripetibile": True
+    }
 }
 
 achievements_combat = {
-    "Campione": {
-        "punti": 250,
-        "descrizione": "Vinci 5 partite consecutive.",
+    "Puoi usarlo come tagliaerba": {
+        "punti": 10,
+        "descrizione": "Tama il tuo primo erbivoro",
         "ripetibile": False
     },
-    "Assassino Silenzioso": {
-        "punti": 150,
-        "descrizione": "Uccidi 10 nemici senza essere visto.",
-        "ripetibile": True
+    "Ogni tanto morde": {
+        "punti": 10,
+        "descrizione": "Tama il tuo primo carnivoro",
+        "ripetibile": False
     },
+    "Blue, Charlie, Delta, Echo": {
+        "punti": 15,
+        "descrizione": "Tama un branco di almeno 4 raptor",
+        "ripetibile": False
+    },
+    "3 metri sopra il cielo": {
+        "punti": 10,
+        "descrizione": "Tama il tuo primo volatile",
+        "ripetibile": False
+    },
+    "Aquila di Manwë": {
+        "punti": 15,
+        "descrizione": "Tama un argentavis",
+        "ripetibile": False
+    },
+    "Diego": {
+        "punti": 10,
+        "descrizione": "Tama uno smilodonte",
+        "ripetibile": False
+    },
+    "Horizon Zero Dawn": {
+        "punti": 10,
+        "descrizione": "Tama un dino tek",
+        "ripetibile": False
+    },
+    "Amico inseparabile": {
+        "punti": 5,
+        "descrizione": "Tama un dino da spalla",
+        "ripetibile": False
+    },
+    "Come un vero Targaryen": {
+        "punti": 50,
+        "descrizione": "Ottieni la tua prima viverna da un uovo",
+        "ripetibile": False
+    },
+    "\"Me lo dica ancora...\" \"Ho un Tirannosaurus Rex.\"": {
+        "punti": 20,
+        "descrizione": "Tama un rex",
+        "ripetibile": False
+    },
+    "Palla da demolizione": {
+        "punti": 15,
+        "descrizione": "Tama un dedicuro",
+        "ripetibile": False
+    },
+    "Ma è una cosa aberrante!": {
+        "punti": 10,
+        "descrizione": "Tama un dino abberrante",
+        "ripetibile": False
+    },
+    "In fondo al mar": {
+        "punti": 10,
+        "descrizione": "Tama un dino acquatico",
+        "ripetibile": False
+    },
+    "A shark tale": {
+        "punti": 15,
+        "descrizione": "Tama un megalodonte",
+        "ripetibile": False
+    },
+    "Hai provato con una carcassa di squalo?": {
+        "punti": 50,
+        "descrizione": "Tama un mosasauro",
+        "ripetibile": False
+    },
+    "It's Fabulous!!": {
+        "punti": 20,
+        "descrizione": "Tama un unicorno",
+        "ripetibile": False
+    },
+    "Lucertola infernale": {
+        "punti": 50,
+        "descrizione": "Ottieni un magmasauro da un uovo",
+        "ripetibile": False
+    },
+    "Evoca il kraken": {
+        "punti": 70,
+        "descrizione": "Tama un tusoteutide",
+        "ripetibile": False
+    },
+    "\"Il pubblico vuole 'più denti'\"": {
+        "punti": 100,
+        "descrizione": "Tama un giganotosauro",
+        "ripetibile": False
+    },
+    "Non è brutalità ma sopravvivenza": {
+        "punti": 5,
+        "descrizione": "Uccidi il tuo primo dino",
+        "ripetibile": False
+    },
+    "Addio venti freddi": {
+        "punti": 30,
+        "descrizione": "Uccidi una viverna (ghiaccio)",
+        "ripetibile": False
+    },
+    "Dragon Slayer": {
+        "punti": 50,
+        "descrizione": "Uccidi una viverna per tipo (fuoco, veleno, fulmine)",
+        "ripetibile": False
+    },
+    "Aspè...davvero?": {
+        "punti": 200,
+        "descrizione": "Uccidi un titanosauro",
+        "ripetibile": False
+    },
+    "La prossima volta prova con il passo del deserto": {
+        "punti": 50,
+        "descrizione": "Uccidi un deathworm",
+        "ripetibile": False
+    },
+    "Tu si che hai le palle": {
+        "punti": 150,
+        "descrizione": "Uccidi un giganotosauro",
+        "ripetibile": False
+    },
+    "Sono io l'alpha": {
+        "punti": 30,
+        "descrizione": "Uccidi un raptor alpha",
+        "ripetibile": False
+    },
+    "Diavolo rosso": {
+        "punti": 50,
+        "descrizione": "Uccidi un carnotauro alpha",
+        "ripetibile": False
+    },
+    "Demone sovrano": {
+        "punti": 70,
+        "descrizione": "Uccidi un rex alpha",
+        "ripetibile": False
+    },
+    "Lo squalo più grosso": {
+        "punti": 50,
+        "descrizione": "Uccidi un meg alpha",
+        "ripetibile": False
+    },
+    "Mostro marino": {
+        "punti": 70,
+        "descrizione": "Uccidi un mosa alpha",
+        "ripetibile": False
+    },
+    "Leggenda degli abissi": {
+        "punti": 100,
+        "descrizione": "Uccidi un tuso alpha",
+        "ripetibile": False
+    },
+    "Ammazzadraghi leggendario": {
+        "punti": 100,
+        "descrizione": "Uccidi una viverna del fuoco alpha",
+        "ripetibile": False
+    },
+    "Ma quindi esiste davvero!": {
+        "punti": 100,
+        "descrizione": "Tama un Liopleuridon",
+        "ripetibile": False
+    },
+    "Dragon Trainer": {
+        "punti": 100,
+        "descrizione": "Ottieni una viverna per tipo (fuoco, elettro, veleno, ghiaccio)",
+        "ripetibile": False
+    },
+    "Tuta alare vivente": {
+        "punti": 10,
+        "descrizione": "Tama un sinomacrops",
+        "ripetibile": False
+    },
+    "Babbuino dispettoso": {
+        "punti": 15,
+        "descrizione": "Tama un Dinophitecus",
+        "ripetibile": False
+    },
+    "Lanciarazzi preistorico": {
+        "punti": 15,
+        "descrizione": "Tama un Amargasauro",
+        "ripetibile": False
+    },
+    "I bulletti al completo": {
+        "punti": 20,
+        "descrizione": "Ottieni un branco almeno 3 allosauri",
+        "ripetibile": False
+    },
+    "Pare le sia piaciuto il pesce": {
+        "punti": 5,
+        "descrizione": "Tama una lontra",
+        "ripetibile": False
+    },
+    "Siamo sicuri non sia malato?": {
+        "punti": 10,
+        "descrizione": "Tama un R dino",
+        "ripetibile": False
+    },
+    "Sage mode unlocked": {
+        "punti": 5,
+        "descrizione": "Tama un belzebufo",
+        "ripetibile": False
+    },
+    "Carro armato in miniatura": {
+        "punti": 15,
+        "descrizione": "Tama un ankylosauro",
+        "ripetibile": False
+    },
+    "Leone preistorico": {
+        "punti": 20,
+        "descrizione": "Tama un leone marsupiale",
+        "ripetibile": False
+    },
+    "Il WWF lo verrà a sapere": {
+        "punti": 20,
+        "descrizione": "Uccidi una balena",
+        "ripetibile": False
+    },
+    "Moby Dick sconfitta": {
+        "punti": 30,
+        "descrizione": "Uccidi una balena alpha",
+        "ripetibile": False
+    },
+    "Il cammello che non ti aspettavi": {
+        "punti": 10,
+        "descrizione": "Tama un morellatops",
+        "ripetibile": False
+    },
+    "\"Allora cosa facciamo?\" \"Non lo so, tu cosa vuoi fare?\"": {
+        "punti": 15,
+        "descrizione": "Tama uno stormo di voltures (almeno 5)",
+        "ripetibile": False
+    },
+    "Crocodile Dundee": {
+        "punti": 15,
+        "descrizione": "Tama un coccodrillo-like dino",
+        "ripetibile": False
+    },
+    "Sardegna is coming": {
+        "punti": 15,
+        "descrizione": "Tama un ovis",
+        "ripetibile": False
+    },
+    "Carne Gourmet": {
+        "punti": 5,
+        "descrizione": "Uccidi un ovis",
+        "ripetibile": False
+    },
+    "Il tank furioso": {
+        "punti": 50,
+        "descrizione": "Tama un acrocanthosauro",
+        "ripetibile": False
+    },
+    "\"Segui la corrente bwello!\"": {
+        "punti": 10,
+        "descrizione": "Tama un archelon",
+        "ripetibile": False
+    },
+    "Da qui si vede casa mia!": {
+        "punti": 15,
+        "descrizione": "Tama un brachiosauro",
+        "ripetibile": False
+    },
+    "Non mi serve l'acqua per nuotare": {
+        "punti": 10,
+        "descrizione": "Tama un concavenator",
+        "ripetibile": False
+    },
+    "Ho avuto tanta paura": {
+        "punti": 20,
+        "descrizione": "Tama un deinosuco",
+        "ripetibile": False
+    },
+    "Dunbo": {
+        "punti": 10,
+        "descrizione": "Tama un deinotherium",
+        "ripetibile": False
+    },
+    "Meglio portarlo dal dentista": {
+        "punti": 10,
+        "descrizione": "Tama un xiphactinus",
+        "ripetibile": False
+    },
+    "\"Metti la cera, togli la cera\"": {
+        "punti": 15,
+        "descrizione": "Tama un ceratosauro",
+        "ripetibile": False
+    },
+    "Jigsaw": {
+        "punti": 10,
+        "descrizione": "Tama un Helicoprion",
+        "ripetibile": False
+    },
+    "E' stato elettrizzante!": {
+        "punti": 20,
+        "descrizione": "Tama un Draconis Glaucus",
+        "ripetibile": False
+    },
+    "Dalla wiki sembrava più facile": {
+        "punti": 20,
+        "descrizione": "Tama un basilosauro",
+        "ripetibile": False
+    },
+    "Una scoperta scientifica incredibile": {
+        "punti": 10,
+        "descrizione": "Ottieni della biotossina",
+        "ripetibile": False
+    },
+    "Ritorno alla lava": {
+        "punti": 50,
+        "descrizione": "Uccidi un magmasauro",
+        "ripetibile": False
+    },
+    "Scoiattolo volante": {
+        "punti": 15,
+        "descrizione": "Tama un maewing",
+        "ripetibile": False
+    },
+    "Edward mani di forbice": {
+        "punti": 20,
+        "descrizione": "Tama un terizinosauro",
+        "ripetibile": False
+    },
+    "Come Timon e Pumba": {
+        "punti": 10,
+        "descrizione": "Tama un deodonte",
+        "ripetibile": False
+    },
+    "Edvige": {
+        "punti": 15,
+        "descrizione": "Tama un gufo delle nevi",
+        "ripetibile": False
+    },
+    "Duro come la roccia": {
+        "punti": 100,
+        "descrizione": "Tama un rock elemental",
+        "ripetibile": False
+    },
+    "La vela della paura": {
+        "punti": 20,
+        "descrizione": "Tama uno spino",
+        "ripetibile": False
+    },
+    "Il volo di Fierobecco": {
+        "punti": 30,
+        "descrizione": "Tama un grifone",
+        "ripetibile": False
+    },
+    "Come una falena verso la fiamma": {
+        "punti": 5,
+        "descrizione": "Tama una limantria",
+        "ripetibile": False
+    },
+    "Il pet di Salazar Serpeverde": {
+        "punti": 50,
+        "descrizione": "Uccidi un basilisco",
+        "ripetibile": False
+    },
+    "Non fidarti della luce": {
+        "punti": 15,
+        "descrizione": "Tama un anglefish",
+        "ripetibile": False
+    },
+    "Il ruggito del signore dei ghiacci": {
+        "punti": 30,
+        "descrizione": "Tama uno yutiranno",
+        "ripetibile": False
+    },
+    "Dottor Jekyll & Mr. Hyde": {
+        "punti": 70,
+        "descrizione": "Tama un ferox",
+        "ripetibile": False
+    },
+    "Grazie per aver volato con Ryanair": {
+        "punti": 30,
+        "descrizione": "Tama un quetzal",
+        "ripetibile": False
+    },
+    "Abbiamo trovato Nessie": {
+        "punti": 30,
+        "descrizione": "Tama un plesiosauro",
+        "ripetibile": False
+    },
+    "Ma quanto caghi?": {
+        "punti": 5,
+        "descrizione": "Tama una phioma",
+        "ripetibile": False
+    },
+    "Supersonic-Ice-Jet Beast": {
+        "punti": 50,
+        "descrizione": "Tama un managarm",
+        "ripetibile": False
+    },
+    "Il sacro appallottola merda": {
+        "punti": 5,
+        "descrizione": "Tama uno scarabeo stercorario",
+        "ripetibile": False
+    },
+    "Furia sanguigna sbloccata": {
+        "punti": 100,
+        "descrizione": "Tama un Carcha",
+        "ripetibile": False
+    },
+    "L'eroe che non sapevamo di meritare": {
+        "punti": 150,
+        "descrizione": "Uccidi un Carcha",
+        "ripetibile": False
+    },
+    "Allora esistono davvero!": {
+        "punti": 200,
+        "descrizione": "Ottieni un ibrido Rogue",
+        "ripetibile": False
+    }
 }
 
 achievements_crafting = {
-    "Fabbro": {
-        "punti": 80,
-        "descrizione": "Crea la tua prima arma.",
+    "Utensili del mestiere": {
+        "punti": 5,
+        "descrizione": "Crafta ascia e piccone in pietra",
         "ripetibile": False
     },
-    "Artigiano": {
-        "punti": 120,
-        "descrizione": "Crea 50 oggetti.",
-        "ripetibile": True
+    "Si spezza come un grissino": {
+        "punti": 5,
+        "descrizione": "Crafta una lancia",
+        "ripetibile": False
     },
+    "Come da bambini": {
+        "punti": 5,
+        "descrizione": "Crafta una fionda",
+        "ripetibile": False
+    },
+    "Acchiappacavalli, ma più grandi": {
+        "punti": 5,
+        "descrizione": "Crafta dei bola",
+        "ripetibile": False
+    },
+    "Robin Hood": {
+        "punti": 5,
+        "descrizione": "Crafta l'arco",
+        "ripetibile": False
+    },
+    "Meglio di niente": {
+        "punti": 5,
+        "descrizione": "Crafta il set armatura in fibra",
+        "ripetibile": False
+    },
+    "Camping all'aperto": {
+        "punti": 5,
+        "descrizione": "Crafta un sacco a pelo",
+        "ripetibile": False
+    },
+    "Sembra comodo": {
+        "punti": 5,
+        "descrizione": "Crafta un letto",
+        "ripetibile": False
+    },
+    "Spero non arrivi il lupo": {
+        "punti": 5,
+        "descrizione": "Crafta una casa in paglia",
+        "ripetibile": False
+    },
+    "Fa un po prurito": {
+        "punti": 15,
+        "descrizione": "Crafta il set armatura in pelle",
+        "ripetibile": False
+    },
+    "Il lupo fa fatica": {
+        "punti": 15,
+        "descrizione": "Crafta una casa in legno",
+        "ripetibile": False
+    },
+    "Il lupo si fotte": {
+        "punti": 10,
+        "descrizione": "Crafta una casa in pietra",
+        "ripetibile": False
+    },
+    "Ci puoi fare anche la pizza": {
+        "punti": 5,
+        "descrizione": "Crafta una fornace",
+        "ripetibile": False
+    },
+    "Apothecary diaries": {
+        "punti": 5,
+        "descrizione": "Crafta il mortaio e pestello",
+        "ripetibile": False
+    },
+    "Funziona davvero!": {
+        "punti": 5,
+        "descrizione": "Crafta il preserving bin",
+        "ripetibile": False
+    },
+    "Olio di gomito": {
+        "punti": 15,
+        "descrizione": "Crafta il banco da lavoro",
+        "ripetibile": False
+    },
+    "Pronti per le crociate": {
+        "punti": 20,
+        "descrizione": "Crafta il set armatura in ferro",
+        "ripetibile": False
+    },
+    "Nani e vichinghi": {
+        "punti": 5,
+        "descrizione": "Crafta ascia e piccone in ferro",
+        "ripetibile": False
+    },
+    "2 di picche": {
+        "punti": 15,
+        "descrizione": "Crafta la picca",
+        "ripetibile": False
+    },
+    "Ora si ragiona": {
+        "punti": 15,
+        "descrizione": "Crafta la balestra",
+        "ripetibile": False
+    },
+    "Meglio non sniffarlo": {
+        "punti": 5,
+        "descrizione": "Crafta il narcotico",
+        "ripetibile": False
+    },
+    "Far west": {
+        "punti": 20,
+        "descrizione": "Crafta la pistola semplice",
+        "ripetibile": False
+    },
+    "Old but gold": {
+        "punti": 20,
+        "descrizione": "Crafta il longneck rifle",
+        "ripetibile": False
+    },
+    "Servono più munizioni": {
+        "punti": 15,
+        "descrizione": "Crafta dei proiettili",
+        "ripetibile": False
+    },
+    "Con questi metti a nanna un elefante": {
+        "punti": 15,
+        "descrizione": "Crafta i dardi sedativi",
+        "ripetibile": False
+    },
+    "Nikola Tesla": {
+        "punti": 20,
+        "descrizione": "Crafta un generatore",
+        "ripetibile": False
+    },
+    "E luce fu!": {
+        "punti": 20,
+        "descrizione": "Crafta delle luci elettriche",
+        "ripetibile": False
+    },
+    "Idraulica base": {
+        "punti": 15,
+        "descrizione": "Crafta un sistema di tubature per l'acqua",
+        "ripetibile": False
+    },
+    "Fondiamo tutto!": {
+        "punti": 15,
+        "descrizione": "Crafta la fornace industriale",
+        "ripetibile": False
+    },
+    "Cuociamo tutto!": {
+        "punti": 10,
+        "descrizione": "Crafta l'industrial grill",
+        "ripetibile": False
+    },
+    "Ottima per qualche brodaglia": {
+        "punti": 5,
+        "descrizione": "Crafta la cucina da campo",
+        "ripetibile": False
+    },
+    "Ristorante stellato": {
+        "punti": 15,
+        "descrizione": "Crafta la cucina industriale",
+        "ripetibile": False
+    },
+    "Breaking Bad": {
+        "punti": 15,
+        "descrizione": "Crafta il banco chimico",
+        "ripetibile": False
+    },
+    "Maciniamo tutto! (non erba)": {
+        "punti": 15,
+        "descrizione": "Crafta il grinder",
+        "ripetibile": False
+    },
+    "Mettici i gelati": {
+        "punti": 15,
+        "descrizione": "Crafta il frigo",
+        "ripetibile": False
+    },
+    "Fa un po male all'interno coscia": {
+        "punti": 5,
+        "descrizione": "Crafta una sella",
+        "ripetibile": False
+    },
+    "Quella sotto il cuscino": {
+        "punti": 15,
+        "descrizione": "Crafta la pistola avanzata",
+        "ripetibile": False
+    },
+    "Ratatatata": {
+        "punti": 15,
+        "descrizione": "Crafta il fucile automatico",
+        "ripetibile": False
+    },
+    "Vuoi vedere una groviera?": {
+        "punti": 15,
+        "descrizione": "Crafta il fucile a pompa",
+        "ripetibile": False
+    },
+    "Trickshot": {
+        "punti": 15,
+        "descrizione": "Crafta il fucile da cecchino",
+        "ripetibile": False
+    },
+    "\"Una volta anch'io ero un avventuriero...\"": {
+        "punti": 10,
+        "descrizione": "Crafta un npc",
+        "ripetibile": False
+    },
+    "B&B": {
+        "punti": 15,
+        "descrizione": "Costruisci una casa a due piani",
+        "ripetibile": False
+    },
+    "Garden In": {
+        "punti": 10,
+        "descrizione": "Costruisci una serra (coperta in vetro)",
+        "ripetibile": False
+    },
+    "Quartiere a luci rosse": {
+        "punti": 5,
+        "descrizione": "Costruisci una zona breeding",
+        "ripetibile": False
+    },
+    "The Sims": {
+        "punti": 5,
+        "descrizione": "Arreda e decora la casa",
+        "ripetibile": False
+    },
+    "R.I.P": {
+        "punti": 5,
+        "descrizione": "Costruisci una tomba",
+        "ripetibile": False
+    },
+    "Con licenza": {
+        "punti": 5,
+        "descrizione": "Costruisci una statua di un dino",
+        "ripetibile": False
+    },
+    "Meglio fuori che dentro": {
+        "punti": 5,
+        "descrizione": "Costruisci un gabinetto",
+        "ripetibile": False
+    },
+    "A cuccia": {
+        "punti": 15,
+        "descrizione": "Costruisci una trappola per taming",
+        "ripetibile": False
+    },
+    "Meglio del fosso di Helm": {
+        "punti": 15,
+        "descrizione": "Costruisci mura attorno alla tua base (in caso di elementi naturali tappare ogni possibile ingresso via terra)",
+        "ripetibile": False
+    },
+    "Verso Narnia": {
+        "punti": 5,
+        "descrizione": "Crafta un armadio",
+        "ripetibile": False
+    },
+    "Solo cose di valore": {
+        "punti": 20,
+        "descrizione": "Crafta una chest in metallo (bunker)",
+        "ripetibile": False
+    },
+    "Skal!!": {
+        "punti": 15,
+        "descrizione": "Crafta della birra",
+        "ripetibile": False
+    },
+    "Estus": {
+        "punti": 15,
+        "descrizione": "Crafta una pozione per la salute",
+        "ripetibile": False
+    },
+    "Stimpack": {
+        "punti": 15,
+        "descrizione": "Crafta una pozione per il vigore",
+        "ripetibile": False
+    },
+    "La mia patong": {
+        "punti": 15,
+        "descrizione": "Crafta un piatto (no carne cotta)",
+        "ripetibile": False
+    },
+    "Chi sono io?": {
+        "punti": 15,
+        "descrizione": "Crafta il tonico scervellatore",
+        "ripetibile": False
+    },
+    "Autan": {
+        "punti": 5,
+        "descrizione": "Crafta il repellente",
+        "ripetibile": false
+    },
+    "Pronti alla rivolta": {
+        "punti": 20,
+        "descrizione": "Crafta il set armatura antisommossa",
+        "ripetibile": false
+    },
+    "Nemmeno questo è ingeribile": {
+        "punti": 15,
+        "descrizione": "Crafta del polimero",
+        "ripetibile": false
+    },
+    "It's Sci-Fi, really": {
+        "punti": 50,
+        "descrizione": "Crafta un generatore tek",
+        "ripetibile": false
+    },
+    "Iron Man": {
+        "punti": 100,
+        "descrizione": "Crafta il set armatura tek",
+        "ripetibile": false
+    },
+    "Trasmissione Istantanea": {
+        "punti": 100,
+        "descrizione": "Crafta il teletrasportatore",
+        "ripetibile": false
+    },
+    "Forse stona un po ma ci piace": {
+        "punti": 100,
+        "descrizione": "Costruisci una base tek",
+        "ripetibile": false
+    },
+    "Swoosh / Pew pew": {
+        "punti": 20,
+        "descrizione": "Crafta un'arma tek",
+        "ripetibile": false
+    },
+    "Barriera impenetrabile": {
+        "punti": 20,
+        "descrizione": "Crafta il tek forcefield",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 1": {
+        "punti": 10,
+        "descrizione": "Crafta un ibrido type 4",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 2": {
+        "punti": 15,
+        "descrizione": "Crafta un ibrido type 3",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 3": {
+        "punti": 20,
+        "descrizione": "Crafta un ibrido type 2",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 4": {
+        "punti": 25,
+        "descrizione": "Crafta un ibrido type 1",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 5": {
+        "punti": 30,
+        "descrizione": "Crafta un ibrido type A",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 6": {
+        "punti": 35,
+        "descrizione": "Crafta un ibrido type S",
+        "ripetibile": false
+    },
+    "Giochi a fare dio? 7": {
+        "punti": 50,
+        "descrizione": "Crafta un ibrido Operation type",
+        "ripetibile": false
+    },
+    "La guerra dei cloni": {
+        "punti": 150,
+        "descrizione": "Crafta una camera di clonazione e clona un dino",
+        "ripetibile": false
+    }
 }
 
 all_achievement_lists = {
