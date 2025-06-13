@@ -970,11 +970,13 @@ async def send_paginated_embed(interaction: Interaction, entries, title, per_pag
             self.page = 0
             self.message = None
 
-            self.back_button = Button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary)
+            # Bottone indietro
+            self.back_button = Button(label="⬅️ Indietro", style=ButtonStyle.secondary, disabled=(max_page <= 1))
             self.back_button.callback = self.go_back
             self.add_item(self.back_button)
 
-            self.next_button = Button(label="➡️ Avanti", style=discord.ButtonStyle.secondary)
+            # Bottone avanti
+            self.next_button = Button(label="➡️ Avanti", style=ButtonStyle.secondary, disabled=(max_page <= 1))
             self.next_button.callback = self.go_next
             self.add_item(self.next_button)
 
