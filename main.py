@@ -2440,16 +2440,49 @@ async def regole_1vs1(interaction: discord.Interaction):
 
 @bot.tree.command(name="regole_achievement", description="Spiega come funziona il sistema degli achievements")
 async def regole_achievement(interaction: discord.Interaction):
-
-    # Crea l'embed
     embed = discord.Embed(
-        title="Come usare il file di spreadheets",
-        description="TBA",
+        title="📜 Regole e Comandi del Sistema Achievements",
+        description="Ecco come funziona il sistema degli achievement e i comandi disponibili per gestirli.",
         color=discord.Color.green()
     )
 
-    # Invia il messaggio con l'embed
-    await interaction.response.send_message(embed=embed)
+    embed.add_field(
+        name="🎯 Come funziona",
+        value=(
+            "Gli achievement sono obiettivi che puoi completare per guadagnare punti.\n"
+            "Alcuni achievement possono essere ripetuti, altri sono unici.\n"
+            "I punti accumulati ti permettono di scalare la classifica generale o quella delle tribe."
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="📌 Comandi principali",
+        value=(
+            "`/punti [membro]` — Mostra i punti di un utente (se non specificato mostra i tuoi)\n"
+            "`/aggiungi <membro> <quantita>` — Aggiunge punti a un utente (solo ADMIN)\n"
+            "`/togli <membro> <quantita>` — Togli punti a un utente (solo ADMIN)\n"
+            "`/classifica [generale|tribe]` — Mostra la classifica punti o delle tribe\n"
+            "`/lista_achievements` — Mostra gli achievement disponibili\n"
+            "`/redeem_achievement` — Completa uno o più achievement\n"
+            "`/achievement_history` — Mostra gli achievement completati (solo ADMIN)\n"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="ℹ️ Note",
+        value=(
+            "Il sistema è pensato per motivare e premiare la partecipazione.\n"
+            "Gli admin possono gestire i punti manualmente con i comandi appositi.\n"
+            "Usa `/redeem_achievement` per completare achievement e guadagnare punti automaticamente."
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text="Sistema achievement sviluppato con ❤️ da Dodo e implementato con 🩸 da kuro")
+
+    await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili")
 async def lista_achievements(interaction: Interaction):
