@@ -2460,7 +2460,7 @@ async def duel(
     ora: str,
     categoria: Literal["Small", "Medium", "Big", "Mega"],
     tipo: Literal["Land", "Flyers", "Acquatic"]
-    ):
+):
     await interaction.response.defer()
 
     try:
@@ -2483,28 +2483,7 @@ async def duel(
         f"Sfidanti:\n- {interaction.user.mention}\n- {utente.mention}"
     )
 
-    image_url = IMAGE_MAP[categoria][tipo]
-    print(f"DEBUG: Provo a scaricare immagine da URL: {image_url}")
-
     try:
-        # Scarica immagine
-        async with aiohttp.ClientSession() as session:
-            async with session.get(image_url) as response:
-                print(f"DEBUG: Status code della risposta: {response.status}")
-                if response.status != 200:
-                    text = await response.text()
-                    print(f"DEBUG: Risposta errore: {text}")
-                    return await interaction.followup.send("❌ Errore nel recupero dell'immagine.", ephemeral=True)
-                image_bytes = await response.read()
-
-    except Exception as e:
-        print(f"DEBUG: Eccezione durante il download immagine: {e}")
-        return await interaction.followup.send(f"❌ Errore durante il download immagine: {e}", ephemeral=True)
-
-        image_b64 = base64.b64encode(image_bytes).decode('utf-8')
-        image_data = f"data:image/png;base64,{image_b64}"
-
-        # Crea evento vocale
         event = await guild.create_scheduled_event(
             name=title,
             start_time=duel_datetime,
@@ -2512,32 +2491,31 @@ async def duel(
             description=description,
             channel=arena_channel,
             entity_type=discord.EntityType.voice,
-            image=image_data  # <-- qui la stringa base64
+            # Rimuovo l'immagine per ora
         )
-
-        # Salva nel database
-        duels_collection.insert_one({
-            "guild_id": guild.id,
-            "event_id": event.id,
-            "challenger_id": interaction.user.id,
-            "challenger_name": interaction.user.display_name,
-            "opponent_id": utente.id,
-            "opponent_name": utente.display_name,
-            "category": categoria,
-            "type": tipo,
-            "datetime": duel_datetime,
-            "channel_id": arena_channel.id,
-            "status": "scheduled",
-            "created_at": datetime.utcnow()
-        })
-
-        await interaction.followup.send(
-            f"✅ Duello schedulato!\n📅 {title}\n🕒 <t:{int(duel_datetime.timestamp())}:F>\n🗓️ Evento creato nel canale vocale **Arena**.",
-            ephemeral=False
-        )
-
     except Exception as e:
-        await interaction.followup.send(f"❌ Errore durante la creazione dell'evento: {e}", ephemeral=True)
+        return await interaction.followup.send(f"❌ Errore durante la creazione dell'evento: {e}", ephemeral=True)
+
+    # Salva nel database
+    duels_collection.insert_one({
+        "guild_id": guild.id,
+        "event_id": event.id,
+        "challenger_id": interaction.user.id,
+        "challenger_name": interaction.user.display_name,
+        "opponent_id": utente.id,
+        "opponent_name": utente.display_name,
+        "category": categoria,
+        "type": tipo,
+        "datetime": duel_datetime,
+        "channel_id": arena_channel.id,
+        "status": "scheduled",
+        "created_at": datetime.utcnow()
+    })
+
+    await interaction.followup.send(
+        f"✅ Duello schedulato!\n📅 {title}\n🕒 <t:{int(duel_datetime.timestamp())}:F>\n🗓️ Evento creato nel canale vocale **Arena**.",
+        ephemeral=False
+    )
 
 @bot.tree.command(name="duel_history", description="Mostra la cronologia dei duelli schedulati (ADMIN)")
 async def duel_history(interaction: discord.Interaction):
