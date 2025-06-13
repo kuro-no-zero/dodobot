@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from discord import ButtonStyle
 import io
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
@@ -275,77 +275,77 @@ achievements_survival = {
     "Brute Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Clever Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Cunning Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Devious Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Devourer Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Hunter Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Immune Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Massive Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Pack Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Skylord Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Strong Artifact": {
         "punti": 50,
         "descrizione": "Ottieni l'artefatto",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Dinopithecus King Gamma": {
         "punti": 100,
         "descrizione": "Sconfiggi il boss a difficoltà gamma",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Dinopithecus King Beta": {
         "punti": 150,
         "descrizione": "Sconfiggi il boss a difficoltà beta",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Dinopithecus King Alpha": {
         "punti": 200,
         "descrizione": "Sconfiggi il boss a difficoltà alpha",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Acro Selvaggio": {
         "punti": 200,
         "descrizione": "Sconfiggi il boss Acro Selvaggio",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Back to the future": {
         "punti": 100,
@@ -355,12 +355,12 @@ achievements_survival = {
     "Abominio Definitivo": {
         "punti": 400,
         "descrizione": "Sconfiggi e ottieni EelBoss",
-        "ripetibile": True
+        "ripetibile": False
     },
     "Cyber Dinosauro": {
         "punti": 400,
         "descrizione": "Sconfiggi e ottieni il Cyber Macrocercodraco",
-        "ripetibile": True
+        "ripetibile": False
     }
 }
 
@@ -1161,6 +1161,30 @@ all_achievement_lists = {
     "Crafting": (achievements_crafting, 0x8a2be2),
 }
 
+IMAGE_MAP = {
+    "Small": {
+        "Land": "https://example.com/small_land.jpg",
+        "Flyers": "https://example.com/small_flyers.jpg",
+        "Acquatic": "https://example.com/small_acquatic.jpg",
+    },
+    "Medium": {
+        "Land": "https://example.com/small_land.jpg",
+        "Flyers": "https://example.com/small_flyers.jpg",
+        "Acquatic": "https://example.com/small_acquatic.jpg",
+    },
+    "Big": {
+        "Land": "https://example.com/small_land.jpg",
+        "Flyers": "https://example.com/small_flyers.jpg",
+        "Acquatic": "https://example.com/small_acquatic.jpg",
+    },
+    "Mega": {
+        "Land": "https://example.com/small_land.jpg",
+        "Flyers": "https://example.com/small_flyers.jpg",
+        "Acquatic": "https://example.com/small_acquatic.jpg",
+    }
+
+}
+
 sent_messages = []
 sent_messages_redeem = []
 PAGE_SIZE = 25
@@ -1194,6 +1218,7 @@ db = client["ark_bot_db"]              # Nome database
 punti_collection = db["punti"]         # Collezione per i punti
 redeemed_collection = db["redeemed"]   # Nuova collezione per tracciare i redeem
 achievements_collection = db["achievements"]
+duels_collection = db["duels"]
 
 # === FUNZIONI DB ===
 def get_punti(user_id):
@@ -2425,6 +2450,131 @@ async def undo(interaction: discord.Interaction, utente: discord.User, lista: Li
 
     await interaction.response.send_message(f"Scegli quale entry annullare per {utente.name} in {lista}:", view=view, ephemeral=True)
 
+@bot.tree.command(name="duel", description="Schedula un duello tra due utenti con evento")
+async def duel(
+    interaction: discord.Interaction,
+    utente: discord.User,
+    data: str,
+    ora: str,
+    categoria: Literal["Small", "Medium", "Big", "Mega"],
+    tipo: Literal["Land", "Flyers", "Acquatic"]
+    ):
+    await interaction.response.defer()
+
+    try:
+        duel_datetime = datetime.strptime(f"{data} {ora}", "%Y-%m-%d %H:%M")
+        if duel_datetime < datetime.now():
+            return await interaction.followup.send("⚠️ La data/ora deve essere nel futuro!", ephemeral=True)
+    except ValueError:
+        return await interaction.followup.send("❌ Formato non valido! Usa data `YYYY-MM-DD` e ora `HH:MM`", ephemeral=True)
+
+    guild = interaction.guild
+    arena_channel = discord.utils.get(guild.voice_channels, name="Arena")
+    if not arena_channel:
+        return await interaction.followup.send("❌ Canale vocale 'Arena' non trovato!", ephemeral=True)
+
+    title = f"Duello fra {interaction.user.display_name} e {utente.display_name}, categoria {tipo}, {categoria}"
+    description = (
+        f"⚔️ Duello imminente!\n\n"
+        f"Categoria: **{categoria}**\n"
+        f"Tipo: **{tipo}**\n"
+        f"Sfidanti:\n- {interaction.user.mention}\n- {utente.mention}"
+    )
+
+    image_url = IMAGE_MAP[categoria][tipo]
+
+    try:
+        # Scarica immagine
+        async with aiohttp.ClientSession() as session:
+            async with session.get(image_url) as response:
+                if response.status != 200:
+                    return await interaction.followup.send("❌ Errore nel recupero dell'immagine.", ephemeral=True)
+                image_bytes = await response.read()
+
+        # Crea evento vocale
+        event = await guild.create_scheduled_event(
+            name=title,
+            start_time=duel_datetime,
+            end_time=duel_datetime + timedelta(minutes=30),
+            description=description,
+            channel=arena_channel,
+            entity_type=discord.EntityType.voice,
+            image=image_bytes
+        )
+
+        # Salva nel database
+        duels_collection.insert_one({
+            "guild_id": guild.id,
+            "event_id": event.id,
+            "challenger_id": interaction.user.id,
+            "challenger_name": interaction.user.display_name,
+            "opponent_id": utente.id,
+            "opponent_name": utente.display_name,
+            "category": categoria,
+            "type": tipo,
+            "datetime": duel_datetime,
+            "channel_id": arena_channel.id,
+            "status": "scheduled",
+            "created_at": datetime.utcnow()
+        })
+
+        await interaction.followup.send(
+            f"✅ Duello schedulato!\n📅 {title}\n🕒 <t:{int(duel_datetime.timestamp())}:F>\n🗓️ Evento creato nel canale vocale **Arena**.",
+            ephemeral=False
+        )
+
+    except Exception as e:
+        await interaction.followup.send(f"❌ Errore durante la creazione dell'evento: {e}", ephemeral=True)
+
+@bot.tree.command(name="duel_history", description="Mostra la cronologia dei duelli schedulati (ADMIN)")
+async def duel_history(interaction: discord.Interaction):
+    if not is_authorized(interaction):
+        await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    docs = list(duels_collection.find().sort("datetime", -1))  # Ordine decrescente per data
+    if not docs:
+        await interaction.followup.send("Nessun duello registrato.", ephemeral=True)
+        return
+
+    entries = []
+    for doc in docs:
+        challenger = await bot.fetch_user(int(doc["challenger_id"]))
+        opponent = await bot.fetch_user(int(doc["opponent_id"]))
+        duel_time = doc["datetime"].strftime("%d/%m/%Y %H:%M")
+        status = doc.get("status", "scheduled")
+
+        entries.append(
+            f"[{duel_time}] 🥊 **{challenger.name}** vs **{opponent.name}** — {doc['type']} | {doc['category']} ({status})"
+        )
+
+    await send_paginated_embed(interaction, entries, "📋 Storico Duelli")
+    if not is_authorized(interaction):
+        await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    docs = list(duels_collection.find().sort("datetime", -1))  # Ordine decrescente per data
+    if not docs:
+        await interaction.followup.send("Nessun duello registrato.", ephemeral=True)
+        return
+
+    entries = []
+    for doc in docs:
+        challenger = await bot.fetch_user(int(doc["challenger_id"]))
+        opponent = await bot.fetch_user(int(doc["opponent_id"]))
+        duel_time = doc["datetime"].strftime("%d/%m/%Y %H:%M")
+        status = doc.get("status", "scheduled")
+
+        entries.append(
+            f"[{duel_time}] 🥊 **{challenger.name}** vs **{opponent.name}** — {doc['type']} | {doc['category']} ({status})"
+        )
+
+    await send_paginated_embed(interaction, entries, "📋 Storico Duelli")
+    
 # === AVVIO BOT ===
 @bot.event
 async def on_ready():
