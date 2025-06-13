@@ -972,7 +972,7 @@ async def punti(interaction: discord.Interaction, membro: discord.Member = None)
     punti = get_punti(membro.id)
     await interaction.response.send_message(f"{membro.display_name} ha {punti} punti.")
 
-@bot.tree.command(name="aggiungi", description="Aggiungi punti a un utente (admin)")
+@bot.tree.command(name="aggiungi", description="Aggiungi punti a un utente (ADMIN)")
 @app_commands.describe(membro="L'utente a cui aggiungere punti", quantita="Numero di punti da aggiungere")
 async def aggiungi(interaction: discord.Interaction, membro: discord.Member, quantita: int):
     if not is_authorized(interaction):
@@ -982,7 +982,7 @@ async def aggiungi(interaction: discord.Interaction, membro: discord.Member, qua
     set_punti(membro.id, attuali + quantita)
     await interaction.response.send_message(f"{quantita} punti aggiunti a {membro.display_name}.")
 
-@bot.tree.command(name="togli", description="Togli punti a un utente (admin)")
+@bot.tree.command(name="togli", description="Togli punti a un utente (ADMIN)")
 @app_commands.describe(membro="L'utente a cui togliere punti", quantita="Numero di punti da togliere")
 async def togli(interaction: discord.Interaction, membro: discord.Member, quantita: int):
     if not is_authorized(interaction):
@@ -1016,7 +1016,7 @@ async def classifica(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="clear_points", description="Rimuove un utente dal conteggio punti (admin)")
+@bot.tree.command(name="clear_points", description="Rimuove un utente dal conteggio punti (ADMIN)")
 @app_commands.describe(membro="L'utente da rimuovere")
 async def clear_points(interaction: discord.Interaction, membro: discord.Member):
     # Verifica se l'utente ha i permessi di amministratore
@@ -1033,19 +1033,19 @@ async def clear_points(interaction: discord.Interaction, membro: discord.Member)
         await interaction.response.send_message(f"{membro.display_name} non era presente nella classifica.")
 
     # Comando per far scegliere il dinosauro
-@bot.tree.command(name="redeem_dino")
+@bot.tree.command(name="redeem_dino", description="Effettivo redeem dei dino")
 async def redeem_dino(interaction: discord.Interaction):
     user_id = interaction.user.id
     view = DinoRedeemView(user_id, redeemable_dinos)
     await interaction.response.send_message("Scegli il dino da redeemare:", view=view, ephemeral=True)
 
-@bot.tree.command(name="lista_dino", description="Mostra i dinosauri disponibili.")
+@bot.tree.command(name="lista_dino", description="Mostra i dino disponibili per il redeem")
 async def lista_dino(interaction: Interaction):
     desc = format_dino_table(redeemable_dinos)
     view = DinoDropdownView(redeemable_dinos)
     await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
-@bot.tree.command(name="redeem_hisory", description="Mostra log redeem dinos (admin)")
+@bot.tree.command(name="redeem_hisory", description="Mostra log redeem dinos (ADMIN)")
 async def redeem_hisory(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
@@ -1064,7 +1064,7 @@ async def redeem_hisory(interaction: discord.Interaction):
     message = "📋 **Log Redeem:**\n" + "\n".join(lines)
     await interaction.response.send_message(message, ephemeral=True)
 
-@bot.tree.command(name="clear_redeem_history", description="Pulisce la lista dei redeem (solo admin)")
+@bot.tree.command(name="clear_redeem_history", description="Pulisce la lista dei redeem (ADMIN)")
 async def clear_redeem_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
@@ -1095,7 +1095,7 @@ async def patata(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="regole_1vs1", description="Le regole per le sfide 1vs1")
+@bot.tree.command(name="regole_1vs1", description="Mostra le regole per le sfide 1vs1/tornei")
 async def regole_1vs1(interaction: discord.Interaction):
     
     # Crea l'embed
@@ -1108,7 +1108,7 @@ async def regole_1vs1(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="regole_achievement", description="Come ottenere punti attraverso gli achievement custom")
+@bot.tree.command(name="regole_achievement", description="Spiega come funziona il sistema degli achievements")
 async def regole_achievement(interaction: discord.Interaction):
 
     # Crea l'embed
@@ -1121,7 +1121,7 @@ async def regole_achievement(interaction: discord.Interaction):
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili.")
+@bot.tree.command(name="lista_achievements", description="Mostra gli achievements disponibili")
 async def lista_achievements(interaction: Interaction):
 
     await interaction.response.defer(thinking=True, ephemeral=True)
@@ -1162,7 +1162,7 @@ async def redeem_achievement(interaction: Interaction):
 
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-@bot.tree.command(name="achievement_history", description="Mostra gli achievement completati (solo admin)")
+@bot.tree.command(name="achievement_history", description="Mostra gli achievement completati dagli utenti (ADMIN)")
 async def achievement_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
@@ -1181,7 +1181,7 @@ async def achievement_history(interaction: discord.Interaction):
     message = "📋 **Log Achievement:**\n" + "\n".join(lines)
     await interaction.response.send_message(message, ephemeral=True)
 
-@bot.tree.command(name="clear_achievement_history", description="Elimina tutti gli achievement completati (solo admin)")
+@bot.tree.command(name="clear_achievement_history", description="Pulisce la lista degli achievement completati (ADMIN)")
 async def clear_achievement_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
@@ -1229,7 +1229,7 @@ async def dodo(interaction: discord.Interaction):
     embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
 
     # Comando tecnico
-    embed.add_field(name="/sync", value="🔄 Sincronizza i comandi slash del bot.", inline=False)
+    embed.add_field(name="!sync", value="🔄 Sincronizza i comandi slash del bot.", inline=False)
 
     embed.set_footer(text="Per ulteriori dettagli, contatta lo sviluppatore o usa il comando con attenzione.")
     await interaction.response.send_message(embed=embed, ephemeral=True)
