@@ -468,7 +468,7 @@ class DinoRedeemSelect(discord.ui.Select):
 
         # Manda il messaggio pubblico nel canale dell'interazione
         await interaction.channel.send(
-            f"**{interaction.user.display_name}** ha riscattato **{chosen_dino}** per {dino_info['punti']} punti!"
+            f"**{interaction.user.mention}** ha riscattato **{chosen_dino}** per {dino_info['punti']} punti!"
         )
 
 class DinoRedeemView(discord.ui.View):
@@ -1045,8 +1045,8 @@ async def lista_dino(interaction: Interaction):
     view = DinoDropdownView(redeemable_dinos)
     await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
-@bot.tree.command(name="mostra_redeem", description="Mostra log redeem dinos (admin)")
-async def mostra_redeem(interaction: discord.Interaction):
+@bot.tree.command(name="redeem_hisory", description="Mostra log redeem dinos (admin)")
+async def redeem_hisory(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
@@ -1064,8 +1064,8 @@ async def mostra_redeem(interaction: discord.Interaction):
     message = "📋 **Log Redeem:**\n" + "\n".join(lines)
     await interaction.response.send_message(message, ephemeral=True)
 
-@bot.tree.command(name="clear_redeem", description="Pulisce la lista dei redeem (solo admin)")
-async def clear_redeem(interaction: discord.Interaction):
+@bot.tree.command(name="clear_redeem_history", description="Pulisce la lista dei redeem (solo admin)")
+async def clear_redeem_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
@@ -1162,8 +1162,8 @@ async def redeem_achievement(interaction: Interaction):
 
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-@bot.tree.command(name="achievements_history", description="Mostra gli achievement completati (solo admin)")
-async def mostra_achievements(interaction: discord.Interaction):
+@bot.tree.command(name="achievement_history", description="Mostra gli achievement completati (solo admin)")
+async def achievement_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
@@ -1181,8 +1181,8 @@ async def mostra_achievements(interaction: discord.Interaction):
     message = "📋 **Log Achievement:**\n" + "\n".join(lines)
     await interaction.response.send_message(message, ephemeral=True)
 
-@bot.tree.command(name="clear_achievements", description="Elimina tutti gli achievement completati (solo admin)")
-async def clear_achievements(interaction: discord.Interaction):
+@bot.tree.command(name="clear_achievement_history", description="Elimina tutti gli achievement completati (solo admin)")
+async def clear_achievement_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
@@ -1195,6 +1195,44 @@ async def clear_achievements(interaction: discord.Interaction):
         await interaction.response.send_message(f"✅ Eliminati **{result.deleted_count}** achievement completati.", ephemeral=True)
     else:
         await interaction.response.send_message("Nessun achievement da eliminare.", ephemeral=True)
+
+@bot.tree.command(name="dodo", description="Mostra la lista dei comandi disponibili")
+async def dodo(interaction: discord.Interaction):
+    embed = Embed(
+        title="📜 Lista Comandi Disponibili",
+        description="Ecco un riepilogo di tutti i comandi disponibili con una breve descrizione.",
+        color=0x3498db
+    )
+
+    # Comandi base e informativi
+    embed.add_field(name="/lista_achievements", value="📋 Mostra la lista degli achievement disponibili, con descrizioni e punti.", inline=False)
+    embed.add_field(name="/redeem_achievement", value="🏆 Completa uno o più achievement e guadagna punti.", inline=False)
+    embed.add_field(name="/punti", value="🔍 Mostra i punti attuali di un utente.", inline=False)
+    embed.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti degli utenti.", inline=False)
+    embed.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements di Dodo", inline=False)
+    embed.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole per le sfide 1vs1/tornei.", inline=False)
+    embed.add_field(name="/patata", value="🥔 Se ti vuoi davvero male", inline=False)
+
+    # Comandi dinosauri
+    embed.add_field(name="/lista_dino", value="🦕 Mostra i dino disponibili per il redeem.", inline=False)
+    embed.add_field(name="/redeem_dino", value="🦖 Comando per l'effettivo redeem dei dino.", inline=False)
+    embed.add_field(name="/redeem_hisory", value="🦖 Mostra il log dei redeem (ADMIN).", inline=False)
+
+    # Comandi amministrativi per achievement
+    embed.add_field(name="/achievement_history", value="📚 Mostra gli achievement completati dagli utenti (ADMIN)", inline=False)
+    embed.add_field(name="/clear_achievement_history", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
+    embed.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN).", inline=False)
+
+    # Comandi amministrativi per punti
+    embed.add_field(name="/aggiungi", value="➕ Aggiungi punti a un utente (ADMIN).", inline=False)
+    embed.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN).", inline=False)
+    embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
+
+    # Comando tecnico
+    embed.add_field(name="/sync", value="🔄 Sincronizza i comandi slash del bot.", inline=False)
+
+    embed.set_footer(text="Per ulteriori dettagli, contatta lo sviluppatore o usa il comando con attenzione.")
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 # === AVVIO BOT ===
 @bot.event
