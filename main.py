@@ -1366,6 +1366,16 @@ class DuelResolutionView(discord.ui.View):
 
         if winner == "cancel":
             duels_collection.delete_one({"_id": selected_duel["_id"]})
+
+            try:
+                channel = self.bot.get_channel(int(selected_duel["channel_id"]))
+                if channel:
+                    event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
+                    if event:
+                        await event.delete()
+            except Exception as e:
+                print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
+
             await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
             return
 
@@ -1404,6 +1414,16 @@ class DuelResolutionView(discord.ui.View):
             set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_loss)
 
         duels_collection.delete_one({"_id": selected_duel["_id"]})
+
+        try:
+            channel = self.bot.get_channel(int(selected_duel["channel_id"]))
+            if channel:
+                event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
+                if event:
+                    await event.delete()
+        except Exception as e:
+            print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
+
         await interaction.response.send_message("✅ Duello risolto con successo!", ephemeral=True)
 
 # VISTA con bottoni per ogni dinosauro
