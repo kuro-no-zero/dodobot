@@ -1129,6 +1129,9 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+def is_valid_url(url):
+    return isinstance(url, str) and url.startswith("http")
+
 # === COMANDI SLASH ===
 @bot.command()
 async def sync(ctx):
@@ -1495,8 +1498,10 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         color=discord.Color.green()
     )
 
-    if image_url and image_url.startswith("http"):
-        embed.set_thumbnail(url=image_url)
+    if not is_valid_url(image_url):
+        image_url = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
+
+    embed.set_thumbnail(url=image_url)
 
     await interaction.followup.send(embed=embed, ephemeral=True)
 
