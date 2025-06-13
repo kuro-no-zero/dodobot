@@ -10,6 +10,7 @@ from threading import Thread
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from discord import ButtonStyle
+from discord.app_commands import CommandTree
 import io
 import math
 from datetime import datetime, timedelta, timezone
@@ -1252,6 +1253,109 @@ def get_tribe_members(user_id: int) -> list[int]:
 def is_authorized(interaction: discord.Interaction) -> bool:
     """Verifica se l'utente ha uno dei ruoli autorizzati."""
     return any(role.id in AUTHORIZED_ROLE_IDS for role in interaction.user.roles)
+
+# === VIEW DUELLI ===
+
+class DuelResolutionView(ui.View):
+    def __init__(self, duels, user_id):
+        super().__init__(timeout=300)
+        self.duels = duels
+        self.user_id = user_id
+        self.page = 0
+        self.duel_select = ui.Select(placeholder="Scegli un duello da risolvere", min_values=1, max_values=1, options=[])
+        self.add_item(self.duel_select)
+        self.build_duel_options()
+
+        self.result_select = ui.Select(
+            placeholder="Seleziona il vincitore",
+            options=[],
+            custom_id="result_select"
+        )
+        self.add_item(self.result_select)
+
+        self.confirm_button = ui.Button(label="✅ Conferma", style=discord.ButtonStyle.green)
+        self.confirm_button.callback = self.confirm
+        self.add_item(self.confirm_button)
+
+        self.prev_button = ui.Button(label="⬅️", style=discord.ButtonStyle.secondary)
+        self.prev_button.callback = self.prev_page
+        self.add_item(self.prev_button)
+
+        self.next_button = ui.Button(label="➡️", style=discord.ButtonStyle.secondary)
+        self.next_button.callback = self.next_page
+        self.add_item(self.next_button)
+
+    def build_duel_options(self):
+        self.duel_select.options.clear()
+        start = self.page * 25
+        end = start + 25
+        page_duels = self.duels[start:end]
+
+        for i, duel in enumerate(page_duels):
+            label = f"{duel['challenger_name']} vs {duel['opponent_name']} - {duel['datetime'].strftime('%Y-%m-%d %H:%M')}"
+            self.duel_select.options.append(
+                SelectOption(label=label[:100], value=str(start + i))
+            )
+
+    async def interaction_check(self, interaction: Interaction) -> bool:
+        return interaction.user.id == self.user_id
+
+    async def prev_page(self, interaction: Interaction):
+        if self.page > 0:
+            self.page -= 1
+            self.build_duel_options()
+            await interaction.response.edit_message(view=self)
+
+    async def next_page(self, interaction: Interaction):
+        max_pages = math.ceil(len(self.duels) / 25)
+        if self.page < max_pages - 1:
+            self.page += 1
+            self.build_duel_options()
+            await interaction.response.edit_message(view=self)
+
+    async def confirm(self, interaction: Interaction):
+        if not self.duel_select.values or not self.result_select.values:
+            return await interaction.response.send_message("⚠️ Devi selezionare un duello e un risultato.", ephemeral=True)
+
+        selected_index = int(self.duel_select.values[0])
+        selected_duel = self.duels[selected_index]
+        winner = self.result_select.values[0]
+
+        if winner == "cancel":
+            duels_collection.delete_one({"_id": selected_duel["_id"]})
+            await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
+            return
+
+        # Calcolo punti
+        category = selected_duel["category"].capitalize()
+        size = selected_duel["type"].capitalize()
+
+        win_points = {
+            "Small": [50, 60, 70],
+            "Medium": [80, 90, 100],
+            "Big": [120, 130, 140],
+            "Mega": [200, 0, 0]
+        }
+        loss_points = {
+            "Small": [40, 50, 60],
+            "Medium": [70, 80, 90],
+            "Big": [100, 110, 120],
+            "Mega": [150, 0, 0]
+        }
+
+        index = {"Land": 0, "Flyers": 1, "Acquatic": 2}.get(category, 0)
+        punti_win = win_points[size][index]
+        punti_loss = loss_points[size][index]
+
+        if winner == "challenger":
+            set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_win)
+            set_punti(selected_duel["opponent_id"], get_punti(selected_duel["opponent_id"]) + punti_loss)
+        else:
+            set_punti(selected_duel["opponent_id"], get_punti(selected_duel["opponent_id"]) + punti_win)
+            set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_loss)
+
+        duels_collection.delete_one({"_id": selected_duel["_id"]})
+        await interaction.response.send_message("✅ Duello risolto con successo!", ephemeral=True)
 
 # VISTA con bottoni per ogni dinosauro
 class DinoRedeemSelect(discord.ui.Select):
@@ -2554,7 +2658,31 @@ async def duel_history(interaction: discord.Interaction):
         )
 
     await send_paginated_embed(interaction, entries, "📋 Storico Duelli")
-    
+
+@bot.tree.command(name="resolve_duel", description="Risolvi un duello completato")
+async def resolve_duel(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+
+    duels = list(duels_collection.find({"status": "pending"}))
+    user_id = interaction.user.id
+
+    filtered = [duel for duel in duels if duel["challenger_id"] == user_id or duel["opponent_id"] == user_id]
+
+    if not filtered:
+        return await interaction.followup.send("❌ Non ci sono duelli da risolvere in cui sei coinvolto.", ephemeral=True)
+
+    view = DuelResolutionView(filtered, user_id)
+
+    # Precompila le opzioni del result_select con il primo duello
+    first_duel = filtered[0]
+    view.result_select.options = [
+        SelectOption(label=first_duel["challenger_name"], value="challenger"),
+        SelectOption(label=first_duel["opponent_name"], value="opponent"),
+        SelectOption(label="❌ Duello annullato", value="cancel")
+    ]
+
+    await interaction.followup.send("🎯 Seleziona un duello da risolvere:", ephemeral=True, view=view)
+
 # === AVVIO BOT ===
 @bot.event
 async def on_ready():
