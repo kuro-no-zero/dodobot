@@ -206,7 +206,7 @@ tribe_members = {
 
 # === Liste Achievements ===
 
-achievement_survival = {
+achievements_survival = {
     "Non è granchè, ma è casa": {
         "punti": 10,
         "descrizione": "Costruisci una struttura chiusa con un letto all'interno",
