@@ -1391,7 +1391,7 @@ class DuelResolutionView(discord.ui.View):
 
         print(f"DEBUG - category: {category}, size: {size}")
 
-        category_map = {"land": 0, "flyers": 1, "aquatic": 2}
+        category_map = {"land": 0, "flyers": 1, "acquatic": 2}
         index = category_map.get(category)
 
         if index is None or size not in ["Small", "Medium", "Big", "Mega"]:
