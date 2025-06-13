@@ -1389,6 +1389,8 @@ class DuelResolutionView(discord.ui.View):
         category = selected_duel["type"].lower()
         size = selected_duel["category"].capitalize()
 
+        print(f"DEBUG - category: {category}, size: {size}")
+
         category_map = {"land": 0, "flyers": 1, "aquatic": 2}
         index = category_map.get(category)
 
