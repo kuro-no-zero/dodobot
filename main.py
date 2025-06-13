@@ -1238,54 +1238,37 @@ async def dodo(interaction: discord.Interaction):
     embed.set_footer(text="Per ulteriori dettagli, contatta lo sviluppatore o usa il comando con attenzione.")
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@bot.tree.command(name="dino_info", description="Mostra info dettagliate su un dinosauro da ark.fandom.com")
-@app_commands.describe(nome="Nome del dinosauro da cercare (es. Ankylosaurus)")
-async def dino_info(interaction: Interaction, nome: str):
-    await interaction.response.defer()  # Tempo per fare scraping senza timeout
+@bot.tree.command(name="dinopic", description="Mostra l'immagine del dino dalla wiki di ARK")
+@app_commands.describe(nome="Nome della creatura (es: Ankylosaurus)")
+async def dinopic(interaction: discord.Interaction, nome: str):
+    await interaction.response.defer()
 
-    url = f"https://ark.fandom.com/wiki/{nome.capitalize()}"
-    response = requests.get(url)
+    nome_formattato = quote_plus(nome.title().replace("_", " "))
+    url = f"https://ark.fandom.com/wiki/{nome_formattato}"
 
-    if response.status_code != 200:
-        await interaction.followup.send(f"Non ho trovato la pagina per '{nome}'.")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except Exception as e:
+        await interaction.followup.send(f"Errore nel recupero della pagina: {e}")
         return
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    # Proviamo a prendere la prima tabella 'wikitable' che spesso contiene le info principali
-    tabella = soup.find("table", {"class": "wikitable"})
-    if not tabella:
-        await interaction.followup.send("Non ho trovato la tabella con le informazioni.")
+    soup = BeautifulSoup(response.text, 'html.parser')
+    infobox = soup.find("aside")
+
+    if not infobox:
+        await interaction.followup.send("Impossibile trovare informazioni su questa creatura.")
         return
 
-    info = {}
-    # Cicla sulle righe per estrarre chiave e valore
-    for row in tabella.find_all("tr"):
-        th = row.find("th")
-        td = row.find("td")
-        if th and td:
-            key = th.get_text(strip=True)
-            value = td.get_text(strip=True)
-            info[key] = value
-
-    if not info:
-        await interaction.followup.send("Non sono riuscito a estrarre informazioni utili.")
+    img_tag = infobox.find("img")
+    if not img_tag or "src" not in img_tag.attrs:
+        await interaction.followup.send("Immagine non trovata per questa creatura.")
         return
 
-    embed = Embed(title=f"Info su {nome.capitalize()}", color=0x00ff00)
-    for k, v in info.items():
-        # Limita la lunghezza del campo per non superare i limiti Discord
-        if len(v) > 1024:
-            v = v[:1021] + "..."
-        embed.add_field(name=k, value=v, inline=False)
+    img_url = img_tag["src"]
 
-    # Prova a prendere immagine (se presente)
-    # Di solito c'è un'immagine principale in un div con classe 'pi-image-collection'
-    img_div = soup.find("div", {"class": "pi-image-collection"})
-    if img_div:
-        img = img_div.find("img")
-        if img and img.has_attr("src"):
-            embed.set_thumbnail(url=img["src"])
+    embed = discord.Embed(color=discord.Color.green())
+    embed.set_image(url=img_url)
 
     await interaction.followup.send(embed=embed)
 
