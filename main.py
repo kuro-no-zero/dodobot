@@ -576,7 +576,7 @@ class AchievementsRedeemView(View):
         if not self.selected_list_name or self.selected_list_name == "none":
             return [discord.SelectOption(label="Nessun achievement", value="none", default=True)]
 
-        ach_dict, _, _ = all_achievement_lists[self.selected_list_name]
+        ach_dict, _ = all_achievement_lists[self.selected_list_name]
         ach_names = sorted(ach_dict.keys())
 
         if not ach_names:
@@ -606,7 +606,7 @@ class AchievementsRedeemView(View):
 
         # Embed aggiornato
         if self.selected_ach_name and self.selected_ach_name != "none":
-            ach_dict, one_shot, color = all_achievement_lists[self.selected_list_name]
+            ach_dict, color = all_achievement_lists[self.selected_list_name]
             dati = ach_dict[self.selected_ach_name]
             embed = Embed(title=self.selected_ach_name, color=color)
             embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
@@ -1316,7 +1316,7 @@ async def lista_achievements(interaction: Interaction):
 async def redeem_achievement(interaction: Interaction):
     view = AchievementsRedeemView()
     # Embed iniziale della prima lista e primo achievement
-    ach_dict, one_shot, color = all_achievement_lists[view.selected_list_name]
+    ach_dict, color = all_achievement_lists[view.selected_list_name]
     first_ach_name = sorted(ach_dict.keys())[0] if ach_dict else None
 
     if first_ach_name:
