@@ -1308,7 +1308,7 @@ async def classifica(interaction: discord.Interaction, tipo: Literal["generale",
         medaglia = medaglie.get(posizione, f"#{posizione}")
         embed.add_field(
             name=f"{medaglia} {nome}",
-            value=f"✨ **{punti}** punti\n🎯 **{n_achievements}** achievement completati",
+            value=f"✨ **{punti}** punti",
             inline=False
         )
         posizione += 1
