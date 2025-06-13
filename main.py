@@ -1498,8 +1498,10 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         color=discord.Color.green()
     )
 
-    if not is_valid_url(image_url):
+    if not (image_url and image_url.startswith("http")):
         image_url = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
+
+    print(f"[DEBUG] image_url: {repr(image_url)}")
 
     embed.set_thumbnail(url=image_url)
 
