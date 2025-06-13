@@ -2664,11 +2664,15 @@ async def duel_history(interaction: discord.Interaction):
 async def resolve_duel(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
 
-    duels = list(duels_collection.find({"status": "pending"}))
+    duels = list(duels_collection.find({"status": {"$in": ["scheduled", "pending"]}}))
     user_id = interaction.user.id
 
-    filtered = [duel for duel in duels if duel["challenger_id"] == user_id or duel["opponent_id"] == user_id]
+    print(f"User {user_id} cerca duelli con status pending/scheduled")
+    print(f"Duelli trovati nel DB: {len(duels)}")
 
+    filtered = [duel for duel in duels if duel["challenger_id"] == user_id or duel["opponent_id"] == user_id]
+    print(f"Duelli filtrati coinvolgendo l'utente: {len(filtered)}")
+    
     if not filtered:
         return await interaction.followup.send("❌ Non ci sono duelli da risolvere in cui sei coinvolto.", ephemeral=True)
 
