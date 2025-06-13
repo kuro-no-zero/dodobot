@@ -23,6 +23,7 @@ import aiohttp
 import base64
 import logging
 import pytz
+from discord import ui
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -1256,17 +1257,17 @@ def is_authorized(interaction: discord.Interaction) -> bool:
 
 # === VIEW DUELLI ===
 
-class DuelResolutionView(ui.View):
+class DuelResolutionView(discord.ui.View):
     def __init__(self, duels, user_id):
         super().__init__(timeout=300)
         self.duels = duels
         self.user_id = user_id
         self.page = 0
-        self.duel_select = ui.Select(placeholder="Scegli un duello da risolvere", min_values=1, max_values=1, options=[])
+        self.duel_select = discord.ui.Select(placeholder="Scegli un duello da risolvere", min_values=1, max_values=1, options=[])
         self.add_item(self.duel_select)
         self.build_duel_options()
 
-        self.result_select = ui.Select(
+        self.result_select = discord.ui.Select(
             placeholder="Seleziona il vincitore",
             options=[],
             custom_id="result_select"
