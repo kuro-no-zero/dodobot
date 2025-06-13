@@ -1080,74 +1080,27 @@ class UndoSelect(Select):
 
 # === SCRAPING ===
 
-def get_dino_data(nome_dino: str):
+def get_dino_description(nome_dino: str):
     slug = nome_dino.strip().replace(" ", "_")
     url = f"https://ark.fandom.com/wiki/{slug}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
     r = requests.get(url, headers=headers)
     if r.status_code != 200:
-        return None, f"Pagina per '{nome_dino}' non trovata sul wiki di Ark."
+        return None, None, f"Pagina per '{nome_dino}' non trovata sul wiki di Ark."
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Titolo pagina (nome ufficiale)
-    title = soup.find("h1", {"id": "firstHeading"})
-    nome = title.text if title else nome_dino.title()
+    # Cerca il primo <p> di testo che abbia almeno 50 caratteri (per evitare <p> vuoti o insignificanti)
+    paragraphs = soup.find_all("p")
+    for p in paragraphs:
+        testo = p.get_text(strip=True)
+        if len(testo) > 50:
+            # Pulizia base: rimuovo eventuali \n e spazi eccessivi
+            descrizione = ' '.join(testo.split())
+            return descrizione, url, None
 
-    # Immagine principale (prima immagine in aside.portable-infobox)
-    img_url = None
-    infobox_aside = soup.find("aside", class_="portable-infobox")
-    if infobox_aside:
-        img_tag = infobox_aside.find("img")
-        if img_tag and img_tag.has_attr("src"):
-            src = img_tag["src"]
-            img_url = src if src.startswith("http") else "https:" + src
-
-    # Cerca il div con tutte le classi
-    framework = None
-    for div in soup.find_all("div"):
-        classes = div.get("class", [])
-        if "info-arkitex" in classes and "info-framework" in classes:
-            framework = div
-            break
-
-    if not framework:
-        return None, f"Nessuna informazione strutturata trovata per '{nome_dino}'."
-
-    info_units = []
-    for div in framework.find_all("div"):
-        classes = div.get("class", [])
-        if "info-arkitex" in classes and "info-unit" in classes:
-            info_units.append(div)
-
-    if not info_units:
-        return None, f"Nessun blocco info-unit trovato per '{nome_dino}'."
-
-    stats = {}
-    for unit in info_units:
-        caption_tag = unit.find("div", class_="info-unit-caption")
-        caption = caption_tag.text.strip() if caption_tag else None
-
-        rows = []
-        for div in unit.find_all("div"):
-            classes = div.get("class", [])
-            if "info-arkitex" in classes and "info-unit-row" in classes:
-                rows.append(div)
-
-        for r in rows:
-            label = r.find("div", class_="info-unit-row-label")
-            value = r.find("div", class_="info-unit-row-value")
-            if label and value:
-                key = f"{caption} - {label.text.strip()}" if caption else label.text.strip()
-                stats[key] = value.text.strip()
-
-    return {
-        "nome": nome,
-        "stats": stats,
-        "img": img_url,
-        "url": url
-    }, None
+    return None, None, f"Nessuna descrizione utile trovata per '{nome_dino}'."
 
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -1503,30 +1456,22 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
         ephemeral=True
     )
 
-@bot.tree.command(name="dino_info", description="Mostra info e statistiche base di un dinosauro di Ark")
+@bot.tree.command(name="dino_info", description="Mostra la descrizione base di un dinosauro di Ark")
 @app_commands.describe(nome="Nome del dinosauro (es: Argentavis, Rex, Dodo)")
 async def dino_info(interaction: discord.Interaction, nome: str):
     await interaction.response.defer()
 
-    dino_data, error = get_dino_data(nome)
+    descrizione, url, error = get_dino_description(nome)
     if error:
         await interaction.followup.send(error, ephemeral=True)
         return
 
     embed = discord.Embed(
-        title=f"{dino_data['nome']} - Statistiche base",
-        url=dino_data["url"],
+        title=f"{nome.title()} - Descrizione base",
+        url=url,
         color=discord.Color.green()
     )
-
-    if dino_data["img"]:
-        embed.set_thumbnail(url=dino_data["img"])
-
-    if dino_data["stats"]:
-        for stat_name, stat_value in dino_data["stats"].items():
-            embed.add_field(name=stat_name, value=stat_value, inline=True)
-    else:
-        embed.description = "Nessuna statistica trovata."
+    embed.description = descrizione
 
     await interaction.followup.send(embed=embed, ephemeral=True)
 
