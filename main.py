@@ -11,6 +11,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from discord import ButtonStyle
 import io
+import math
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
@@ -960,53 +961,48 @@ class AchievementDropdownView(View):
             desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
             await interaction.response.edit_message(content=desc, embed=None, view=self)
 
-async def send_paginated_embed(interaction: Interaction, entries, title, per_page=10):
-    pages = [entries[i:i+per_page] for i in range(0, len(entries), per_page)]
-    max_page = len(pages)
+async def send_paginated_embed(interaction: Interaction, entries: list[str], title: str):
+    per_page = 10
+    total_pages = math.ceil(len(entries) / per_page)
+    current_page = 0
+
+    def get_embed(page):
+        start = page * per_page
+        end = start + per_page
+        embed = Embed(title=title, description="\n".join(entries[start:end]))
+        embed.set_footer(text=f"Pagina {page + 1} di {total_pages}")
+        return embed
 
     class Paginator(View):
         def __init__(self):
-            super().__init__(timeout=180)
-            self.page = 0
-            self.message = None
+            super().__init__(timeout=120)
+            self.current_page = 0
+            self.update_buttons()
 
-            # Bottone indietro
-            self.back_button = Button(label="⬅️ Indietro", style=ButtonStyle.secondary, disabled=(max_page <= 1))
-            self.back_button.callback = self.go_back
-            self.add_item(self.back_button)
+        def update_buttons(self):
+            self.clear_items()
+            if total_pages <= 1:
+                return
+            self.add_item(Button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary, custom_id="back", disabled=self.current_page == 0))
+            self.add_item(Button(label="Avanti ➡️", style=discord.ButtonStyle.secondary, custom_id="next", disabled=self.current_page == total_pages - 1))
 
-            # Bottone avanti
-            self.next_button = Button(label="➡️ Avanti", style=ButtonStyle.secondary, disabled=(max_page <= 1))
-            self.next_button.callback = self.go_next
-            self.add_item(self.next_button)
+        async def interaction_check(self, interaction: Interaction) -> bool:
+            return True  # puoi limitarlo all'admin se vuoi
 
-        async def update(self, interaction):
-            embed = Embed(
-                title=title,
-                description="\n".join(pages[self.page]),
-                color=discord.Color.green()
-            )
-            embed.set_footer(text=f"Pagina {self.page + 1} di {max_page}")
-            await interaction.response.edit_message(embed=embed, view=self)
+        @discord.ui.button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary, custom_id="back")
+        async def back(self, interaction: Interaction, button: Button):
+            self.current_page -= 1
+            self.update_buttons()
+            await interaction.response.edit_message(embed=get_embed(self.current_page), view=self)
 
-        async def go_back(self, interaction: Interaction):
-            if self.page > 0:
-                self.page -= 1
-                await self.update(interaction)
-
-        async def go_next(self, interaction: Interaction):
-            if self.page < max_page - 1:
-                self.page += 1
-                await self.update(interaction)
+        @discord.ui.button(label="Avanti ➡️", style=discord.ButtonStyle.secondary, custom_id="next")
+        async def next(self, interaction: Interaction, button: Button):
+            self.current_page += 1
+            self.update_buttons()
+            await interaction.response.edit_message(embed=get_embed(self.current_page), view=self)
 
     view = Paginator()
-    embed = Embed(
-        title=title,
-        description="\n".join(pages[0]),
-        color=discord.Color.green()
-    )
-    embed.set_footer(text=f"Pagina 1 di {max_page}")
-    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+    await interaction.followup.send(embed=get_embed(0), view=view, ephemeral=True)
 
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -1123,9 +1119,11 @@ async def redeem_history(interaction: discord.Interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True) 
+
     docs = list(redeemed_collection.find().sort("timestamp", 1))
     if not docs:
-        await interaction.response.send_message("Nessun redeem registrato.", ephemeral=True)
+        await interaction.followup.send("Nessun redeem registrato.", ephemeral=True)
         return
 
     entries = []
@@ -1240,9 +1238,11 @@ async def achievement_history(interaction: discord.Interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
 
+    await interaction.response.defer(ephemeral=True) 
+
     docs = list(achievements_collection.find().sort("timestamp", 1))
     if not docs:
-        await interaction.response.send_message("Nessun achievement registrato.", ephemeral=True)
+        await interaction.followup.send("Nessun achievement registrato.", ephemeral=True)
         return
 
     entries = []
