@@ -2708,6 +2708,22 @@ async def duel_history(interaction: discord.Interaction):
 
     await send_paginated_embed(interaction, entries, "📋 Storico Duelli")
 
+@bot.tree.command(name="duel_clear_history", description="Pulisce tutta la cronologia dei duelli (ADMIN)")
+async def duel_clear_history(interaction: discord.Interaction):
+    # Controllo permessi: modifica `is_authorized` come serve
+    if not is_authorized(interaction):
+        await interaction.response.send_message("❌ Non hai i permessi per usare questo comando.", ephemeral=True)
+        return
+
+    await interaction.response.defer(ephemeral=True)
+
+    # Tuo database collection
+    result = duels_collection.delete_many({})
+    count = result.deleted_count
+
+    await interaction.followup.send(f"🧹 Ho cancellato **{count}** duelli dalla storia.", ephemeral=True)
+
+
 @bot.tree.command(name="resolve_duel", description="Risolvi un duello completato")
 async def resolve_duel(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
