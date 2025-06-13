@@ -1092,13 +1092,13 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Trova immagine principale nella tabella laterale (infobox)
+    # Cerca immagine dentro i blocchi con classi che iniziano per 'info-arkitex'
     image_url = None
-    infobox = soup.find("table", class_="infobox")
-    if infobox:
-        first_img = infobox.find("img")
-        if first_img:
-            src = first_img.get("src")
+    image_blocks = soup.find_all("div", class_=lambda x: x and x.startswith("info-arkitex"))
+    for block in image_blocks:
+        img_tag = block.find("img")
+        if img_tag:
+            src = img_tag.get("src")
             if src:
                 if src.startswith("//"):
                     image_url = "https:" + src
@@ -1106,6 +1106,7 @@ def get_dino_description(nome_dino: str):
                     image_url = src
                 else:
                     image_url = "https://ark.fandom.com" + src
+            break  # Usa la prima immagine valida trovata
 
     # Sezione Utility
     utility_header = soup.find(id="Utility")
