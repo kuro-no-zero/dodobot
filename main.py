@@ -463,15 +463,15 @@ class DinoRedeemSelect(discord.ui.Select):
             "timestamp": interaction.created_at
         })
 
-        # Rispondi all'interazione per evitare timeout (no messaggio visibile)
-        await interaction.response.defer()
-
-        # Manda messaggio pubblico con testo + link immagine (se presente)
-        message_text = f"**{interaction.user.mention}** ha riscattato **{chosen_dino}** per {dino_info['punti']} punti!"
+        embed = discord.Embed(
+        title=f"{chosen_dino} riscattato!",
+        description=f"**{interaction.user.display_name}** ha riscattato **{chosen_dino}** per {dino_info['punti']} punti! 🎉",
+        color=0x00ff00
+        )
         if "img" in dino_info:
-            message_text += f"\n{dino_info['img']}"
+            embed.set_image(url=dino_info["img"])
 
-        await interaction.channel.send(message_text)
+        await interaction.response.send_message(embed=embed)
 
 class DinoRedeemView(discord.ui.View):
     def __init__(self, user_id, dinos):
