@@ -2404,7 +2404,7 @@ async def regole_1vs1(interaction: discord.Interaction):
         inline=False
     )
 
-    embed.set_footer(text="Sistema duelli sviluppato con ❤️ dal team server")
+    embed.set_footer(text="Sistema duelli sviluppato con ❤️ da Dodo e implementato con 🩸 da kuro")
 
     await interaction.response.send_message(embed=embed, ephemeral=False)
 
