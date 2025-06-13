@@ -1164,26 +1164,25 @@ all_achievement_lists = {
 
 IMAGE_MAP = {
     "Small": {
-        "Land": "https://example.com/small_land.jpg",
-        "Flyers": "https://example.com/small_flyers.jpg",
-        "Acquatic": "https://example.com/small_acquatic.jpg",
+        "Land": "https://i.imgur.com/aAlywGR.jpeg",
+        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
+        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
     },
     "Medium": {
-        "Land": "https://example.com/small_land.jpg",
-        "Flyers": "https://example.com/small_flyers.jpg",
-        "Acquatic": "https://example.com/small_acquatic.jpg",
+        "Land": "https://i.imgur.com/aAlywGR.jpeg",
+        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
+        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
     },
     "Big": {
-        "Land": "https://example.com/small_land.jpg",
-        "Flyers": "https://example.com/small_flyers.jpg",
-        "Acquatic": "https://example.com/small_acquatic.jpg",
+        "Land": "https://i.imgur.com/aAlywGR.jpeg",
+        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
+        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
     },
     "Mega": {
-        "Land": "https://example.com/small_land.jpg",
-        "Flyers": "https://example.com/small_flyers.jpg",
-        "Acquatic": "https://example.com/small_acquatic.jpg",
+        "Land": "https://i.imgur.com/aAlywGR.jpeg",
+        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
+        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
     }
-
 }
 
 sent_messages = []
