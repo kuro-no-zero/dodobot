@@ -1092,24 +1092,25 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Prova a trovare la prima immagine "importante" (spesso è nel primo <img> della colonna destra)
+    # Trova immagine principale
     image_url = None
-for img in soup.find_all("img"):
-    src = img.get("src")
-    if src and "/images/" in src and not src.startswith("data:"):
-        if src.startswith("http"):
-            image_url = src
-        elif src.startswith("//"):
-            image_url = "https:" + src
-        else:
-            image_url = "https://ark.fandom.com" + src
-        break
+    for img in soup.find_all("img"):
+        src = img.get("src")
+        if src and "/images/" in src and not src.startswith("data:"):
+            if src.startswith("http"):
+                image_url = src
+            elif src.startswith("//"):
+                image_url = "https:" + src
+            else:
+                image_url = "https://ark.fandom.com" + src
+            break
 
-    # Trova la sezione Utility > Roles
+    # Sezione Utility
     utility_header = soup.find(id="Utility")
     if not utility_header:
         return None, None, image_url, f"Sezione 'Utility' non trovata per '{nome_dino}'."
 
+    # Sezione Roles
     roles_header = utility_header.find_next("span", id="Roles")
     if not roles_header:
         return None, None, image_url, f"Sezione 'Roles' non trovata per '{nome_dino}'."
