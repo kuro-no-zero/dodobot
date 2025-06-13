@@ -1138,8 +1138,15 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-def is_valid_url(url):
-    return isinstance(url, str) and url.startswith("http")
+def is_valid_image_url(url: str) -> bool:
+    if not url:
+        return False
+    url = url.strip()
+    if url.startswith("http://") or url.startswith("https://"):
+        if url.startswith("data:"):
+            return False
+        return True
+    return False
 
 # === COMANDI SLASH ===
 @bot.command()
@@ -1500,6 +1507,8 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         await interaction.followup.send(error, ephemeral=True)
         return
 
+    print(f"[DEBUG] image_url: {image_url}")  # Per debug
+
     embed = discord.Embed(
         title=f"{nome.title()} - Ruoli",
         url=url,
@@ -1507,8 +1516,7 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         color=discord.Color.green()
     )
 
-    # Usa immagine principale se esiste, altrimenti placeholder
-    if image_url and image_url.startswith("http"):
+    if is_valid_image_url(image_url):
         embed.set_image(url=image_url)
     else:
         embed.set_image(url="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")
