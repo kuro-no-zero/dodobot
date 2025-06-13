@@ -1370,7 +1370,9 @@ class DuelResolutionView(discord.ui.View):
         if not selected_duel:
             return await interaction.response.send_message("⚠️ Nessun duello selezionato.", ephemeral=True)
 
-        # Se il duello è stato annullato
+        # differisci subito la risposta per evitare timeout
+        await interaction.response.defer(ephemeral=True)
+
         if winner == "cancel":
             duels_collection.delete_one({"_id": selected_duel["_id"]})
 
@@ -1382,38 +1384,11 @@ class DuelResolutionView(discord.ui.View):
             except Exception as e:
                 print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
 
-            return await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
+            return await interaction.followup.send("❌ Duello annullato con successo.", ephemeral=True)
 
-        # Determina la categoria e dimensione
-        category = selected_duel["type"].lower()
-        size = selected_duel["category"].capitalize()
+        # calcolo punti...
 
-        print(f"DEBUG - category: {category}, size: {size}")
-
-        category_map = {"land": 0, "flyers": 1, "acquatic": 2}
-        index = category_map.get(category)
-
-        if index is None or size not in ["Small", "Medium", "Big", "Mega"]:
-            return await interaction.response.send_message("⚠️ Categoria o dimensione del duello non valida.", ephemeral=True)
-
-        # Tabelle punteggio
-        win_points = {
-            "Small": [50, 60, 70],
-            "Medium": [80, 90, 100],
-            "Big": [120, 130, 140],
-            "Mega": [200, 0, 0]
-        }
-        loss_points = {
-            "Small": [40, 50, 60],
-            "Medium": [70, 80, 90],
-            "Big": [100, 110, 120],
-            "Mega": [150, 0, 0]
-        }
-
-        punti_win = win_points[size][index]
-        punti_loss = loss_points[size][index]
-
-        # Assegna i punti
+        # assegna punti
         if winner == "challenger":
             set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_win)
             set_punti(selected_duel["opponent_id"], get_punti(selected_duel["opponent_id"]) + punti_loss)
@@ -1421,12 +1396,10 @@ class DuelResolutionView(discord.ui.View):
             set_punti(selected_duel["opponent_id"], get_punti(selected_duel["opponent_id"]) + punti_win)
             set_punti(selected_duel["challenger_id"], get_punti(selected_duel["challenger_id"]) + punti_loss)
         else:
-            return await interaction.response.send_message("⚠️ Selezione vincitore non valida.", ephemeral=True)
+            return await interaction.followup.send("⚠️ Selezione vincitore non valida.", ephemeral=True)
 
-        # Rimuovi il duello dal DB
         duels_collection.delete_one({"_id": selected_duel["_id"]})
 
-        # Elimina l'evento Discord (se ancora esiste)
         try:
             if interaction.guild:
                 event = await interaction.guild.fetch_scheduled_event(int(selected_duel["event_id"]))
@@ -1435,7 +1408,7 @@ class DuelResolutionView(discord.ui.View):
         except Exception as e:
             print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
 
-        await interaction.response.send_message("✅ Duello risolto con successo!", ephemeral=True)
+        await interaction.followup.send("✅ Duello risolto con successo!", ephemeral=True)
 
 # VISTA con bottoni per ogni dinosauro
 class DinoRedeemSelect(discord.ui.Select):
