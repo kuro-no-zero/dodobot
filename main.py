@@ -1081,7 +1081,7 @@ class UndoSelect(Select):
 # === SCRAPING ===
 
 def get_dino_data(nome_dino: str):
-    slug = nome_dino.strip().replace(" ", "_").capitalize()
+    slug = nome_dino.strip().replace(" ", "_")
     url = f"https://ark.fandom.com/wiki/{slug}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
@@ -1104,23 +1104,41 @@ def get_dino_data(nome_dino: str):
             src = img_tag["src"]
             img_url = src if src.startswith("http") else "https:" + src
 
-    # Info base: dentro div class="info-arkitex info-framework"
-    framework = soup.find("div", class_="info-arkitex info-framework")
+    # Cerca il div con tutte le classi
+    framework = None
+    for div in soup.find_all("div"):
+        classes = div.get("class", [])
+        if "info-arkitex" in classes and "info-framework" in classes:
+            framework = div
+            break
+
     if not framework:
         return None, f"Nessuna informazione strutturata trovata per '{nome_dino}'."
 
-    info_units = framework.find_all("div", class_="info-arkitex info-unit")
+    info_units = []
+    for div in framework.find_all("div"):
+        classes = div.get("class", [])
+        if "info-arkitex" in classes and "info-unit" in classes:
+            info_units.append(div)
+
+    if not info_units:
+        return None, f"Nessun blocco info-unit trovato per '{nome_dino}'."
+
     stats = {}
     for unit in info_units:
         caption_tag = unit.find("div", class_="info-unit-caption")
         caption = caption_tag.text.strip() if caption_tag else None
 
-        rows = unit.find_all("div", class_="info-arkitex info-unit-row")
+        rows = []
+        for div in unit.find_all("div"):
+            classes = div.get("class", [])
+            if "info-arkitex" in classes and "info-unit-row" in classes:
+                rows.append(div)
+
         for r in rows:
             label = r.find("div", class_="info-unit-row-label")
             value = r.find("div", class_="info-unit-row-value")
             if label and value:
-                # uso caption + label come chiave per chiarezza
                 key = f"{caption} - {label.text.strip()}" if caption else label.text.strip()
                 stats[key] = value.text.strip()
 
