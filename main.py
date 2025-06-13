@@ -2350,16 +2350,63 @@ async def patata(interaction: discord.Interaction):
 
 @bot.tree.command(name="regole_1vs1", description="Mostra le regole per le sfide 1vs1/tornei")
 async def regole_1vs1(interaction: discord.Interaction):
-    
-    # Crea l'embed
     embed = discord.Embed(
-        title="Regole per le sfide 1vs1",
-        description="TBA",
-        color=discord.Color.green()
+        title="📜 Regole Duelli 1vs1",
+        description="Ecco tutto quello che devi sapere per partecipare ai duelli nel server!",
+        color=discord.Color.gold()
     )
 
-    # Invia il messaggio con l'embed
-    await interaction.response.send_message(embed=embed)
+    embed.add_field(
+        name="📌 Comandi principali",
+        value=(
+            "`/duel` — Crea una sfida 1vs1 contro un altro utente\n"
+            "`/resolve_duel` — Risolvi un duello selezionando il vincitore o annullandolo\n"
+            "`/duel_clear_history` — (Admin) Cancella tutti i duelli dal database"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🏆 Categorie",
+        value=(
+            "**Land** — Dinosauri terrestri\n"
+            "**Flyers** — Dinosauri volanti\n"
+            "**Acquatic** — Creature acquatiche"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="📏 Dimensioni",
+        value=(
+            "`Small`  — Dinosauro piccolo\n"
+            "`Medium` — Dinosauro medio\n"
+            "`Big`    — Dinosauro grande\n"
+            "`Mega`   — Dinosauro boss o leggendario"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🎯 Punteggi",
+        value=(
+            "**Vittoria:**\n"
+            "`Small` → Land: 50 | Flyers: 60 | Acquatic: 70\n"
+            "`Medium` → Land: 80 | Flyers: 90 | Acquatic: 100\n"
+            "`Big` → Land: 120 | Flyers: 130 | Acquatic: 140\n"
+            "`Mega` → Land: 200 (Flyers/Acquatic non supportati)\n\n"
+            **"Sconfitta:****\n"
+            "`Small` → Land: 40 | Flyers: 50 | Acquatic: 60\n"
+            "`Medium` → Land: 70 | Flyers: 80 | Acquatic: 90\n"
+            "`Big` → Land: 100 | Flyers: 110 | Acquatic: 120\n"
+            "`Mega` → Land: 150 (Flyers/Acquatic non supportati)"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text="Sistema duelli sviluppato con ❤️ da Dodo e implementato con 🩸 da kuro")
+    
+    await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @bot.tree.command(name="regole_achievement", description="Spiega come funziona il sistema degli achievements")
 async def regole_achievement(interaction: discord.Interaction):
@@ -2463,7 +2510,7 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     )
 
     # Comandi base e informativi
-    embed.add_field(name=" --> COMANDI BASE E INFORMATIVI", value="", inline=False)
+    embed.add_field(name=" --> BASIC & INFO", value="", inline=False)
 
     embed.add_field(name="/dodo", value="🔍 Lista dei comandi disponibili, l'hai appena usato!", inline=False)
     embed.add_field(name="/punti", value="💸 Mostra i punti attuali di un utente.", inline=False)
@@ -2474,17 +2521,14 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     # Comandi cazzari
     embed.add_field(name="/patata", value="🥔 Se ti vuoi davvero male", inline=False)
 
-    # Comandi dinosauri
-    embed.add_field(name=" --> COMANDI REDEEM DINO", value="", inline=False)
+    # Comandi redeem
+    embed.add_field(name=" --> COMANDI REDEEM DINO & ACHIEVEMENTS", value="", inline=False)
 
     embed.add_field(name="/lista_dino", value="🦕 Mostra i dino disponibili per il redeem.", inline=False)
     embed.add_field(name="/redeem_dino", value="🦖 Comando per l'effettivo redeem dei dino.", inline=False)
     embed.add_field(name="/redeem_hisory", value="📜 Mostra il log dei redeem (ADMIN).", inline=False)
     embed.add_field(name="/clear_redeem_history", value="🔥 Pulisce la lista dei redeem (ADMIN).", inline=False)
     embed.add_field(name="/clear_last_redeems", value="🧹 Pulisce gli ultimi n redeems completati (ADMIN)", inline=False)
-
-    # Comandi achievement
-    embed.add_field(name=" --> COMANDI ACHIEVEMENTS", value="", inline=False)
 
     embed.add_field(name="/lista_achievements", value="📋 Mostra la lista degli achievement disponibili, con descrizioni e punti.", inline=False)
     embed.add_field(name="/redeem_achievement", value="🏆 Completa uno o più achievement e guadagna punti.", inline=False)
@@ -2493,11 +2537,12 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed.add_field(name="/clear_last_achievements", value="🧹 Pulisce gli ultimi n achievements completati (ADMIN)", inline=False)
 
     # Comandi amministrativi
-    embed.add_field(name=" --> COMANDI MOD", value="", inline=False)
+    embed.add_field(name=" --> ⚠️COMANDI MOD⚠️", value="", inline=False)
 
     embed.add_field(name="/aggiungi", value="➕ Aggiungi punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
+    embed.add_field(name="/duel_clear_history", value="❗ Annulla ogni duello shcedulato (ADMIN).", inline=False)
     embed.add_field(name="/undo", value="↩️ Annulla una o piu azioni (entries) fra le ultime 10 di un utente (ADMIN)", inline=False)
 
     embed.set_footer(text="Per ulteriori dettagli, chiedi a kurous")
