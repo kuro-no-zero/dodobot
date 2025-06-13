@@ -1088,52 +1088,35 @@ def get_dino_description(nome_dino: str):
 
     r = requests.get(url, headers=headers)
     if r.status_code != 200:
-        return None, None, f"Pagina per '{nome_dino}' non trovata sul wiki di Ark."
+        return None, None, None, f"Pagina per '{nome_dino}' non trovata sul wiki di Ark."
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Trova la sezione Utility
+    # Estrai l'immagine principale dalla tabella a destra (infobox)
+    infobox = soup.find("table", class_="infobox")
+    image_url = None
+    if infobox:
+        img_tag = infobox.find("img")
+        if img_tag and img_tag.get("src"):
+            image_url = "https:" + img_tag["src"]
+
+    # Trova la sezione Utility > Roles
     utility_header = soup.find(id="Utility")
     if not utility_header:
-        return None, None, f"Sezione 'Utility' non trovata per '{nome_dino}'."
+        return None, None, image_url, f"Sezione 'Utility' non trovata per '{nome_dino}'."
 
-    # Trova il sotto-header Roles
     roles_header = utility_header.find_next("span", id="Roles")
     if not roles_header:
-        return None, None, f"Sezione 'Roles' non trovata per '{nome_dino}'."
+        return None, None, image_url, f"Sezione 'Roles' non trovata per '{nome_dino}'."
 
-    # Trova la lista <ul> immediatamente dopo Roles
     roles_list = roles_header.find_parent().find_next_sibling("ul")
     if not roles_list:
-        return None, None, f"Lista 'Roles' non trovata per '{nome_dino}'."
+        return None, None, image_url, f"Lista 'Roles' non trovata per '{nome_dino}'."
 
-    items = []
-    for li in roles_list.find_all("li"):
-        testo = li.get_text(strip=True)
+    items = [f"• {li.get_text(strip=True)}" for li in roles_list.find_all("li")]
+    descrizione = "\n".join(items)
 
-        # Assicura spazio dopo i ":" per chiarezza
-        if ":" in testo:
-            parti = testo.split(":", 1)
-            titolo = parti[0].strip() + ":"
-            descrizione = parti[1].strip()
-
-            # Spezza la descrizione in frasi più brevi
-            frasi = [f.strip() for f in descrizione.split(".") if f.strip()]
-            if frasi:
-                testo_formattato = f"• {titolo} {frasi[0]}."
-                # Le frasi successive vanno a capo con un trattino per evidenziare
-                if len(frasi) > 1:
-                    testo_formattato += "\n" + "\n".join(f"- {f}." for f in frasi[1:])
-            else:
-                testo_formattato = f"• {titolo} {descrizione}"
-        else:
-            # Caso senza ":" (più raro)
-            testo_formattato = f"• {testo}"
-
-        items.append(testo_formattato)
-
-    descrizione = "\n\n".join(items)
-    return descrizione, url, None
+    return descrizione, url, image_url, None
 
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -1494,21 +1477,23 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
 async def dino_info(interaction: discord.Interaction, nome: str):
     await interaction.response.defer()
 
-    descrizione, url, error = get_dino_description(nome)
+    descrizione, url, image_url, error = get_dino_description(nome)
     if error:
         await interaction.followup.send(error, ephemeral=True)
         return
 
-    # Troncamento per non superare il limite Discord
     if len(descrizione) > MAX_DESCRIPTION_LENGTH:
         descrizione = descrizione[:MAX_DESCRIPTION_LENGTH].rsplit('\n', 1)[0] + "\n…"
 
     embed = discord.Embed(
-        title=f"{nome.title()} - Descrizione base",
+        title=f"{nome.title()} - Ruoli principali",
         url=url,
         color=discord.Color.green()
     )
     embed.description = descrizione
+
+    if image_url:
+        embed.set_thumbnail(url=image_url)
 
     await interaction.followup.send(embed=embed, ephemeral=True)
 
