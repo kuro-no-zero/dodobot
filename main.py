@@ -1081,8 +1081,7 @@ class UndoSelect(Select):
 # === SCRAPING ===
 
 def get_dino_data(nome_dino: str):
-    # Normalizza il nome (minuscolo, spazi sostituiti da underscore)
-    slug = nome_dino.strip().lower().replace(" ", "_")
+    slug = nome_dino.strip().replace(" ", "_").capitalize()
     url = f"https://ark.fandom.com/wiki/{slug}"
     headers = {"User-Agent": "Mozilla/5.0"}
 
@@ -1096,33 +1095,38 @@ def get_dino_data(nome_dino: str):
     title = soup.find("h1", {"id": "firstHeading"})
     nome = title.text if title else nome_dino.title()
 
-    # Trova la tabella con le statistiche base
-    infobox = soup.find("table", {"class": "infobox"})
+    # Immagine principale (prima immagine in aside.portable-infobox)
+    img_url = None
+    infobox_aside = soup.find("aside", class_="portable-infobox")
+    if infobox_aside:
+        img_tag = infobox_aside.find("img")
+        if img_tag and img_tag.has_attr("src"):
+            src = img_tag["src"]
+            img_url = src if src.startswith("http") else "https:" + src
 
-    if not infobox:
-        return None, f"Info non trovate per '{nome_dino}'."
+    # Info base: dentro div class="info-arkitex info-framework"
+    framework = soup.find("div", class_="info-arkitex info-framework")
+    if not framework:
+        return None, f"Nessuna informazione strutturata trovata per '{nome_dino}'."
 
-    data = {}
+    info_units = framework.find_all("div", class_="info-arkitex info-unit")
+    stats = {}
+    for unit in info_units:
+        caption_tag = unit.find("div", class_="info-unit-caption")
+        caption = caption_tag.text.strip() if caption_tag else None
 
-    # Prendiamo righe della tabella
-    rows = infobox.find_all("tr")
-    for row in rows:
-        th = row.find("th")
-        td = row.find("td")
-        if th and td:
-            key = th.text.strip()
-            value = td.text.strip().replace("\n", " ")
-            # Filtra statistiche base (esempi)
-            if key in ["Health", "Stamina", "Oxygen", "Food", "Weight", "Melee Damage", "Speed", "Torpor"]:
-                data[key] = value
-
-    # Immagine del dinosauro (primo img nella infobox)
-    img = infobox.find("img")
-    img_url = "https:" + img["src"] if img and img.has_attr("src") else None
+        rows = unit.find_all("div", class_="info-arkitex info-unit-row")
+        for r in rows:
+            label = r.find("div", class_="info-unit-row-label")
+            value = r.find("div", class_="info-unit-row-value")
+            if label and value:
+                # uso caption + label come chiave per chiarezza
+                key = f"{caption} - {label.text.strip()}" if caption else label.text.strip()
+                stats[key] = value.text.strip()
 
     return {
         "nome": nome,
-        "stats": data,
+        "stats": stats,
         "img": img_url,
         "url": url
     }, None
