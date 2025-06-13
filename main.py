@@ -1009,6 +1009,69 @@ async def send_paginated_embed(interaction: Interaction, entries: list[str], tit
     view = Paginator()
     await interaction.followup.send(embed=get_embed(0), view=view, ephemeral=True)
 
+class UndoSelectView(View):
+    def __init__(self, user_id: int, collection, list_type: str, max_entries: int = 10):
+        super().__init__(timeout=120)
+        self.user_id = user_id
+        self.collection = collection
+        self.list_type = list_type  # "achievement" o "redeem"
+        self.max_entries = max_entries
+        self.entries = list(collection.find({"user_id": str(user_id)}).sort("timestamp", -1).limit(max_entries))
+
+        options = []
+        for i, entry in enumerate(self.entries):
+            # Testo da mostrare nella select, breve descrizione
+            if list_type == "achievement":
+                label = entry["achievement"]
+                pts = entry.get("punti", 0)
+                desc = f"+{pts} pt"
+            else:
+                label = entry.get("nome", "Redeem")
+                pts = entry.get("punti", 0)
+                desc = f"+{pts} pt"
+
+            options.append(discord.SelectOption(
+                label=label[:100],  # limite discord
+                description=desc,
+                value=str(i)  # indice nell'array
+            ))
+
+        self.add_item(UndoSelect(options, self))
+
+class UndoSelect(Select):
+    def __init__(self, options, parent_view):
+        super().__init__(placeholder="Scegli una entry da annullare...", options=options, min_values=1, max_values=1)
+        self.parent_view = parent_view
+
+    async def callback(self, interaction: Interaction):
+        idx = int(self.values[0])
+        entry = self.parent_view.entries[idx]
+
+        # Elimina dal DB
+        result = self.parent_view.collection.delete_one({"_id": entry["_id"]})
+
+        if result.deleted_count == 0:
+            await interaction.response.send_message("Errore: entry non trovata o già cancellata.", ephemeral=True)
+            return
+
+        # Aggiorna punti
+        user_id = int(entry["user_id"])
+        punti_utente = get_punti(user_id)
+        punti_da_modificare = entry.get("punti", 0)
+
+        if self.parent_view.list_type == "achievement":
+            # Undo achievement: tolgo i punti guadagnati
+            set_punti(user_id, punti_utente - punti_da_modificare)
+        else:
+            # Undo redeem: riaggiungo i punti tolti dal redeem
+            set_punti(user_id, punti_utente + punti_da_modificare)
+
+        await interaction.response.send_message(
+            f"Entry '{self.values[0]}' annullata e {punti_da_modificare} punti aggiornati per l'utente.",
+            ephemeral=True
+        )
+        self.parent_view.stop()
+
 # === BOT SETUP ===
 intents = discord.Intents.default()
 intents.message_content = True
@@ -1396,6 +1459,27 @@ async def dinopic(interaction: discord.Interaction, nome: str):
     embed.set_image(url=img_url)
 
     await interaction.followup.send(embed=embed)
+
+@bot.tree.command(name="undo", description="Annulla un redeem o achievement (ADMIN)")
+async def undo(interaction: discord.Interaction, utente: discord.User, lista: str):
+    if not is_authorized(interaction):
+        await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
+        return
+
+    if lista == "achievement":
+        collection = achievements_collection
+    elif lista == "redeem":
+        collection = redeemed_collection
+    else:
+        await interaction.response.send_message("Lista non valida, scegli 'achievement' o 'redeem'.", ephemeral=True)
+        return
+
+    view = UndoSelectView(utente.id, collection, lista)
+    if not view.entries:
+        await interaction.response.send_message(f"Nessuna entry trovata per {utente.name} in {lista}.", ephemeral=True)
+        return
+
+    await interaction.response.send_message(f"Scegli quale entry annullare per {utente.name} in {lista}:", view=view, ephemeral=True)
 
 # === AVVIO BOT ===
 @bot.event
