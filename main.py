@@ -1375,9 +1375,8 @@ class DuelResolutionView(discord.ui.View):
             duels_collection.delete_one({"_id": selected_duel["_id"]})
 
             try:
-                channel = self.bot.get_channel(int(selected_duel["channel_id"]))
-                if channel:
-                    event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
+                if interaction.guild:
+                    event = await interaction.guild.fetch_scheduled_event(int(selected_duel["event_id"]))
                     if event:
                         await event.delete()
             except Exception as e:
@@ -1429,9 +1428,8 @@ class DuelResolutionView(discord.ui.View):
 
         # Elimina l'evento Discord (se ancora esiste)
         try:
-            channel = self.bot.get_channel(int(selected_duel["channel_id"]))
-            if channel:
-                event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
+            if interaction.guild:
+                event = await interaction.guild.fetch_scheduled_event(int(selected_duel["event_id"]))
                 if event:
                     await event.delete()
         except Exception as e:
