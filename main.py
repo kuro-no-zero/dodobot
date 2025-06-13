@@ -1092,18 +1092,20 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Trova immagine principale
+    # Trova immagine principale nella tabella laterale (infobox)
     image_url = None
-    for img in soup.find_all("img"):
-        src = img.get("src")
-        if src and "/images/" in src and not src.startswith("data:"):
-            if src.startswith("http"):
-                image_url = src
-            elif src.startswith("//"):
-                image_url = "https:" + src
-            else:
-                image_url = "https://ark.fandom.com" + src
-            break
+    infobox = soup.find("table", class_="infobox")
+    if infobox:
+        first_img = infobox.find("img")
+        if first_img:
+            src = first_img.get("src")
+            if src:
+                if src.startswith("//"):
+                    image_url = "https:" + src
+                elif src.startswith("http"):
+                    image_url = src
+                else:
+                    image_url = "https://ark.fandom.com" + src
 
     # Sezione Utility
     utility_header = soup.find(id="Utility")
@@ -1488,17 +1490,14 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         await interaction.followup.send(error, ephemeral=True)
         return
 
-    if len(descrizione) > MAX_DESCRIPTION_LENGTH:
-        descrizione = descrizione[:MAX_DESCRIPTION_LENGTH].rsplit('\n', 1)[0] + "\n…"
-
     embed = discord.Embed(
-        title=f"{nome.title()} - Ruoli principali",
+        title=f"{nome.title()} - Ruoli",
         url=url,
+        description=descrizione[:4096],  # Troncamento di sicurezza
         color=discord.Color.green()
     )
-    embed.description = descrizione
 
-    if image_url and image_url.startswith("http"):
+    if image_url:
         embed.set_thumbnail(url=image_url)
 
     await interaction.followup.send(embed=embed, ephemeral=True)
