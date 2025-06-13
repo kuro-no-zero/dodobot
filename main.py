@@ -1370,10 +1370,15 @@ class DuelResolutionView(discord.ui.View):
             return
 
         category = selected_duel["category"].lower()
-        category_map = {"land": 0, "flyers": 1, "acquatic": 2}
-        index = category_map.get(category, 0)
+        category_map = {"land": 0, "flyers": 1, "aquatic": 2}
+        index = category_map.get(category)
+
+        if index is None:
+            return await interaction.response.send_message(f"⚠️ Categoria non valida: `{selected_duel['category']}`", ephemeral=True)
 
         size = selected_duel["type"].capitalize()
+        if size not in ["Small", "Medium", "Big", "Mega"]:
+            return await interaction.response.send_message(f"⚠️ Dimensione non valida: `{selected_duel['type']}`", ephemeral=True)
 
         win_points = {
             "Small": [50, 60, 70],
