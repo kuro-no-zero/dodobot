@@ -1297,6 +1297,10 @@ class DuelResolutionView(discord.ui.View):
             self.duel_select.options.append(
                 SelectOption(label=label[:100], value=str(start + i))
             )
+        
+        max_pages = math.ceil(len(self.duels) / 25)
+        self.prev_button.disabled = (self.page == 0)
+        self.next_button.disabled = (self.page >= max_pages - 1 or max_pages == 1)
 
     async def interaction_check(self, interaction: Interaction) -> bool:
         return interaction.user.id == self.user_id
@@ -2672,7 +2676,7 @@ async def resolve_duel(interaction: discord.Interaction):
 
     filtered = [duel for duel in duels if duel["challenger_id"] == user_id or duel["opponent_id"] == user_id]
     print(f"Duelli filtrati coinvolgendo l'utente: {len(filtered)}")
-    
+
     if not filtered:
         return await interaction.followup.send("❌ Non ci sono duelli da risolvere in cui sei coinvolto.", ephemeral=True)
 
