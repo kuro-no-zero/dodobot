@@ -1421,33 +1421,47 @@ async def dodo(interaction: discord.Interaction):
     )
 
     # Comandi base e informativi
-    embed.add_field(name="/lista_achievements", value="📋 Mostra la lista degli achievement disponibili, con descrizioni e punti.", inline=False)
-    embed.add_field(name="/redeem_achievement", value="🏆 Completa uno o più achievement e guadagna punti.", inline=False)
+    embed.add_field(name="COMANDI BASE E INFORMATIVI", value="", inline=False)
+
+    embed.add_field(name="/dodo", value="🔍 Lista dei comandi disponibili, l'hai appena usato!", inline=False)
     embed.add_field(name="/punti", value="🔍 Mostra i punti attuali di un utente.", inline=False)
     embed.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti degli utenti.", inline=False)
     embed.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements di Dodo", inline=False)
     embed.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole per le sfide 1vs1/tornei.", inline=False)
+
+    # Comandi cazzari
+    embed.add_field(name="COMANDI MEME", value="", inline=False)
+
     embed.add_field(name="/patata", value="🥔 Se ti vuoi davvero male", inline=False)
 
     # Comandi dinosauri
+    embed.add_field(name="COMANDI REDEEM DINO", value="", inline=False)
+
     embed.add_field(name="/lista_dino", value="🦕 Mostra i dino disponibili per il redeem.", inline=False)
     embed.add_field(name="/redeem_dino", value="🦖 Comando per l'effettivo redeem dei dino.", inline=False)
     embed.add_field(name="/redeem_hisory", value="🦖 Mostra il log dei redeem (ADMIN).", inline=False)
+    embed.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN).", inline=False)
+    embed.add_field(name="/clear_last_redeems", value="🧹 Pulisce gli ultimi n redeems completati (ADMIN)", inline=False)
 
-    # Comandi amministrativi per achievement
+    # Comandi achievement
+    embed.add_field(name="COMANDI ACHIEVEMENTS", value="", inline=False)
+
+    embed.add_field(name="/lista_achievements", value="📋 Mostra la lista degli achievement disponibili, con descrizioni e punti.", inline=False)
+    embed.add_field(name="/redeem_achievement", value="🏆 Completa uno o più achievement e guadagna punti.", inline=False)
     embed.add_field(name="/achievement_history", value="📚 Mostra gli achievement completati dagli utenti (ADMIN)", inline=False)
     embed.add_field(name="/clear_achievement_history", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
-    embed.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN).", inline=False)
+    embed.add_field(name="/clear_last_achievements", value="🧹 Pulisce gli ultimi n achievements completati (ADMIN)", inline=False)
 
-    # Comandi amministrativi per punti
+    # Comandi amministrativi
+    embed.add_field(name="COMANDI ADMIN", value="", inline=False)
+
     embed.add_field(name="/aggiungi", value="➕ Aggiungi punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
-
-    # Comando tecnico
+    embed.add_field(name="/undo", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
     embed.add_field(name="!sync", value="🔄 Sincronizza i comandi slash del bot.", inline=False)
 
-    embed.set_footer(text="Per ulteriori dettagli, contatta lo sviluppatore o usa il comando con attenzione.")
+    embed.set_footer(text="Per ulteriori dettagli, chiedi a kurous")
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
@@ -1502,31 +1516,31 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
         ephemeral=True
     )
 
-@bot.tree.command(name="dino_info", description="Mostra la descrizione base di un dinosauro di Ark")
-@app_commands.describe(nome="Nome del dinosauro (es: Argentavis, Rex, Dodo)")
-async def dino_info(interaction: discord.Interaction, nome: str):
-    await interaction.response.defer()
+# @bot.tree.command(name="dino_info", description="Mostra la descrizione base di un dinosauro di Ark")
+# @app_commands.describe(nome="Nome del dinosauro (es: Argentavis, Rex, Dodo)")
+# async def dino_info(interaction: discord.Interaction, nome: str):
+#     await interaction.response.defer()
 
-    descrizione, url, image_url, error = get_dino_description(nome)
-    if error:
-        await interaction.followup.send(error, ephemeral=True)
-        return
+#     descrizione, url, image_url, error = get_dino_description(nome)
+#     if error:
+#         await interaction.followup.send(error, ephemeral=True)
+#         return
 
-    print(f"[DEBUG] image_url: {image_url}")  # Per debug
+#     print(f"[DEBUG] image_url: {image_url}")  # Per debug
 
-    embed = discord.Embed(
-        title=f"{nome.title()} - Ruoli",
-        url=url,
-        description=descrizione[:4096],
-        color=discord.Color.green()
-    )
+#     embed = discord.Embed(
+#         title=f"{nome.title()} - Ruoli",
+#         url=url,
+#         description=descrizione[:4096],
+#         color=discord.Color.green()
+#     )
 
-    if is_valid_image_url(image_url):
-        embed.set_image(url=image_url)
-    else:
-        embed.set_image(url="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")
+#     if is_valid_image_url(image_url):
+#         embed.set_image(url=image_url)
+#     else:
+#         embed.set_image(url="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")
 
-    await interaction.followup.send(embed=embed, ephemeral=True)
+#     await interaction.followup.send(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="undo", description="Annulla un redeem o achievement (ADMIN)")
 async def undo(interaction: discord.Interaction, utente: discord.User, lista: str):
