@@ -1369,8 +1369,9 @@ class DuelResolutionView(discord.ui.View):
             await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
             return
 
-        category = selected_duel["category"].capitalize()
-        size = selected_duel["type"].capitalize()
+        category = selected_duel["category"].lower()
+        category_map = {"land": 0, "flyers": 1, "acquatic": 2}
+        index = category_map.get(category, 0)
 
         win_points = {
             "Small": [50, 60, 70],
@@ -1385,7 +1386,6 @@ class DuelResolutionView(discord.ui.View):
             "Mega": [150, 0, 0]
         }
 
-        index = {"Land": 0, "Flyers": 1, "Acquatic": 2}.get(category, 0)
         punti_win = win_points[size][index]
         punti_loss = loss_points[size][index]
 
