@@ -211,176 +211,49 @@ tribe_members = {
 
 # === Liste Achievements ===
 
-achievements_oneshot = {
-    "Primo Passo": {"punti": 50, "descrizione": "Completa il tutorial iniziale."},
-    "Esploratore": {"punti": 100, "descrizione": "Visita 10 diverse aree del server."},
-    "Campione": {"punti": 250, "descrizione": "Vinci 5 partite consecutive."},
-    "Chiacchierone": {"punti": 75, "descrizione": "Invia 100 messaggi nella chat."},
-    "Notturno": {"punti": 40, "descrizione": "Accedi al server dopo mezzanotte."},
-    "Lettore Accanito": {"punti": 60, "descrizione": "Leggi 20 messaggi di fila senza rispondere."},
-    "Silenzioso": {"punti": 30, "descrizione": "Rimani online per 2 ore senza scrivere nulla."},
-    "Veterano": {"punti": 300, "descrizione": "Raggiungi 6 mesi di presenza nel server."},
-    "Condivisore": {"punti": 90, "descrizione": "Condividi 5 link con altri utenti."},
-    "Creativo": {"punti": 110, "descrizione": "Crea un nuovo canale o thread sul server."},
-    "Memer": {"punti": 70, "descrizione": "Invia 10 meme diversi."},
-    "DJ del Server": {"punti": 150, "descrizione": "Fai partire la musica per almeno 30 minuti."},
-    "Supporter": {"punti": 200, "descrizione": "Aiuta un altro utente a risolvere un problema."},
-    "Streamer": {"punti": 180, "descrizione": "Avvia una live nel server."},
-    "Portavoce": {"punti": 85, "descrizione": "Partecipa a una discussione vocale di gruppo."},
-    "Accademico": {"punti": 95, "descrizione": "Condividi una risorsa utile con altri membri."},
-    "Curioso": {"punti": 50, "descrizione": "Visita ogni canale almeno una volta."},
-    "Ambasciatore": {"punti": 140, "descrizione": "Invita 3 nuovi utenti a unirsi al server."},
-    "Spirito Guida": {"punti": 250, "descrizione": "Guida un nuovo membro per una settimana."},
-    "Esorcista": {"punti": 120, "descrizione": "Riporta l'ordine in una chat caotica."},
-    "Archivista": {"punti": 100, "descrizione": "Scrivi un messaggio fissato."},
-    "Iconico": {"punti": 130, "descrizione": "Cambia avatar e ricevi 5 complimenti."},
-    "Curatore": {"punti": 90, "descrizione": "Organizza una sezione del server."},
-    "Fabbro del Meme": {"punti": 100, "descrizione": "Crea un meme originale che diventa virale."},
-    "Collezionista": {"punti": 110, "descrizione": "Raccogli 10 ruoli diversi nel server."},
-    "Implacabile": {"punti": 160, "descrizione": "Partecipa a 3 eventi consecutivi."},
-    "Fotografo": {"punti": 55, "descrizione": "Condividi 5 foto nel canale media."},
-    "Viaggiatore del Tempo": {"punti": 125, "descrizione": "Scrivi un messaggio esattamente a mezzogiorno e a mezzanotte."},
-    "Artista": {"punti": 170, "descrizione": "Condividi un'opera d'arte fatta da te."},
-    "Saggio": {"punti": 190, "descrizione": "Dai un consiglio utile a 5 utenti diversi."},
-    "Risvegliato": {"punti": 60, "descrizione": "Accedi al server ogni giorno per una settimana."},
-    "Comico": {"punti": 80, "descrizione": "Fai ridere almeno 3 persone con un messaggio."},
-    "Shadowban": {"punti": 45, "descrizione": "Scrivi 20 messaggi ignorati da tutti."},
-    "Organizzatore": {"punti": 200, "descrizione": "Crea un evento e ricevi almeno 5 partecipanti."},
-    "Analista": {"punti": 105, "descrizione": "Scrivi un post dettagliato su un argomento tecnico."},
-    "Medico di Discord": {"punti": 150, "descrizione": "Calma una discussione accesa con parole pacate."},
-    "Fantasma": {"punti": 35, "descrizione": "Appari online solo per 5 minuti e poi sparisci."},
-    "Maestro del Ping": {"punti": 90, "descrizione": "Pinga 10 persone senza farti odiare."},
+achievements_survival = {
+    "Primo Passo": {
+        "punti": 50,
+        "descrizione": "Completa il tutorial iniziale.",
+        "ripetibile": False
+    },
+    "Esploratore": {
+        "punti": 100,
+        "descrizione": "Visita 10 diverse aree del server.",
+        "ripetibile": True
+    },
 }
 
-achievements_infiniti = {
-    "Mangia 'na foglia": {"punti": 50, "descrizione": "Hai bisogno di altri dettagli, coglione?"},
-    "Uccidi Alessia": {"punti": 100, "descrizione": "Uccidi Alessia in maniera creativa"},
-    "Tortura Patata": {"punti": 250, "descrizione": "Fai provare le pene dell'inferno a quello schifo di listrosauro"},
-    "Sputa su Luigi": {"punti": 75, "descrizione": "Rendilo viscido dentro e fuori."},
-    "Morte per pomodoro": {"punti": 120, "descrizione": "Elimina un nemico usando solo ortaggi."},
-    "Inciampa volontariamente": {"punti": 40, "descrizione": "Fallisci in grande stile."},
-    "Brucia l'erba (letteralmente)": {"punti": 90, "descrizione": "Incendia un prato. Perché no."},
-    "Maledici una rana": {"punti": 60, "descrizione": "Dalle la colpa per tutto."},
-    "Insulta una nuvola": {"punti": 30, "descrizione": "Grida al cielo e bestemmia contro l’umidità."},
-    "Sacrifica il criceto": {"punti": 200, "descrizione": "Per ottenere potere oscuro."},
-    "Evoca il demone del bidet": {"punti": 300, "descrizione": "Non chiedere come. Fallo e basta."},
-    "Lama nella minestra": {"punti": 110, "descrizione": "Condisci con violenza."},
-    "Soffia sulla torta": {"punti": 45, "descrizione": "Fallisci deliberatamente una festa di compleanno."},
-    "Cavalca un piccione": {"punti": 150, "descrizione": "Fai il tuo ingresso in scena con stile."},
-    "Tira un sasso al sole": {"punti": 85, "descrizione": "Un gesto inutile ma apprezzabile."},
-    "Rutta su Discord": {"punti": 55, "descrizione": "Lascia il tuo segno vocale nel server."},
-    "Caccia all'untore": {"punti": 125, "descrizione": "Accusa qualcuno a caso di tutto."},
-    "Twerk sulla tomba di Patata": {"punti": 180, "descrizione": "Onora i morti a modo tuo."},
-    "Canta all'inverso": {"punti": 70, "descrizione": "Convoca qualcosa di sbagliato."},
-    "Scolpisci con i denti": {"punti": 95, "descrizione": "Artista borderline."},
-    "Punta il dito a caso": {"punti": 20, "descrizione": "Sii colpevolmente vago."},
-    "Mastica carbone": {"punti": 100, "descrizione": "Perché il sapore della sconfitta non basta."},
-    "Sussurra a uno stegosauro": {"punti": 140, "descrizione": "Tenta la diplomazia con le punte."},
-    "Dormi nell'inventario": {"punti": 80, "descrizione": "Chiudi gli occhi tra le tue cose."},
-    "Uccidi con l'ironia": {"punti": 135, "descrizione": "Ferisce più della spada."},
-    "Sputa veleno psicologico": {"punti": 160, "descrizione": "Manipola come un vero bastardo."},
-    "Ingoia un machete": {"punti": 220, "descrizione": "Prestazione da circo estremo."},
-    "Dai un pugno al passato": {"punti": 105, "descrizione": "Risolvi traumi con violenza."},
-    "Ridi nel vuoto": {"punti": 50, "descrizione": "Fatti sentire da chi non ascolta."},
-    "Spezza le catene della noia": {"punti": 90, "descrizione": "Solo tu puoi interrompere lo schifo."},
-    "Versa del latte sulla tastiera": {"punti": 15, "descrizione": "Errore fatale. E volontario."},
-    "Monta un cinghiale": {"punti": 145, "descrizione": "Sfida la logica e vinci."},
-    "Tatuati un insulto": {"punti": 210, "descrizione": "Deve contenere almeno una parolaccia."},
-    "Dichiara guerra ai cubi": {"punti": 100, "descrizione": "I blocchi devono cadere."},
-    "Infila la testa in una padella": {"punti": 65, "descrizione": "È caldo lì dentro."},
-    "Domina il caos con una banana": {"punti": 190, "descrizione": "La frutta come arma definitiva."},
-    "Accarezza un'anima urlante": {"punti": 175, "descrizione": "Calma il dolore con amore."},
-    "Scava con una forchetta": {"punti": 130, "descrizione": "Non è efficiente, ma è tuo stile."},
+achievements_combat = {
+    "Campione": {
+        "punti": 250,
+        "descrizione": "Vinci 5 partite consecutive.",
+        "ripetibile": False
+    },
+    "Assassino Silenzioso": {
+        "punti": 150,
+        "descrizione": "Uccidi 10 nemici senza essere visto.",
+        "ripetibile": True
+    },
 }
 
-achievement_crafting = {
-    "Fornaio Esperto": {"punti": 10, "descrizione": "Hai sfornato il tuo primo pane fragrante."},
-    "Maestro del Fuoco": {"punti": 20, "descrizione": "Hai creato una fornace per lavorare i metalli."},
-    "Artigiano di Legno": {"punti": 15, "descrizione": "Hai costruito una sedia usando solo il legno grezzo."},
-    "Alchimista Novizio": {"punti": 25, "descrizione": "Hai mescolato con successo la tua prima pozione curativa."},
-    "Fabbro d'Eccellenza": {"punti": 30, "descrizione": "Hai forgiato la tua prima spada."},
-    "Intagliatore Abile": {"punti": 12, "descrizione": "Hai scolpito un simbolo antico sul legno."},
-    "Tessitore di Velli": {"punti": 18, "descrizione": "Hai creato un mantello con stoffe pregiate."},
-    "Cacciatore Esperto": {"punti": 22, "descrizione": "Hai raccolto tutte le pelli necessarie per un'armatura."},
-    "Inventore Creativo": {"punti": 35, "descrizione": "Hai progettato un nuovo strumento artigianale."},
-    "Alchimista Esperto": {"punti": 40, "descrizione": "Hai creato una pozione rara di grande potere."},
-    "Costruttore di Armi": {"punti": 28, "descrizione": "Hai assemblato la tua prima arma da mischia."},
-    "Mastro Vasaio": {"punti": 14, "descrizione": "Hai creato un vaso con argilla pregiata."},
-    "Esperto Intreccio": {"punti": 16, "descrizione": "Hai intrecciato corde resistenti."},
-    "Fabbro di Armature": {"punti": 38, "descrizione": "Hai realizzato un'armatura completa."},
-    "Cucitore Abile": {"punti": 20, "descrizione": "Hai cucito un abito elegante."},
-    "Mastro Ceramista": {"punti": 17, "descrizione": "Hai modellato una scultura in ceramica."},
-    "Alchimista di Fuoco": {"punti": 45, "descrizione": "Hai creato una miscela esplosiva."},
-    "Falegname Esperto": {"punti": 25, "descrizione": "Hai costruito una robusta porta di legno."},
-    "Sarto di Corte": {"punti": 30, "descrizione": "Hai confezionato un abito reale."},
-    "Forgiatore di Lame": {"punti": 35, "descrizione": "Hai forgiato una lama affilata come un rasoio."},
-    "Scultore di Pietra": {"punti": 22, "descrizione": "Hai scolpito un bassorilievo complesso."},
-    "Costruttore di Trappole": {"punti": 27, "descrizione": "Hai creato una trappola ingegnosa."},
-    "Esperto di Erbe": {"punti": 18, "descrizione": "Hai raccolto erbe rare per pozioni."},
-    "Mastro Tessitore": {"punti": 20, "descrizione": "Hai tessuto un arazzo colorato."},
-    "Inventore Meccanico": {"punti": 40, "descrizione": "Hai costruito un dispositivo meccanico complesso."},
-    "Fabbro Leggendario": {"punti": 50, "descrizione": "Hai creato un'arma leggendaria."},
-    "Mastro Cuoio": {"punti": 23, "descrizione": "Hai lavorato il cuoio per un'armatura leggera."},
-    "Cacciatore di Teschi": {"punti": 26, "descrizione": "Hai raccolto teschi rari per rituali."},
-    "Costruttore di Navi": {"punti": 55, "descrizione": "Hai completato la costruzione di una nave."},
-    "Mastro Orologiaio": {"punti": 33, "descrizione": "Hai creato un orologio preciso."},
-    "Esperto di Veleni": {"punti": 37, "descrizione": "Hai preparato un veleno mortale."},
-    "Maestro di Incisione": {"punti": 21, "descrizione": "Hai inciso simboli magici su un oggetto."},
-    "Costruttore di Arpe": {"punti": 19, "descrizione": "Hai costruito un'arpa melodiosa."},
-    "Falegname di Navi": {"punti": 48, "descrizione": "Hai lavorato al ponte di una nave."},
-    "Alchimista Mistico": {"punti": 42, "descrizione": "Hai creato una pozione mistica rara."},
-    "Mastro Muratore": {"punti": 29, "descrizione": "Hai costruito un muro di pietra robusto."},
-    "Forgiatore di Anelli": {"punti": 31, "descrizione": "Hai forgiato un anello magico."},
-    "Scultore di Ghiaccio": {"punti": 24, "descrizione": "Hai scolpito una figura di ghiaccio."},
-    "Esperto di Spezie": {"punti": 15, "descrizione": "Hai raccolto spezie rare per cucinare."},
-    "Maestro Tessitore": {"punti": 28, "descrizione": "Hai tessuto un tappeto decorativo."},
-    "Inventore Alchimista": {"punti": 39, "descrizione": "Hai creato un congegno alchemico unico."},
-    "Fabbro di Spade": {"punti": 34, "descrizione": "Hai realizzato una spada perfetta."},
-    "Mastro di Lanterne": {"punti": 18, "descrizione": "Hai costruito lanterne brillanti."},
-    "Alchimista di Ghiaccio": {"punti": 43, "descrizione": "Hai creato una pozione ghiacciata."},
-    "Costruttore di Ponti": {"punti": 44, "descrizione": "Hai completato un ponte di legno."},
-    "Maestro di Vetro": {"punti": 32, "descrizione": "Hai soffiato un vaso di vetro."},
-    "Mastro di Cordami": {"punti": 20, "descrizione": "Hai realizzato corde resistenti."},
-    "Forgiatore di Martelli": {"punti": 37, "descrizione": "Hai forgiato un martello potente."},
-    "Scultore di Legno": {"punti": 25, "descrizione": "Hai scolpito una statua in legno."},
-    "Esperto di Cianfrusaglie": {"punti": 14, "descrizione": "Hai assemblato oggetti curiosi."},
-    "Costruttore di Fortificazioni": {"punti": 49, "descrizione": "Hai costruito una fortezza."},
-    "Mastro di Lame": {"punti": 36, "descrizione": "Hai affilato lame da guerra."},
-    "Alchimista di Veleno": {"punti": 41, "descrizione": "Hai preparato un veleno subdolo."},
-    "Falegname di Mobili": {"punti": 27, "descrizione": "Hai creato un mobile elegante."},
-    "Maestro di Pietra": {"punti": 30, "descrizione": "Hai tagliato pietre preziose."},
-    "Inventore di Trappole": {"punti": 38, "descrizione": "Hai progettato trappole sofisticate."},
-    "Forgiatore di Spade Lunghe": {"punti": 45, "descrizione": "Hai realizzato una spada lunga leggendaria."},
-    "Scultore di Marmo": {"punti": 28, "descrizione": "Hai scolpito una statua in marmo."},
-    "Esperto di Erbe Rari": {"punti": 22, "descrizione": "Hai raccolto erbe rarissime."},
-    "Costruttore di Archi": {"punti": 33, "descrizione": "Hai costruito archi da caccia."},
-    "Mastro di Stuoie": {"punti": 19, "descrizione": "Hai tessuto stuoie resistenti."},
-    "Alchimista di Luce": {"punti": 47, "descrizione": "Hai creato una pozione di luce."},
-    "Fabbro di Scudi": {"punti": 35, "descrizione": "Hai forgiato uno scudo robusto."},
-    "Mastro di Pergamene": {"punti": 21, "descrizione": "Hai creato pergamene magiche."},
-    "Costruttore di Scale": {"punti": 26, "descrizione": "Hai costruito scale solide."},
-    "Forgiatore di Spade Corte": {"punti": 32, "descrizione": "Hai forgiato una spada corta veloce."},
-    "Scultore di Bronzo": {"punti": 23, "descrizione": "Hai scolpito una figura in bronzo."},
-    "Esperto di Spezie Rare": {"punti": 16, "descrizione": "Hai raccolto spezie rare e preziose."},
-    "Maestro di Armature": {"punti": 40, "descrizione": "Hai creato armature perfette."},
-    "Inventore di Meccanismi": {"punti": 39, "descrizione": "Hai inventato meccanismi complessi."},
-    "Falegname di Strumenti": {"punti": 24, "descrizione": "Hai creato strumenti musicali."},
-    "Alchimista di Fuoco": {"punti": 45, "descrizione": "Hai creato pozioni infuocate."},
-    "Costruttore di Botti": {"punti": 28, "descrizione": "Hai costruito botti per conservare."},
-    "Mastro di Tessuti": {"punti": 22, "descrizione": "Hai lavorato tessuti pregiati."},
-    "Forgiatore di Lame Curvate": {"punti": 34, "descrizione": "Hai forgiato lame curve uniche."},
-    "Scultore di Ossa": {"punti": 20, "descrizione": "Hai scolpito oggetti con ossa."},
-    "Esperto di Alchimia Oscura": {"punti": 50, "descrizione": "Hai creato pozioni di alchimia oscura."},
-    "Maestro di Strumenti": {"punti": 25, "descrizione": "Hai costruito strumenti di precisione."},
-    "Costruttore di Carri": {"punti": 30, "descrizione": "Hai costruito carri robusti."},
-    "Fabbro di Lance": {"punti": 36, "descrizione": "Hai forgiato lance affilate."},
-    "Mastro di Vetro": {"punti": 29, "descrizione": "Hai soffiato vasi di vetro artistici."},
+achievements_crafting = {
+    "Fabbro": {
+        "punti": 80,
+        "descrizione": "Crea la tua prima arma.",
+        "ripetibile": False
+    },
+    "Artigiano": {
+        "punti": 120,
+        "descrizione": "Crea 50 oggetti.",
+        "ripetibile": True
+    },
 }
 
 all_achievement_lists = {
-    "OneShot": (achievements_oneshot, True, 0x2ecc71),
-    "Infiniti": (achievements_infiniti, False, 0x3498db),
-    "Crafting": (achievement_crafting, False, 0x8a2be2),
+    "Survival": (achievements_survival, 0x2ecc71),
+    "Combat": (achievements_combat, 0x3498db),
+    "Crafting": (achievements_crafting, 0x8a2be2),
 }
 
 sent_messages = []
@@ -776,13 +649,13 @@ class AchievementsRedeemView(View):
             await interaction.response.send_message("Seleziona un achievement valido prima di completarlo.", ephemeral=True)
             return
 
-        ach_dict, one_shot, _ = all_achievement_lists[self.selected_list_name]
+        ach_dict, _ = all_achievement_lists[self.selected_list_name] #qui
         dati = ach_dict[self.selected_ach_name]
         user_id = interaction.user.id
         tribe_user_ids = get_tribe_members(user_id)
 
         # Check se già completato da qualcuno nella tribe
-        if one_shot:
+        if not dati["ripetibile"]:
             if achievements_collection.find_one({
                 "user_id": {"$in": [str(uid) for uid in tribe_user_ids]},
                 "achievement": self.selected_ach_name
@@ -802,7 +675,7 @@ class AchievementsRedeemView(View):
                 "achievement": self.selected_ach_name,
                 "punti": dati["punti"],
                 "timestamp": interaction.created_at,
-                "one_shot": one_shot
+                "ripetibile": dati["ripetibile"]
             })
 
         # Feedback all’utente
@@ -1451,6 +1324,8 @@ async def redeem_achievement(interaction: Interaction):
         embed = Embed(title=first_ach_name, color=color)
         embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
         embed.add_field(name="Punti", value=str(dati["punti"]), inline=True)
+        ripetibile_txt = "Sì" if dati["ripetibile"] else "No"
+        embed.add_field(name="Ripetibile", value=ripetibile_txt, inline=True)
     else:
         embed = Embed(title="Nessun achievement", description="Non ci sono achievement da mostrare.", color=discord.Color.dark_gray())
 
@@ -1625,7 +1500,7 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
 #     await interaction.followup.send(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="undo", description="Annulla un redeem o achievement (ADMIN)")
-async def undo(interaction: discord.Interaction, utente: discord.User, lista: str):
+async def undo(interaction: discord.Interaction, utente: discord.User, lista: Literal["achievement", "redeem"] = None):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
