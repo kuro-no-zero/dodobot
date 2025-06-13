@@ -635,7 +635,7 @@ class AchievementsRedeemView(View):
             await interaction.response.send_message("Sei già alla prima pagina.", ephemeral=True)
 
     async def next_page_callback(self, interaction: Interaction):
-        ach_dict, _, _ = all_achievement_lists.get(self.selected_list_name, ({}, False, discord.Color.default()))
+        ach_dict, _ = all_achievement_lists.get(self.selected_list_name, ({}, discord.Color.default()))
         ach_names = sorted(ach_dict.keys())
         max_page = (len(ach_names) - 1) // 25
         if self.ach_page < max_page:
@@ -783,7 +783,7 @@ class AchievementDropdownView(View):
 
     async def select_category_callback(self, interaction: Interaction):
         self.current_category = self.category_select.values[0]
-        achievements, _, _ = all_achievement_lists[self.current_category]
+        achievements, _ = all_achievement_lists[self.current_category]
         self.current_achievements = achievements
         self.ach_page = 0
 
@@ -1293,7 +1293,7 @@ async def lista_achievements(interaction: Interaction):
 
     await interaction.response.defer(thinking=True, ephemeral=True)
     default_cat = sorted(all_achievement_lists.keys())[0]
-    achievements, _, _ = all_achievement_lists[default_cat]
+    achievements, _ = all_achievement_lists[default_cat]
     desc = format_achievements_table(achievements, default_cat, page=0, per_page=MAX_OPTIONS_PER_PAGE)
     view = AchievementDropdownView()
     
