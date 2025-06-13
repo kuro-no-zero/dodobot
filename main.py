@@ -19,6 +19,7 @@ from urllib.parse import quote_plus
 from typing import Optional, List, Dict
 from typing import Literal
 import aiohttp
+import base64
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -1164,24 +1165,24 @@ all_achievement_lists = {
 
 IMAGE_MAP = {
     "Small": {
-        "Land": "https://i.imgur.com/aAlywGR.jpeg",
-        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
-        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
+        "Land": "https://i.imgur.com/g6fr4Me.png",
+        "Flyers": "https://i.imgur.com/g6fr4Me.png",
+        "Acquatic": "https://i.imgur.com/g6fr4Me.png",
     },
     "Medium": {
-        "Land": "https://i.imgur.com/aAlywGR.jpeg",
-        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
-        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
+        "Land": "https://i.imgur.com/g6fr4Me.png",
+        "Flyers": "https://i.imgur.com/g6fr4Me.png",
+        "Acquatic": "https://i.imgur.com/g6fr4Me.png",
     },
     "Big": {
-        "Land": "https://i.imgur.com/aAlywGR.jpeg",
-        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
-        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
+        "Land": "https://i.imgur.com/g6fr4Me.png",
+        "Flyers": "https://i.imgur.com/g6fr4Me.png",
+        "Acquatic": "https://i.imgur.com/g6fr4Me.png",
     },
     "Mega": {
-        "Land": "https://i.imgur.com/aAlywGR.jpeg",
-        "Flyers": "https://i.imgur.com/aAlywGR.jpeg",
-        "Acquatic": "https://i.imgur.com/aAlywGR.jpeg",
+        "Land": "https://i.imgur.com/g6fr4Me.png",
+        "Flyers": "https://i.imgur.com/g6fr4Me.png",
+        "Acquatic": "https://i.imgur.com/g6fr4Me.png",
     }
 }
 
