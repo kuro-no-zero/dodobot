@@ -1373,6 +1373,8 @@ class DuelResolutionView(discord.ui.View):
         category_map = {"land": 0, "flyers": 1, "acquatic": 2}
         index = category_map.get(category, 0)
 
+        size = selected_duel["type"].capitalize()
+
         win_points = {
             "Small": [50, 60, 70],
             "Medium": [80, 90, 100],
