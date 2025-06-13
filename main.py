@@ -1092,13 +1092,13 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Estrai l'immagine principale dalla tabella a destra (infobox)
-    infobox = soup.find("table", class_="infobox")
+    # Prova a trovare la prima immagine "importante" (spesso è nel primo <img> della colonna destra)
     image_url = None
-    if infobox:
-        img_tag = infobox.find("img")
-        if img_tag and img_tag.get("src"):
-            image_url = "https:" + img_tag["src"]
+    for img in soup.find_all("img"):
+        src = img.get("src")
+        if src and "/images/" in src and not src.startswith("data:"):
+            image_url = "https:" + src
+            break
 
     # Trova la sezione Utility > Roles
     utility_header = soup.find(id="Utility")
