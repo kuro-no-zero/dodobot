@@ -756,10 +756,8 @@ class AchievementsRedeemView(View):
             "one_shot": one_shot
         })
 
-        await interaction.response.send_message(
-            f"Hai completato l'achievement **{self.selected_ach_name}** e guadagnato {dati['punti']} punti! 🎉",
-            ephemeral=True
-        )
+        await interaction.response.send_message(f"{interaction.user.mention} ha completato l'achievement **{self.selected_ach_name}** e ha guadagnato {dati['punti']} punti! 🎉"
+)
 
 def format_achievements_table(achievements: dict, categoria: str, page: int, per_page: int) -> str:
     achievement_names = sorted(achievements.keys())
