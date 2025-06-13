@@ -1106,10 +1106,32 @@ def get_dino_description(nome_dino: str):
     if not roles_list:
         return None, None, f"Lista 'Roles' non trovata per '{nome_dino}'."
 
-    # Estrai il testo di ogni <li> e crea una stringa formattata
-    items = [f"• {li.get_text(strip=True)}" for li in roles_list.find_all("li")]
-    descrizione = "\n".join(items)
+    items = []
+    for li in roles_list.find_all("li"):
+        testo = li.get_text(strip=True)
 
+        # Assicura spazio dopo i ":" per chiarezza
+        if ":" in testo:
+            parti = testo.split(":", 1)
+            titolo = parti[0].strip() + ":"
+            descrizione = parti[1].strip()
+
+            # Spezza la descrizione in frasi più brevi
+            frasi = [f.strip() for f in descrizione.split(".") if f.strip()]
+            if frasi:
+                testo_formattato = f"• {titolo} {frasi[0]}."
+                # Le frasi successive vanno a capo con un trattino per evidenziare
+                if len(frasi) > 1:
+                    testo_formattato += "\n" + "\n".join(f"- {f}." for f in frasi[1:])
+            else:
+                testo_formattato = f"• {titolo} {descrizione}"
+        else:
+            # Caso senza ":" (più raro)
+            testo_formattato = f"• {testo}"
+
+        items.append(testo_formattato)
+
+    descrizione = "\n\n".join(items)
     return descrizione, url, None
 
 # === BOT SETUP ===
