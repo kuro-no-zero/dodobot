@@ -1093,7 +1093,6 @@ def get_dino_description(nome_dino: str):
     soup = BeautifulSoup(r.text, "html.parser")
 
     # Trova l'immagine giusta nella tabella info a destra
-    # Usando selettore più specifico per pescare la prima immagine dopo i moduli info
     image_tag = None
     container = soup.select_one(".info-arkitex.info-framework")
     if container:
@@ -1111,8 +1110,14 @@ def get_dino_description(nome_dino: str):
         elif not image_url.startswith("http"):
             image_url = "https://" + image_url.lstrip("/")
 
-    # Se l'url è un data URI o non valido, azzera
-    if not image_url or image_url.startswith("data:"):
+    # Validazione URL immagine: deve essere http(s) e non data URI
+    def is_valid_image_url(url: str) -> bool:
+        if not url:
+            return False
+        url = url.strip()
+        return (url.startswith("http://") or url.startswith("https://")) and not url.startswith("data:")
+
+    if not is_valid_image_url(image_url):
         image_url = None
 
     # Cerca sezione Utility → Roles
