@@ -1238,7 +1238,7 @@ async def togli(interaction: discord.Interaction, membro: discord.Member, quanti
 
 @bot.tree.command(name="classifica", description="Mostra la classifica dei punti e achievement")
 @app_commands.describe(tipo="Scrivi 'tribe' per vedere la classifica delle tribù")
-async def classifica(interaction: discord.Interaction, tipo: Optional[str] = None):
+async def classifica(interaction: discord.Interaction, tipo: Literal["generale", "tribe"] = "generale"):
     
     global tribe_members  # opzionale ma esplicativo
 
