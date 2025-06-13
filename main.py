@@ -964,7 +964,6 @@ class AchievementDropdownView(View):
 async def send_paginated_embed(interaction: Interaction, entries: list[str], title: str):
     per_page = 10
     total_pages = math.ceil(len(entries) / per_page)
-    current_page = 0
 
     def get_embed(page):
         start = page * per_page
@@ -981,25 +980,31 @@ async def send_paginated_embed(interaction: Interaction, entries: list[str], tit
 
         def update_buttons(self):
             self.clear_items()
+
             if total_pages <= 1:
-                return
-            self.add_item(Button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary, custom_id="back", disabled=self.current_page == 0))
-            self.add_item(Button(label="Avanti ➡️", style=discord.ButtonStyle.secondary, custom_id="next", disabled=self.current_page == total_pages - 1))
+                return  # Nessun bottone se c'è solo una pagina
 
-        async def interaction_check(self, interaction: Interaction) -> bool:
-            return True  # puoi limitarlo all'admin se vuoi
+            back_button = Button(label="⬅️ Indietro", style=ButtonStyle.secondary)
+            next_button = Button(label="Avanti ➡️", style=ButtonStyle.secondary)
 
-        @discord.ui.button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary, custom_id="back")
-        async def back(self, interaction: Interaction, button: Button):
-            self.current_page -= 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=get_embed(self.current_page), view=self)
+            back_button.disabled = self.current_page == 0
+            next_button.disabled = self.current_page == total_pages - 1
 
-        @discord.ui.button(label="Avanti ➡️", style=discord.ButtonStyle.secondary, custom_id="next")
-        async def next(self, interaction: Interaction, button: Button):
-            self.current_page += 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=get_embed(self.current_page), view=self)
+            async def back_callback(interaction: Interaction):
+                self.current_page -= 1
+                self.update_buttons()
+                await interaction.response.edit_message(embed=get_embed(self.current_page), view=self)
+
+            async def next_callback(interaction: Interaction):
+                self.current_page += 1
+                self.update_buttons()
+                await interaction.response.edit_message(embed=get_embed(self.current_page), view=self)
+
+            back_button.callback = back_callback
+            next_button.callback = next_callback
+
+            self.add_item(back_button)
+            self.add_item(next_button)
 
     view = Paginator()
     await interaction.followup.send(embed=get_embed(0), view=view, ephemeral=True)
