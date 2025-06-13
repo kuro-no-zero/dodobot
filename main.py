@@ -2348,7 +2348,7 @@ async def patata(interaction: discord.Interaction):
 
     await interaction.response.send_message(f"**{video_title}**\n{video_url}")
 
-@bot.tree.command(name="regole_1vs1", description="Mostra le regole per le sfide 1vs1/tornei")
+@bot.tree.command(name="regole_1vs1", description="Mostra le regole e i comandi dei duelli 1vs1")
 async def regole_1vs1(interaction: discord.Interaction):
     embed = discord.Embed(
         title="📜 Regole Duelli 1vs1",
@@ -2395,7 +2395,7 @@ async def regole_1vs1(interaction: discord.Interaction):
             "`Medium` → Land: 80 | Flyers: 90 | Acquatic: 100\n"
             "`Big` → Land: 120 | Flyers: 130 | Acquatic: 140\n"
             "`Mega` → Land: 200 (Flyers/Acquatic non supportati)\n\n"
-            **"Sconfitta:****\n"
+            "**Sconfitta:**\n"
             "`Small` → Land: 40 | Flyers: 50 | Acquatic: 60\n"
             "`Medium` → Land: 70 | Flyers: 80 | Acquatic: 90\n"
             "`Big` → Land: 100 | Flyers: 110 | Acquatic: 120\n"
@@ -2404,8 +2404,8 @@ async def regole_1vs1(interaction: discord.Interaction):
         inline=False
     )
 
-    embed.set_footer(text="Sistema duelli sviluppato con ❤️ da Dodo e implementato con 🩸 da kuro")
-    
+    embed.set_footer(text="Sistema duelli sviluppato con ❤️ dal team server")
+
     await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @bot.tree.command(name="regole_achievement", description="Spiega come funziona il sistema degli achievements")
