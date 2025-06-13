@@ -16,7 +16,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
-from typing import Literal
+from typing import Optional, List, Dict
 
 # === Lista degli ID dei ruoli autorizzati ===
 
