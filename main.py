@@ -2492,6 +2492,9 @@ async def duel(
                     return await interaction.followup.send("❌ Errore nel recupero dell'immagine.", ephemeral=True)
                 image_bytes = await response.read()
 
+        image_b64 = base64.b64encode(image_bytes).decode('utf-8')
+        image_data = f"data:image/png;base64,{image_b64}"
+
         # Crea evento vocale
         event = await guild.create_scheduled_event(
             name=title,
@@ -2500,7 +2503,7 @@ async def duel(
             description=description,
             channel=arena_channel,
             entity_type=discord.EntityType.voice,
-            image=image_bytes
+            image=image_data  # <-- qui la stringa base64
         )
 
         # Salva nel database
