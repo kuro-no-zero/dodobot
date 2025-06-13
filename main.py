@@ -27,7 +27,7 @@ redeemable_dinos = {
     "Blood Crystal Wyvern": {
         "livello": 115, 
         "punti": 300, 
-        "img": "https://i.redd.it/m8aiey0ekgl51.jpg"
+        "img": "https://i.ebayimg.com/00/s/OTAwWDE2MDA=/z/gV0AAOSwLpNjFBVI/$_57.JPG?set_id=8800005007"
     },
     "Bloodstalker": {
         "livello": 150, 
@@ -52,7 +52,7 @@ redeemable_dinos = {
     "Noglin": {
         "livello": 150, 
         "punti": 450, 
-        "img": "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fu4fyauknzry51.jpg%3Fwidth%3D1080%26crop%3Dsmart%26auto%3Dwebp%26s%3Dfbbd72d495673314fe17e5ea53d703f89a091982"
+        "img": "https://i.ytimg.com/vi/YeYQfVg1YZs/maxresdefault.jpg"
     },
     "Phoenix": {
         "livello": 150, 
@@ -72,7 +72,7 @@ redeemable_dinos = {
     "Tropical Crystal Wyvern": {
         "livello": 115, 
         "punti": 300, 
-        "img": "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fvvaxr0x4lkk51.jpg"
+        "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/7/7c/Crystal_Wyvern_Image.jpg/revision/latest?cb=20200614011556"
     },
     "Voidwyrm": {
         "livello": 115, 
@@ -92,12 +92,12 @@ redeemable_dinos = {
     "Andrewsarchus": {
         "livello": 150, 
         "punti": 170, 
-        "img": "https://www.pcgamesn.com/wp-content/uploads/2022/06/ark-andrewsarchus-spawn-locations-how-to-tame-controls-2.jpg"
+        "img": "https://progametalk.com/wp-content/uploads/2022/06/AKANDREW-1.png"
     },
     "Desmodus": {
         "livello": 150, 
         "punti": 270, 
-        "img": "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fsome-desmodus-colour-mutations-ive-made-and-im-quite-happy-v0-ebpt1z5injh91.jpg%3Fwidth%3D3840%26format%3Dpjpg%26auto%3Dwebp%26s%3De7613bdf60bd76f6bbea1c777fe8f1a74b44df15"
+        "img": "https://clan.fastly.steamstatic.com/images/8729288/e43a622433366d5965501ddb9a031465e093a2d7.png"
     },
     "Fjordhawk": {
         "livello": 150, 
@@ -107,12 +107,12 @@ redeemable_dinos = {
     "Deinonychus": {
         "livello": 75, 
         "punti": 200, 
-        "img": "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2F029y9y6msga31.jpg"
+        "img": "https://ark.wiki.gg/images/thumb/2/29/Mod_Ark_Eternal_Elemental_Ice_DeinoNychus_Image.jpg/1008px-Mod_Ark_Eternal_Elemental_Ice_DeinoNychus_Image.jpg?79bb0e"
     },
     "Gacha (Random)": {
         "livello": 150, 
         "punti": 150, 
-        "img": "https://83374.media.forgecdn.net/attachments/1076/947/20250113160031_1.jpg"
+        "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/e/ef/GachaThumbnail.png/revision/latest?cb=20181017121726"
     },
     "Gasbags": {
         "livello": 150, 
@@ -147,7 +147,7 @@ redeemable_dinos = {
     "Featherlight": {
         "livello": 150, 
         "punti": 30, 
-        "img": "https://staticg.sportskeeda.com/editor/2024/09/da65c-17258070348451-1920.jpg"
+        "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/6/64/Mod_Primal_Fear_Fabled_Featherlight_Image.jpg/revision/latest/scale-to-width-down/1200?cb=20190225211224"
     },
     "Glowtail": {
         "livello": 150, 
