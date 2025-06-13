@@ -1430,8 +1430,6 @@ async def dodo(interaction: discord.Interaction):
     embed.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole per le sfide 1vs1/tornei.", inline=False)
 
     # Comandi cazzari
-    embed.add_field(name="COMANDI MEME", value="", inline=False)
-
     embed.add_field(name="/patata", value="🥔 Se ti vuoi davvero male", inline=False)
 
     # Comandi dinosauri
@@ -1459,7 +1457,6 @@ async def dodo(interaction: discord.Interaction):
     embed.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
     embed.add_field(name="/undo", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
-    embed.add_field(name="!sync", value="🔄 Sincronizza i comandi slash del bot.", inline=False)
 
     embed.set_footer(text="Per ulteriori dettagli, chiedi a kurous")
     await interaction.response.send_message(embed=embed, ephemeral=True)
