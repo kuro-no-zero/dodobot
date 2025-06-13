@@ -2554,29 +2554,6 @@ async def duel_history(interaction: discord.Interaction):
         )
 
     await send_paginated_embed(interaction, entries, "📋 Storico Duelli")
-    if not is_authorized(interaction):
-        await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
-        return
-
-    await interaction.response.defer(ephemeral=True)
-
-    docs = list(duels_collection.find().sort("datetime", -1))  # Ordine decrescente per data
-    if not docs:
-        await interaction.followup.send("Nessun duello registrato.", ephemeral=True)
-        return
-
-    entries = []
-    for doc in docs:
-        challenger = await bot.fetch_user(int(doc["challenger_id"]))
-        opponent = await bot.fetch_user(int(doc["opponent_id"]))
-        duel_time = doc["datetime"].strftime("%d/%m/%Y %H:%M")
-        status = doc.get("status", "scheduled")
-
-        entries.append(
-            f"[{duel_time}] 🥊 **{challenger.name}** vs **{opponent.name}** — {doc['type']} | {doc['category']} ({status})"
-        )
-
-    await send_paginated_embed(interaction, entries, "📋 Storico Duelli")
     
 # === AVVIO BOT ===
 @bot.event
