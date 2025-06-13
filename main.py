@@ -1369,14 +1369,14 @@ class DuelResolutionView(discord.ui.View):
             await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
             return
 
-        category = selected_duel["category"].lower()
+        category = selected_duel["type"].lower()  # era "Flyers", quindi va in lowercase
         category_map = {"land": 0, "flyers": 1, "aquatic": 2}
         index = category_map.get(category)
 
         if index is None:
             return await interaction.response.send_message(f"⚠️ Categoria non valida: `{selected_duel['category']}`", ephemeral=True)
 
-        size = selected_duel["type"].capitalize()
+        size = selected_duel["category"].capitalize()  # era "Big", quindi va capitalizzato
         if size not in ["Small", "Medium", "Big", "Mega"]:
             return await interaction.response.send_message(f"⚠️ Dimensione non valida: `{selected_duel['type']}`", ephemeral=True)
 
