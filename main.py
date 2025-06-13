@@ -1091,16 +1091,26 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Cerca il primo <p> di testo che abbia almeno 50 caratteri (per evitare <p> vuoti o insignificanti)
-    paragraphs = soup.find_all("p")
-    for p in paragraphs:
-        testo = p.get_text(strip=True)
-        if len(testo) > 50:
-            # Pulizia base: rimuovo eventuali \n e spazi eccessivi
-            descrizione = ' '.join(testo.split())
-            return descrizione, url, None
+    # Trova la sezione Utility
+    utility_header = soup.find(id="Utility")
+    if not utility_header:
+        return None, None, f"Sezione 'Utility' non trovata per '{nome_dino}'."
 
-    return None, None, f"Nessuna descrizione utile trovata per '{nome_dino}'."
+    # Trova il sotto-header Roles
+    roles_header = utility_header.find_next("span", id="Roles")
+    if not roles_header:
+        return None, None, f"Sezione 'Roles' non trovata per '{nome_dino}'."
+
+    # Trova la lista <ul> immediatamente dopo Roles
+    roles_list = roles_header.find_parent().find_next_sibling("ul")
+    if not roles_list:
+        return None, None, f"Lista 'Roles' non trovata per '{nome_dino}'."
+
+    # Estrai il testo di ogni <li> e crea una stringa formattata
+    items = [f"• {li.get_text(strip=True)}" for li in roles_list.find_all("li")]
+    descrizione = "\n".join(items)
+
+    return descrizione, url, None
 
 # === BOT SETUP ===
 intents = discord.Intents.default()
@@ -1467,7 +1477,7 @@ async def dino_info(interaction: discord.Interaction, nome: str):
         return
 
     embed = discord.Embed(
-        title=f"{nome.title()} - Descrizione base",
+        title=f"{nome.title()} - Ruoli (Utility → Roles)",
         url=url,
         color=discord.Color.green()
     )
