@@ -1262,7 +1262,7 @@ class DuelResolutionView(discord.ui.View):
         super().__init__(timeout=300)
         self.duels = duels
         self.user_id = user_id
-        self.bot = bo
+        self.bot = bot
         self.page = 0
 
         self.duel_select = discord.ui.Select(
@@ -2806,7 +2806,7 @@ async def resolve_duel(interaction: discord.Interaction):
     if not filtered:
         return await interaction.followup.send("❌ Non ci sono duelli da risolvere in cui sei coinvolto.", ephemeral=True)
 
-    view = DuelResolutionView(filtered, user_id)
+    view = DuelResolutionView(filtered, user_id, bot)
 
     # Precompila le opzioni del result_select con il primo duello
     first_duel = filtered[0]
