@@ -186,6 +186,27 @@ redeemable_dinos = {
     }
 }
 
+# === Lista Tribes ===
+
+tribe_members = {
+    "drake_tribe": [
+        143237899603804161, #radu
+        284988139011964928, #dodo
+        804262403394502677  #sara
+    ],
+    "alessia_tribe": [
+        693906313729802301, #alessia
+        901090228792590346  #laura
+    ],
+    "lus_tribe": [
+        285024740421402624  #lus
+    ],
+    "simonik_tribe": [
+        522441364831469568, #nick
+        254590376201945090  #simo
+    ]
+}
+
 # === Liste Achievements ===
 
 achievements_oneshot = {
@@ -405,6 +426,18 @@ def set_punti(user_id, valore):
         {"$set": {"punti": valore}},
         upsert=True  # Se non esiste, crea
     )
+
+def get_tribe_id(user_id: int) -> str | None:
+    for tribe_id, members in tribe_members.items():
+        if user_id in members:
+            return tribe_id
+    return None
+
+def get_tribe_members(user_id: int) -> list[int]:
+    tribe_id = get_tribe_id(user_id)
+    if tribe_id:
+        return tribe_members[tribe_id]
+    return [user_id]  # Se non ha tribe, considera solo se stesso
 
 # === FUNZIONI DI CONTROLLO ===
 
@@ -741,31 +774,46 @@ class AchievementsRedeemView(View):
             await interaction.response.send_message("Seleziona un achievement valido prima di completarlo.", ephemeral=True)
             return
 
-        user_id = str(interaction.user.id)
         ach_dict, one_shot, _ = all_achievement_lists[self.selected_list_name]
         dati = ach_dict[self.selected_ach_name]
-        punti_utente = get_punti(interaction.user.id)
+        user_id = interaction.user.id
+        tribe_user_ids = get_tribe_members(user_id)
 
+        # Check se già completato da qualcuno nella tribe
         if one_shot:
-            if achievements_collection.find_one({"user_id": user_id, "achievement": self.selected_ach_name}):
+            if achievements_collection.find_one({
+                "user_id": {"$in": [str(uid) for uid in tribe_user_ids]},
+                "achievement": self.selected_ach_name
+            }):
                 await interaction.response.send_message(
-                    f"Hai già completato l'achievement **{self.selected_ach_name}**!",
+                    f"L'achievement **{self.selected_ach_name}** è già stato completato da qualcuno della tua tribe!",
                     ephemeral=True
                 )
                 return
 
-        set_punti(interaction.user.id, punti_utente + dati["punti"])
+        # Assegna l'achievement a tutti i membri della tribe
+        for uid in tribe_user_ids:
+            current_points = get_punti(uid)
+            set_punti(uid, current_points + dati["punti"])
+            achievements_collection.insert_one({
+                "user_id": str(uid),
+                "achievement": self.selected_ach_name,
+                "punti": dati["punti"],
+                "timestamp": interaction.created_at,
+                "one_shot": one_shot
+            })
 
-        achievements_collection.insert_one({
-            "user_id": user_id,
-            "achievement": self.selected_ach_name,
-            "punti": dati["punti"],
-            "timestamp": interaction.created_at,
-            "one_shot": one_shot
-        })
-
-        await interaction.response.send_message(f"{interaction.user.mention} ha completato l'achievement **{self.selected_ach_name}** e ha guadagnato {dati['punti']} punti! 🎉"
-)
+        # Feedback all’utente
+        if len(tribe_user_ids) > 1:
+            await interaction.response.send_message(
+                f"L'achievement **{self.selected_ach_name}** è stato completato da {interaction.user.mention} e assegnato a tutti i membri della tribe! 🎉",
+                ephemeral=True
+            )
+        else:
+            await interaction.response.send_message(
+                f"{interaction.user.mention} ha completato l'achievement **{self.selected_ach_name}** e ha guadagnato {dati['punti']} punti! 🎉",
+                ephemeral=True
+            )
 
 def format_achievements_table(achievements: dict, categoria: str, page: int, per_page: int) -> str:
     achievement_names = sorted(achievements.keys())
