@@ -1332,7 +1332,7 @@ class DuelResolutionView(discord.ui.View):
             discord.SelectOption(label=selected_duel["opponent_name"], value="opponent"),
             discord.SelectOption(label="❌ Duello annullato", value="cancel")
         ]
-        self.result_select.values = []  # reset selezione precedente
+        #self.result_select.values = []  # reset selezione precedente
 
         await interaction.response.edit_message(
             content=f"Duello selezionato: {selected_duel['challenger_name']} vs {selected_duel['opponent_name']}\nSeleziona il vincitore:",
