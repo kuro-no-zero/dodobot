@@ -977,32 +977,15 @@ async def punti(interaction: discord.Interaction, membro: discord.Member = None)
     punti = get_punti(membro.id)
     await interaction.response.send_message(f"{membro.display_name} ha {punti} punti.")
 
-@bot.tree.command(name="aggiungi", description="Aggiungi punti a uno o piu utenti (ADMIN)")
-@app_commands.describe(membri="Utente/i a cui aggiungere punti", quantita="Numero di punti da aggiungere")
-async def aggiungi(interaction: discord.Interaction, membri: str, quantita: int):
+@bot.tree.command(name="aggiungi", description="Aggiungi punti a un utente (ADMIN)")
+@app_commands.describe(membro="L'utente a cui aggiungere punti", quantita="Numero di punti da aggiungere")
+async def aggiungi(interaction: discord.Interaction, membro: discord.Member, quantita: int):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
-
-    # Estrai gli ID dalle menzioni
-    utenti = []
-    for word in membri.split():
-        if word.startswith("<@") and word.endswith(">"):
-            user_id = int(word.strip("<@!>"))
-            membro = interaction.guild.get_member(user_id)
-            if membro:
-                utenti.append(membro)
-
-    if not utenti:
-        await interaction.response.send_message("Nessun utente valido trovato.", ephemeral=True)
-        return
-
-    for membro in utenti:
-        attuali = get_punti(membro.id)
-        set_punti(membro.id, attuali + quantita)
-
-    nomi = ", ".join(m.display_name for m in utenti)
-    await interaction.response.send_message(f"{quantita} punti aggiunti a: {nomi}.")
+    attuali = get_punti(membro.id)
+    set_punti(membro.id, attuali + quantita)
+    await interaction.response.send_message(f"{quantita} punti aggiunti a {membro.display_name}.")
 
 @bot.tree.command(name="togli", description="Togli punti a un utente (ADMIN)")
 @app_commands.describe(membro="L'utente a cui togliere punti", quantita="Numero di punti da togliere")
@@ -1015,25 +998,43 @@ async def togli(interaction: discord.Interaction, membro: discord.Member, quanti
     set_punti(membro.id, nuovi)
     await interaction.response.send_message(f"{quantita} punti rimossi da {membro.display_name}.")
 
-@bot.tree.command(name="classifica", description="Mostra la classifica dei punti")
+@bot.tree.command(name="classifica", description="Mostra la classifica dei punti e achievement")
 async def classifica(interaction: discord.Interaction):
     top = punti_collection.find().sort("punti", -1).limit(10)
-    embed = discord.Embed(title="Classifica Punti", color=discord.Color.gold())
+    embed = discord.Embed(
+        title="🏆 Classifica Generale",
+        description="Ecco i top 10 per **punti** e **achievement** sbloccati!",
+        color=discord.Color.gold()
+    )
 
     posizione = 1
+    medaglie = {1: "🥇", 2: "🥈", 3: "🥉"}
+
     for doc in top:
-        user_id = int(doc["_id"])
-        punti = doc["punti"]
-        membro = interaction.guild.get_member(user_id)
+        user_id = str(doc["_id"])  # user_id salvato come stringa
+        punti = doc.get("punti", 0)
+
+        # Conta quanti achievement ha completato l'utente
+        n_achievements = achievements_collection.count_documents({"user_id": user_id})
+
+        # Ottieni nome utente
+        int_user_id = int(user_id)
+        membro = interaction.guild.get_member(int_user_id)
         if membro:
             nome = membro.display_name
         else:
             try:
-                user = await bot.fetch_user(user_id)
+                user = await bot.fetch_user(int_user_id)
                 nome = user.name
             except:
                 nome = f"Utente ID {user_id}"
-        embed.add_field(name=f"{posizione}. {nome}", value=f"{punti} punti", inline=False)
+
+        medaglia = medaglie.get(posizione, f"#{posizione}")
+        embed.add_field(
+            name=f"{medaglia} {nome}",
+            value=f"✨ **{punti}** punti\n🎯 **{n_achievements}** achievement completati",
+            inline=False
+        )
         posizione += 1
 
     await interaction.response.send_message(embed=embed)
