@@ -1094,11 +1094,16 @@ def get_dino_description(nome_dino: str):
 
     # Prova a trovare la prima immagine "importante" (spesso è nel primo <img> della colonna destra)
     image_url = None
-    for img in soup.find_all("img"):
-        src = img.get("src")
-        if src and "/images/" in src and not src.startswith("data:"):
+for img in soup.find_all("img"):
+    src = img.get("src")
+    if src and "/images/" in src and not src.startswith("data:"):
+        if src.startswith("http"):
+            image_url = src
+        elif src.startswith("//"):
             image_url = "https:" + src
-            break
+        else:
+            image_url = "https://ark.fandom.com" + src
+        break
 
     # Trova la sezione Utility > Roles
     utility_header = soup.find(id="Utility")
@@ -1492,7 +1497,7 @@ async def dino_info(interaction: discord.Interaction, nome: str):
     )
     embed.description = descrizione
 
-    if image_url:
+    if image_url and image_url.startswith("http"):
         embed.set_thumbnail(url=image_url)
 
     await interaction.followup.send(embed=embed, ephemeral=True)
