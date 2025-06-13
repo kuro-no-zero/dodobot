@@ -1071,87 +1071,87 @@ achievements_crafting = {
     "Autan": {
         "punti": 5,
         "descrizione": "Crafta il repellente",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Pronti alla rivolta": {
         "punti": 20,
         "descrizione": "Crafta il set armatura antisommossa",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Nemmeno questo è ingeribile": {
         "punti": 15,
         "descrizione": "Crafta del polimero",
-        "ripetibile": false
+        "ripetibile": False
     },
     "It's Sci-Fi, really": {
         "punti": 50,
         "descrizione": "Crafta un generatore tek",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Iron Man": {
         "punti": 100,
         "descrizione": "Crafta il set armatura tek",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Trasmissione Istantanea": {
         "punti": 100,
         "descrizione": "Crafta il teletrasportatore",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Forse stona un po ma ci piace": {
         "punti": 100,
         "descrizione": "Costruisci una base tek",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Swoosh / Pew pew": {
         "punti": 20,
         "descrizione": "Crafta un'arma tek",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Barriera impenetrabile": {
         "punti": 20,
         "descrizione": "Crafta il tek forcefield",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 1": {
         "punti": 10,
         "descrizione": "Crafta un ibrido type 4",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 2": {
         "punti": 15,
         "descrizione": "Crafta un ibrido type 3",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 3": {
         "punti": 20,
         "descrizione": "Crafta un ibrido type 2",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 4": {
         "punti": 25,
         "descrizione": "Crafta un ibrido type 1",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 5": {
         "punti": 30,
         "descrizione": "Crafta un ibrido type A",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 6": {
         "punti": 35,
         "descrizione": "Crafta un ibrido type S",
-        "ripetibile": false
+        "ripetibile": False
     },
     "Giochi a fare dio? 7": {
         "punti": 50,
         "descrizione": "Crafta un ibrido Operation type",
-        "ripetibile": false
+        "ripetibile": False
     },
     "La guerra dei cloni": {
         "punti": 150,
         "descrizione": "Crafta una camera di clonazione e clona un dino",
-        "ripetibile": false
+        "ripetibile": False
     }
 }
 
