@@ -20,6 +20,7 @@ from typing import Optional, List, Dict
 from typing import Literal
 import aiohttp
 import base64
+import logging
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -2483,14 +2484,22 @@ async def duel(
     )
 
     image_url = IMAGE_MAP[categoria][tipo]
+    print(f"DEBUG: Provo a scaricare immagine da URL: {image_url}")
 
     try:
         # Scarica immagine
         async with aiohttp.ClientSession() as session:
             async with session.get(image_url) as response:
+                print(f"DEBUG: Status code della risposta: {response.status}")
                 if response.status != 200:
+                    text = await response.text()
+                    print(f"DEBUG: Risposta errore: {text}")
                     return await interaction.followup.send("❌ Errore nel recupero dell'immagine.", ephemeral=True)
                 image_bytes = await response.read()
+
+    except Exception as e:
+        print(f"DEBUG: Eccezione durante il download immagine: {e}")
+        return await interaction.followup.send(f"❌ Errore durante il download immagine: {e}", ephemeral=True)
 
         image_b64 = base64.b64encode(image_bytes).decode('utf-8')
         image_data = f"data:image/png;base64,{image_b64}"
