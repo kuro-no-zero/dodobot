@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from discord import ButtonStyle
 import io
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
@@ -2464,8 +2464,9 @@ async def duel(
     await interaction.response.defer()
 
     try:
-        duel_datetime = datetime.strptime(f"{data} {ora}", "%Y-%m-%d %H:%M")
-        if duel_datetime < datetime.now():
+        duel_datetime_naive = datetime.strptime(f"{data} {ora}", "%Y-%m-%d %H:%M")
+        duel_datetime = duel_datetime_naive.astimezone()  # rende il datetime aware
+        if duel_datetime < datetime.now().astimezone():
             return await interaction.followup.send("⚠️ La data/ora deve essere nel futuro!", ephemeral=True)
     except ValueError:
         return await interaction.followup.send("❌ Formato non valido! Usa data `YYYY-MM-DD` e ora `HH:MM`", ephemeral=True)
