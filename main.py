@@ -2680,7 +2680,7 @@ async def duel(
         return await interaction.followup.send("❌ Formato non valido! Usa data `YYYY-MM-DD` e ora `HH:MM`", ephemeral=True)
 
     guild = interaction.guild
-    arena_channel = discord.utils.get(guild.voice_channels, name="Arena")
+    arena_channel = discord.utils.get(guild.voice_channels, name="🏛️Arena🏛️")
     if not arena_channel:
         return await interaction.followup.send("❌ Canale vocale 'Arena' non trovato!", ephemeral=True)
 
