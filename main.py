@@ -1078,6 +1078,55 @@ class UndoSelect(Select):
         )
         self.parent_view.stop()
 
+# === SCRAPING ===
+
+def get_dino_data(nome_dino: str):
+    # Normalizza il nome (minuscolo, spazi sostituiti da underscore)
+    slug = nome_dino.strip().lower().replace(" ", "_")
+    url = f"https://ark.fandom.com/wiki/{slug}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+
+    r = requests.get(url, headers=headers)
+    if r.status_code != 200:
+        return None, f"Pagina per '{nome_dino}' non trovata sul wiki di Ark."
+
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    # Titolo pagina (nome ufficiale)
+    title = soup.find("h1", {"id": "firstHeading"})
+    nome = title.text if title else nome_dino.title()
+
+    # Trova la tabella con le statistiche base
+    infobox = soup.find("table", {"class": "infobox"})
+
+    if not infobox:
+        return None, f"Info non trovate per '{nome_dino}'."
+
+    data = {}
+
+    # Prendiamo righe della tabella
+    rows = infobox.find_all("tr")
+    for row in rows:
+        th = row.find("th")
+        td = row.find("td")
+        if th and td:
+            key = th.text.strip()
+            value = td.text.strip().replace("\n", " ")
+            # Filtra statistiche base (esempi)
+            if key in ["Health", "Stamina", "Oxygen", "Food", "Weight", "Melee Damage", "Speed", "Torpor"]:
+                data[key] = value
+
+    # Immagine del dinosauro (primo img nella infobox)
+    img = infobox.find("img")
+    img_url = "https:" + img["src"] if img and img.has_attr("src") else None
+
+    return {
+        "nome": nome,
+        "stats": data,
+        "img": img_url,
+        "url": url
+    }, None
+
 # === BOT SETUP ===
 intents = discord.Intents.default()
 intents.message_content = True
@@ -1432,39 +1481,32 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
         ephemeral=True
     )
 
-@bot.tree.command(name="dinopic", description="Mostra l'immagine del dino dalla wiki di ARK")
-@app_commands.describe(nome="Nome della creatura (es: Ankylosaurus)")
-async def dinopic(interaction: discord.Interaction, nome: str):
+@bot.tree.command(name="dino_info", description="Mostra info e statistiche base di un dinosauro di Ark")
+@app_commands.describe(nome="Nome del dinosauro (es: Argentavis, Rex, Dodo)")
+async def dino_info(interaction: discord.Interaction, nome: str):
     await interaction.response.defer()
 
-    nome_formattato = quote_plus(nome.title().replace("_", " "))
-    url = f"https://ark.fandom.com/wiki/{nome_formattato}"
-
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except Exception as e:
-        await interaction.followup.send(f"Errore nel recupero della pagina: {e}")
+    dino_data, error = get_dino_data(nome)
+    if error:
+        await interaction.followup.send(error, ephemeral=True)
         return
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-    infobox = soup.find("aside")
+    embed = discord.Embed(
+        title=f"{dino_data['nome']} - Statistiche base",
+        url=dino_data["url"],
+        color=discord.Color.green()
+    )
 
-    if not infobox:
-        await interaction.followup.send("Impossibile trovare informazioni su questa creatura.")
-        return
+    if dino_data["img"]:
+        embed.set_thumbnail(url=dino_data["img"])
 
-    img_tag = infobox.find("img")
-    if not img_tag or "src" not in img_tag.attrs:
-        await interaction.followup.send("Immagine non trovata per questa creatura.")
-        return
+    if dino_data["stats"]:
+        for stat_name, stat_value in dino_data["stats"].items():
+            embed.add_field(name=stat_name, value=stat_value, inline=True)
+    else:
+        embed.description = "Nessuna statistica trovata."
 
-    img_url = img_tag["src"]
-
-    embed = discord.Embed(color=discord.Color.green())
-    embed.set_image(url=img_url)
-
-    await interaction.followup.send(embed=embed)
+    await interaction.followup.send(embed=embed, ephemeral=True)
 
 @bot.tree.command(name="undo", description="Annulla un redeem o achievement (ADMIN)")
 async def undo(interaction: discord.Interaction, utente: discord.User, lista: str):
