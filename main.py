@@ -977,15 +977,32 @@ async def punti(interaction: discord.Interaction, membro: discord.Member = None)
     punti = get_punti(membro.id)
     await interaction.response.send_message(f"{membro.display_name} ha {punti} punti.")
 
-@bot.tree.command(name="aggiungi", description="Aggiungi punti a un utente (ADMIN)")
-@app_commands.describe(membro="L'utente a cui aggiungere punti", quantita="Numero di punti da aggiungere")
-async def aggiungi(interaction: discord.Interaction, membro: discord.Member, quantita: int):
+@bot.tree.command(name="aggiungi", description="Aggiungi punti a uno o piu utenti (ADMIN)")
+@app_commands.describe(membri="Utente/i a cui aggiungere punti", quantita="Numero di punti da aggiungere")
+async def aggiungi(interaction: discord.Interaction, membri: str, quantita: int):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
-    attuali = get_punti(membro.id)
-    set_punti(membro.id, attuali + quantita)
-    await interaction.response.send_message(f"{quantita} punti aggiunti a {membro.display_name}.")
+
+    # Estrai gli ID dalle menzioni
+    utenti = []
+    for word in membri.split():
+        if word.startswith("<@") and word.endswith(">"):
+            user_id = int(word.strip("<@!>"))
+            membro = interaction.guild.get_member(user_id)
+            if membro:
+                utenti.append(membro)
+
+    if not utenti:
+        await interaction.response.send_message("Nessun utente valido trovato.", ephemeral=True)
+        return
+
+    for membro in utenti:
+        attuali = get_punti(membro.id)
+        set_punti(membro.id, attuali + quantita)
+
+    nomi = ", ".join(m.display_name for m in utenti)
+    await interaction.response.send_message(f"{quantita} punti aggiunti a: {nomi}.")
 
 @bot.tree.command(name="togli", description="Togli punti a un utente (ADMIN)")
 @app_commands.describe(membro="L'utente a cui togliere punti", quantita="Numero di punti da togliere")
