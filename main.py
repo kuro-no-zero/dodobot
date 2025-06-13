@@ -1258,10 +1258,11 @@ def is_authorized(interaction: discord.Interaction) -> bool:
 # === VIEW DUELLI ===
 
 class DuelResolutionView(discord.ui.View):
-    def __init__(self, duels, user_id):
+    def __init__(self, duels, user_id, bot):
         super().__init__(timeout=300)
         self.duels = duels
         self.user_id = user_id
+        self.bot = bo
         self.page = 0
 
         self.duel_select = discord.ui.Select(
@@ -1367,28 +1368,28 @@ class DuelResolutionView(discord.ui.View):
         if winner == "cancel":
             duels_collection.delete_one({"_id": selected_duel["_id"]})
 
-            try:
-                channel = self.bot.get_channel(int(selected_duel["channel_id"]))
-                if channel:
-                    event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
-                    if event:
-                        await event.delete()
-            except Exception as e:
-                print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
+        try:
+            channel = self.bot.get_channel(int(selected_duel["channel_id"]))
+            if channel:
+                event = await channel.fetch_scheduled_event(int(selected_duel["event_id"]))
+                if event:
+                    await event.delete()
+        except Exception as e:
+            print(f"[ERRORE] Impossibile cancellare evento Discord: {e}")
 
             await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
             return
 
-        category = selected_duel["type"].lower()  # era "Flyers", quindi va in lowercase
+        category = selected_duel["type"].lower()
         category_map = {"land": 0, "flyers": 1, "aquatic": 2}
         index = category_map.get(category)
 
         if index is None:
-            return await interaction.response.send_message(f"⚠️ Categoria non valida: `{selected_duel['category']}`", ephemeral=True)
+            return await interaction.response.send_message(f"⚠️ Categoria non valida: `{selected_duel['type']}`", ephemeral=True)
 
-        size = selected_duel["category"].capitalize()  # era "Big", quindi va capitalizzato
+        size = selected_duel["category"].capitalize()
         if size not in ["Small", "Medium", "Big", "Mega"]:
-            return await interaction.response.send_message(f"⚠️ Dimensione non valida: `{selected_duel['type']}`", ephemeral=True)
+            return await interaction.response.send_message(f"⚠️ Dimensione non valida: `{selected_duel['category']}`", ephemeral=True)
 
         win_points = {
             "Small": [50, 60, 70],
