@@ -1297,18 +1297,10 @@ async def patata(interaction: discord.Interaction):
     
     # URL dell'immagine
     image_url = "https://www.dododex.com/media/creature/lystrosaurus.png"
+    video_url = "https://youtu.be/EqQv6WtLLwY"
+    video_title = "The only thing that lystros are worth for"
 
-    # Crea l'embed
-    embed = discord.Embed(
-        title="In memory of Patata",
-        description="https://youtu.be/EqQv6WtLLwY",
-        color=discord.Color.blue()
-    )
-    # embed.set_image(url=image_url)
-
-
-    # Invia il messaggio con l'embed
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(f"**{video_title}**\n{video_url}")
 
 @bot.tree.command(name="regole_1vs1", description="Mostra le regole per le sfide 1vs1/tornei")
 async def regole_1vs1(interaction: discord.Interaction):
