@@ -2492,6 +2492,7 @@ async def duel(
             description=description,
             channel=arena_channel,
             entity_type=discord.EntityType.voice,
+            privacy_level=discord.PrivacyLevel.guild_only
             # Rimuovo l'immagine per ora
         )
     except Exception as e:
