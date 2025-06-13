@@ -466,10 +466,12 @@ class DinoRedeemSelect(discord.ui.Select):
         # Rispondi all'interazione per evitare timeout (no messaggio visibile)
         await interaction.response.defer()
 
-        # Manda il messaggio pubblico nel canale dell'interazione
-        await interaction.channel.send(
-            f"**{interaction.user.mention}** ha riscattato **{chosen_dino}** per {dino_info['punti']} punti!"
-        )
+        # Manda messaggio pubblico con testo + link immagine (se presente)
+        message_text = f"**{interaction.user.mention}** ha riscattato **{chosen_dino}** per {dino_info['punti']} punti!"
+        if "img" in dino_info:
+            message_text += f"\n{dino_info['img']}"
+
+        await interaction.channel.send(message_text)
 
 class DinoRedeemView(discord.ui.View):
     def __init__(self, user_id, dinos):
@@ -1045,8 +1047,8 @@ async def lista_dino(interaction: Interaction):
     view = DinoDropdownView(redeemable_dinos)
     await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
-@bot.tree.command(name="redeem_hisory", description="Mostra log redeem dinos (ADMIN)")
-async def redeem_hisory(interaction: discord.Interaction):
+@bot.tree.command(name="redeem_history", description="Mostra log redeem dinos (ADMIN)")
+async def redeem_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
