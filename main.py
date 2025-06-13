@@ -610,13 +610,13 @@ class AchievementsRedeemView(View):
     def __init__(self):
         super().__init__(timeout=None)
         self.list_names = list(all_achievement_lists.keys())
-        self.list_page = 0  # pagina tra le liste (non usata per ora, ma la lascio)
-        self.ach_page = 0   # pagina tra gli achievement (idem)
+        self.list_page = 0  # pagina tra le liste (non usata ma la lasciamo)
+        self.ach_page = 0   # pagina tra gli achievement, importante
 
-        self.selected_list_name = self.list_names[self.list_page]
-        self.selected_ach_name = None  # inizialmente nessun achievement selezionato
+        self.selected_list_name = self.list_names[self.list_page] if self.list_names else None
+        self.selected_ach_name = None
 
-        # Dropdown per scegliere lista
+        # Dropdown categoria
         self.list_select = Select(
             placeholder="Seleziona categoria achievement",
             options=self.get_list_options(),
@@ -625,7 +625,7 @@ class AchievementsRedeemView(View):
         self.list_select.callback = self.list_select_callback
         self.add_item(self.list_select)
 
-        # Dropdown per scegliere achievement
+        # Dropdown achievement (mostra max 25 per pagina)
         self.ach_select = Select(
             placeholder="Seleziona achievement",
             options=self.get_achievement_options(),
@@ -633,6 +633,14 @@ class AchievementsRedeemView(View):
         )
         self.ach_select.callback = self.ach_select_callback
         self.add_item(self.ach_select)
+
+        # Bottoni per navigare la pagina degli achievement
+        self.prev_btn = Button(label="◀️ Indietro", style=discord.ButtonStyle.secondary, custom_id="ach_prev")
+        self.next_btn = Button(label="Avanti ▶️", style=discord.ButtonStyle.secondary, custom_id="ach_next")
+        self.prev_btn.callback = self.prev_page_callback
+        self.next_btn.callback = self.next_page_callback
+        self.add_item(self.prev_btn)
+        self.add_item(self.next_btn)
 
         # Bottone completato
         self.complete_btn = Button(
@@ -644,38 +652,45 @@ class AchievementsRedeemView(View):
         self.add_item(self.complete_btn)
 
     def get_list_options(self):
-        options = []
-        for nome in self.list_names:
-            options.append(discord.SelectOption(label=nome, value=nome))
-        return options
+        if not self.list_names:
+            return [discord.SelectOption(label="Nessuna categoria", value="none", default=True)]
+        return [discord.SelectOption(label=n, value=n) for n in self.list_names[:25]]
 
     def get_achievement_options(self):
+        if not self.selected_list_name or self.selected_list_name == "none":
+            return [discord.SelectOption(label="Nessun achievement", value="none", default=True)]
+
         ach_dict, _, _ = all_achievement_lists[self.selected_list_name]
         ach_names = sorted(ach_dict.keys())
-        options = []
-        for nome in ach_names:
-            options.append(discord.SelectOption(label=nome, value=nome))
-        # Se non ci sono achievement, metti opzione vuota
-        if not options:
-            options.append(discord.SelectOption(label="Nessun achievement", value="none", default=True))
-        return options
+
+        if not ach_names:
+            return [discord.SelectOption(label="Nessun achievement", value="none", default=True)]
+
+        # Calcolo paginazione
+        per_page = 25
+        start = self.ach_page * per_page
+        end = start + per_page
+        paged_names = ach_names[start:end]
+
+        options = [discord.SelectOption(label=n, value=n) for n in paged_names]
+        return options if options else [discord.SelectOption(label="Nessun achievement", value="none", default=True)]
 
     async def update_view(self, interaction: Interaction):
         # Aggiorna le options dropdown
         self.list_select.options = self.get_list_options()
         self.ach_select.options = self.get_achievement_options()
 
-        # Controlla che l'achievement selezionato sia valido
-        ach_options = [opt.value for opt in self.ach_select.options]
-        if self.selected_ach_name not in ach_options:
-            self.selected_ach_name = ach_options[0] if ach_options else None
+        # Controlla validità selezione achievement
+        ach_values = [opt.value for opt in self.ach_select.options]
+        if self.selected_ach_name not in ach_values:
+            self.selected_ach_name = ach_values[0] if ach_values else None
 
-        self.list_select.default_values = [self.selected_list_name]
+        self.list_select.default_values = [self.selected_list_name] if self.selected_list_name else []
         self.ach_select.default_values = [self.selected_ach_name] if self.selected_ach_name else []
 
-        # Embed aggiornato con info achievement
-        ach_dict, one_shot, color = all_achievement_lists[self.selected_list_name]
-        if self.selected_ach_name in ach_dict:
+        # Embed aggiornato
+        if self.selected_ach_name and self.selected_ach_name != "none":
+            ach_dict, one_shot, color = all_achievement_lists[self.selected_list_name]
             dati = ach_dict[self.selected_ach_name]
             embed = Embed(title=self.selected_ach_name, color=color)
             embed.add_field(name="Descrizione", value=dati["descrizione"], inline=False)
@@ -687,12 +702,31 @@ class AchievementsRedeemView(View):
 
     async def list_select_callback(self, interaction: Interaction):
         self.selected_list_name = interaction.data["values"][0]
-        self.selected_ach_name = None  # reset selezione achievement
+        self.selected_ach_name = None
+        self.ach_page = 0  # reset pagina achievement alla nuova categoria
         await self.update_view(interaction)
 
     async def ach_select_callback(self, interaction: Interaction):
         self.selected_ach_name = interaction.data["values"][0]
         await self.update_view(interaction)
+
+    async def prev_page_callback(self, interaction: Interaction):
+        if self.ach_page > 0:
+            self.ach_page -= 1
+            # Aggiorna dropdown
+            await self.update_view(interaction)
+        else:
+            await interaction.response.send_message("Sei già alla prima pagina.", ephemeral=True)
+
+    async def next_page_callback(self, interaction: Interaction):
+        ach_dict, _, _ = all_achievement_lists.get(self.selected_list_name, ({}, False, discord.Color.default()))
+        ach_names = sorted(ach_dict.keys())
+        max_page = (len(ach_names) - 1) // 25
+        if self.ach_page < max_page:
+            self.ach_page += 1
+            await self.update_view(interaction)
+        else:
+            await interaction.response.send_message("Sei già all'ultima pagina.", ephemeral=True)
 
     async def complete_callback(self, interaction: Interaction):
         if not self.selected_ach_name or self.selected_ach_name == "none":
