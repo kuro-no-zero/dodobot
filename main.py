@@ -1092,21 +1092,30 @@ def get_dino_description(nome_dino: str):
 
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # Trova l'immagine nella tabella info a destra
-    image_tag = soup.select_one(".info-arkitex .info-module .info-unit a.image img")
+    # Trova l'immagine giusta nella tabella info a destra
+    # Usando selettore più specifico per pescare la prima immagine dopo i moduli info
+    image_tag = None
+    container = soup.select_one(".info-arkitex.info-framework")
+    if container:
+        image_tag = container.select_one("a.image img")
+
     if not image_tag:
+        # fallback classico se sopra non funziona
         image_tag = soup.find("img", class_="mw-file-element")
 
     image_url = None
     if image_tag and image_tag.has_attr("src"):
         image_url = image_tag["src"]
-        # Completa se manca schema
         if image_url.startswith("//"):
             image_url = "https:" + image_url
         elif not image_url.startswith("http"):
             image_url = "https://" + image_url.lstrip("/")
 
-    # Trova la sezione Utility → Roles
+    # Se l'url è un data URI o non valido, azzera
+    if not image_url or image_url.startswith("data:"):
+        image_url = None
+
+    # Cerca sezione Utility → Roles
     utility_header = soup.find(id="Utility")
     if not utility_header:
         return None, url, image_url, f"Sezione 'Utility' non trovata per '{nome_dino}'."
@@ -1494,16 +1503,15 @@ async def dino_info(interaction: discord.Interaction, nome: str):
     embed = discord.Embed(
         title=f"{nome.title()} - Ruoli",
         url=url,
-        description=descrizione[:4096],  # Troncamento di sicurezza
+        description=descrizione[:4096],
         color=discord.Color.green()
     )
 
-    if not (image_url and image_url.startswith("http")):
-        image_url = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
-
-    print(f"[DEBUG] image_url: {repr(image_url)}")
-
-    embed.set_thumbnail(url=image_url)
+    # Usa immagine principale se esiste, altrimenti placeholder
+    if image_url and image_url.startswith("http"):
+        embed.set_image(url=image_url)
+    else:
+        embed.set_image(url="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")
 
     await interaction.followup.send(embed=embed, ephemeral=True)
 
