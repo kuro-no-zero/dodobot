@@ -21,6 +21,7 @@ from typing import Literal
 import aiohttp
 import base64
 import logging
+import pytz
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -2464,10 +2465,19 @@ async def duel(
     await interaction.response.defer()
 
     try:
+        # Imposta la timezone italiana
+        italy_tz = pytz.timezone("Europe/Rome")
+
+        # Converte stringa in datetime naive
         duel_datetime_naive = datetime.strptime(f"{data} {ora}", "%Y-%m-%d %H:%M")
-        duel_datetime = duel_datetime_naive.astimezone()  # rende il datetime aware
-        if duel_datetime < datetime.now().astimezone():
+
+        # Rende il datetime "aware" con timezone italiana
+        duel_datetime = italy_tz.localize(duel_datetime_naive)
+
+        # Controlla che sia nel futuro rispetto all'ora corrente italiana
+        if duel_datetime < datetime.now(italy_tz):
             return await interaction.followup.send("⚠️ La data/ora deve essere nel futuro!", ephemeral=True)
+
     except ValueError:
         return await interaction.followup.send("❌ Formato non valido! Usa data `YYYY-MM-DD` e ora `HH:MM`", ephemeral=True)
 
