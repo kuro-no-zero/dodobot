@@ -1264,26 +1264,32 @@ class DuelResolutionView(discord.ui.View):
         self.user_id = user_id
         self.page = 0
 
-        self.duel_select = discord.ui.Select(placeholder="Scegli un duello da risolvere", min_values=1, max_values=1, options=[])
+        self.duel_select = discord.ui.Select(
+            placeholder="Scegli un duello da risolvere",
+            min_values=1,
+            max_values=1,
+            options=[]
+        )
+        self.duel_select.callback = self.duel_select_callback
         self.add_item(self.duel_select)
-        #qua era prima
 
         self.result_select = discord.ui.Select(
             placeholder="Seleziona il vincitore",
             options=[],
             custom_id="result_select"
         )
+        self.result_select.callback = self.result_select_callback
         self.add_item(self.result_select)
 
-        self.confirm_button = ui.Button(label="✅ Conferma", style=discord.ButtonStyle.green)
+        self.confirm_button = discord.ui.Button(label="✅ Conferma", style=discord.ButtonStyle.green)
         self.confirm_button.callback = self.confirm
         self.add_item(self.confirm_button)
 
-        self.prev_button = ui.Button(label="⬅️", style=discord.ButtonStyle.secondary)
+        self.prev_button = discord.ui.Button(label="⬅️", style=discord.ButtonStyle.secondary)
         self.prev_button.callback = self.prev_page
         self.add_item(self.prev_button)
 
-        self.next_button = ui.Button(label="➡️", style=discord.ButtonStyle.secondary)
+        self.next_button = discord.ui.Button(label="➡️", style=discord.ButtonStyle.secondary)
         self.next_button.callback = self.next_page
         self.add_item(self.next_button)
 
@@ -1298,30 +1304,59 @@ class DuelResolutionView(discord.ui.View):
         for i, duel in enumerate(page_duels):
             label = f"{duel['challenger_name']} vs {duel['opponent_name']} - {duel['datetime'].strftime('%Y-%m-%d %H:%M')}"
             self.duel_select.options.append(
-                SelectOption(label=label[:100], value=str(start + i))
+                discord.SelectOption(label=label[:100], value=str(start + i))
             )
-        
+
         max_pages = math.ceil(len(self.duels) / 25)
         self.prev_button.disabled = (self.page == 0)
-        self.next_button.disabled = (self.page >= max_pages - 1 or max_pages == 1)
+        self.next_button.disabled = (max_pages <= 1 or self.page >= max_pages - 1)
 
-    async def interaction_check(self, interaction: Interaction) -> bool:
+        # Se cambio pagina resetto selezioni e risultato
+        self.duel_select.values = []
+        self.result_select.options = []
+        self.result_select.values = []
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user_id
 
-    async def prev_page(self, interaction: Interaction):
+    async def duel_select_callback(self, interaction: discord.Interaction):
+        if not self.duel_select.values:
+            await interaction.response.defer()
+            return
+        selected_index = int(self.duel_select.values[0])
+        selected_duel = self.duels[selected_index]
+
+        # Aggiorno il result_select con i nomi dei giocatori + annulla
+        self.result_select.options = [
+            discord.SelectOption(label=selected_duel["challenger_name"], value="challenger"),
+            discord.SelectOption(label=selected_duel["opponent_name"], value="opponent"),
+            discord.SelectOption(label="❌ Duello annullato", value="cancel")
+        ]
+        self.result_select.values = []  # reset selezione precedente
+
+        await interaction.response.edit_message(
+            content=f"Duello selezionato: {selected_duel['challenger_name']} vs {selected_duel['opponent_name']}\nSeleziona il vincitore:",
+            view=self
+        )
+
+    async def result_select_callback(self, interaction: discord.Interaction):
+        # Solo rispondo per evitare interaction failed, il risultato lo confermi con il bottone
+        await interaction.response.defer()
+
+    async def prev_page(self, interaction: discord.Interaction):
         if self.page > 0:
             self.page -= 1
             self.build_duel_options()
             await interaction.response.edit_message(view=self)
 
-    async def next_page(self, interaction: Interaction):
+    async def next_page(self, interaction: discord.Interaction):
         max_pages = math.ceil(len(self.duels) / 25)
         if self.page < max_pages - 1:
             self.page += 1
             self.build_duel_options()
             await interaction.response.edit_message(view=self)
 
-    async def confirm(self, interaction: Interaction):
+    async def confirm(self, interaction: discord.Interaction):
         if not self.duel_select.values or not self.result_select.values:
             return await interaction.response.send_message("⚠️ Devi selezionare un duello e un risultato.", ephemeral=True)
 
@@ -1334,7 +1369,6 @@ class DuelResolutionView(discord.ui.View):
             await interaction.response.send_message("❌ Duello annullato con successo.", ephemeral=True)
             return
 
-        # Calcolo punti
         category = selected_duel["category"].capitalize()
         size = selected_duel["type"].capitalize()
 
