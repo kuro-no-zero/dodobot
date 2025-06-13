@@ -1494,7 +1494,7 @@ async def clear_achievement_history(interaction: discord.Interaction):
 
 @bot.tree.command(name="dodo", description="Mostra la lista dei comandi disponibili")
 @app_commands.describe(visibilita="Scrivi 'public' per renderlo visibile a tutti, altrimenti sarà privato.")
-async def dodo(interaction: discord.Interaction, visibilita: str = None):
+async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "private"] = None):
     embed = Embed(
         title="📜 Lista Comandi Disponibili",
         description="Ecco un riepilogo di tutti i comandi disponibili con una breve descrizione.",
