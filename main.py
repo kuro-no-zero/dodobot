@@ -1421,10 +1421,10 @@ async def dodo(interaction: discord.Interaction):
     )
 
     # Comandi base e informativi
-    embed.add_field(name="COMANDI BASE E INFORMATIVI", value="", inline=False)
+    embed.add_field(name=" --> COMANDI BASE E INFORMATIVI", value="", inline=False)
 
     embed.add_field(name="/dodo", value="🔍 Lista dei comandi disponibili, l'hai appena usato!", inline=False)
-    embed.add_field(name="/punti", value="🔍 Mostra i punti attuali di un utente.", inline=False)
+    embed.add_field(name="/punti", value="💸 Mostra i punti attuali di un utente.", inline=False)
     embed.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti degli utenti.", inline=False)
     embed.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements di Dodo", inline=False)
     embed.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole per le sfide 1vs1/tornei.", inline=False)
@@ -1433,30 +1433,30 @@ async def dodo(interaction: discord.Interaction):
     embed.add_field(name="/patata", value="🥔 Se ti vuoi davvero male", inline=False)
 
     # Comandi dinosauri
-    embed.add_field(name="COMANDI REDEEM DINO", value="", inline=False)
+    embed.add_field(name=" --> COMANDI REDEEM DINO", value="", inline=False)
 
     embed.add_field(name="/lista_dino", value="🦕 Mostra i dino disponibili per il redeem.", inline=False)
     embed.add_field(name="/redeem_dino", value="🦖 Comando per l'effettivo redeem dei dino.", inline=False)
-    embed.add_field(name="/redeem_hisory", value="🦖 Mostra il log dei redeem (ADMIN).", inline=False)
-    embed.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN).", inline=False)
+    embed.add_field(name="/redeem_hisory", value="📜 Mostra il log dei redeem (ADMIN).", inline=False)
+    embed.add_field(name="/clear_redeem_history", value="🔥 Pulisce la lista dei redeem (ADMIN).", inline=False)
     embed.add_field(name="/clear_last_redeems", value="🧹 Pulisce gli ultimi n redeems completati (ADMIN)", inline=False)
 
     # Comandi achievement
-    embed.add_field(name="COMANDI ACHIEVEMENTS", value="", inline=False)
+    embed.add_field(name=" --> COMANDI ACHIEVEMENTS", value="", inline=False)
 
     embed.add_field(name="/lista_achievements", value="📋 Mostra la lista degli achievement disponibili, con descrizioni e punti.", inline=False)
     embed.add_field(name="/redeem_achievement", value="🏆 Completa uno o più achievement e guadagna punti.", inline=False)
-    embed.add_field(name="/achievement_history", value="📚 Mostra gli achievement completati dagli utenti (ADMIN)", inline=False)
-    embed.add_field(name="/clear_achievement_history", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
+    embed.add_field(name="/achievement_history", value="📜 Mostra gli achievement completati dagli utenti (ADMIN)", inline=False)
+    embed.add_field(name="/clear_achievement_history", value="🔥 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
     embed.add_field(name="/clear_last_achievements", value="🧹 Pulisce gli ultimi n achievements completati (ADMIN)", inline=False)
 
     # Comandi amministrativi
-    embed.add_field(name="COMANDI ADMIN", value="", inline=False)
+    embed.add_field(name=" --> COMANDI MOD", value="", inline=False)
 
     embed.add_field(name="/aggiungi", value="➕ Aggiungi punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN).", inline=False)
     embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
-    embed.add_field(name="/undo", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
+    embed.add_field(name="/undo", value="↩️ Annulla una o piu azioni (entries) fra le ultime 10 di un utente (ADMIN)", inline=False)
 
     embed.set_footer(text="Per ulteriori dettagli, chiedi a kurous")
     await interaction.response.send_message(embed=embed, ephemeral=True)
