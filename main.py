@@ -1094,7 +1094,7 @@ def get_dino_description(nome_dino: str):
 
     # Trova l'immagine giusta nella tabella info a destra
     image_tag = None
-    container = soup.select_one(".info-arkitex.info-framework")
+    container = soup.select_one("div.info-arkitex.info-framework div.info-arkitex.info-unit div.info-arkitex.info-unit-row div.info-arkitex.info-X1-100.info-column span[mw\\:File] a.mw-file-description.image img")
     if container:
         image_tag = container.select_one("a.image img")
 
