@@ -11,6 +11,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from discord import ButtonStyle
 import io
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote_plus
@@ -958,7 +959,38 @@ class AchievementDropdownView(View):
 
             desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
             await interaction.response.edit_message(content=desc, embed=None, view=self)
-        
+
+async def send_paginated_embed(interaction, entries, title, per_page=10):
+    pages = [entries[i:i+per_page] for i in range(0, len(entries), per_page)]
+    max_page = len(pages)
+
+    class Paginator(View):
+        def __init__(self):
+            super().__init__(timeout=180)
+            self.page = 0
+
+        async def update(self, interaction):
+            embed = Embed(title=title, description="\n".join(pages[self.page]), color=discord.Color.green())
+            embed.set_footer(text=f"Pagina {self.page + 1} di {max_page}")
+            await interaction.response.edit_message(embed=embed, view=self)
+
+        @Button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary)
+        async def back(self, interaction, button):
+            if self.page > 0:
+                self.page -= 1
+                await self.update(interaction)
+
+        @Button(label="➡️ Avanti", style=discord.ButtonStyle.secondary)
+        async def forward(self, interaction, button):
+            if self.page < max_page - 1:
+                self.page += 1
+                await self.update(interaction)
+
+    view = Paginator()
+    embed = Embed(title=title, description="\n".join(pages[0]), color=discord.Color.green())
+    embed.set_footer(text=f"Pagina 1 di {max_page}")
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
 # === BOT SETUP ===
 intents = discord.Intents.default()
 intents.message_content = True
@@ -1079,13 +1111,13 @@ async def redeem_history(interaction: discord.Interaction):
         await interaction.response.send_message("Nessun redeem registrato.", ephemeral=True)
         return
 
-    lines = []
+    entries = []
     for doc in docs:
         user = await bot.fetch_user(int(doc["user_id"]))
-        lines.append(f"- {user.name} ha riscattato **{doc['nome']}** per {doc['punti']} pt")
+        time = datetime.fromisoformat(str(doc["timestamp"]).replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M")
+        entries.append(f"[{time}] {user.name} ha riscattato **{doc['nome']}** per {doc['punti']} pt")
 
-    message = "📋 **Log Redeem:**\n" + "\n".join(lines)
-    await interaction.response.send_message(message, ephemeral=True)
+    await send_paginated_embed(interaction, entries, "📋 Log Redeem")
 
 @bot.tree.command(name="clear_redeem_history", description="Pulisce la lista dei redeem (ADMIN)")
 async def clear_redeem_history(interaction: discord.Interaction):
@@ -1196,13 +1228,13 @@ async def achievement_history(interaction: discord.Interaction):
         await interaction.response.send_message("Nessun achievement registrato.", ephemeral=True)
         return
 
-    lines = []
+    entries = []
     for doc in docs:
         user = await bot.fetch_user(int(doc["user_id"]))
-        lines.append(f"- {user.name} ha completato **{doc['achievement']}** per {doc['punti']} pt")
+        time = datetime.fromisoformat(str(doc["timestamp"]).replace("Z", "+00:00")).strftime("%d/%m/%Y %H:%M")
+        entries.append(f"[{time}] {user.name} ha completato **{doc['achievement']}** per {doc['punti']} pt")
 
-    message = "📋 **Log Achievement:**\n" + "\n".join(lines)
-    await interaction.response.send_message(message, ephemeral=True)
+    await send_paginated_embed(interaction, entries, "📋 Log Achievement")
 
 @bot.tree.command(name="clear_achievement_history", description="Pulisce la lista degli achievement completati (ADMIN)")
 async def clear_achievement_history(interaction: discord.Interaction):
@@ -1256,6 +1288,58 @@ async def dodo(interaction: discord.Interaction):
 
     embed.set_footer(text="Per ulteriori dettagli, contatta lo sviluppatore o usa il comando con attenzione.")
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
+@app_commands.describe(membro="Utente a cui rimuovere gli achievement", numero="Numero di achievement da eliminare")
+async def clear_last_achievements(interaction: discord.Interaction, membro: discord.Member, numero: int):
+    if not is_authorized(interaction):
+        await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
+        return
+
+    user_id = str(membro.id)
+    # Prendi gli ultimi N achievement ordinati per timestamp decrescente
+    achievements = list(achievements_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(numero))
+
+    if not achievements:
+        await interaction.response.send_message("Nessun achievement trovato per questo utente.", ephemeral=True)
+        return
+
+    # Elimina i documenti uno per uno
+    deleted_count = 0
+    for ach in achievements:
+        achievements_collection.delete_one({"_id": ach["_id"]})
+        deleted_count += 1
+
+    await interaction.response.send_message(
+        f"✅ Eliminati **{deleted_count}** achievement per {membro.display_name}.",
+        ephemeral=True
+    )
+
+@bot.tree.command(name="clear_last_redeems", description="Elimina gli ultimi N redeem di un utente (ADMIN)")
+@app_commands.describe(membro="Utente a cui rimuovere i redeem", numero="Numero di redeem da eliminare")
+async def clear_last_redeems(interaction: discord.Interaction, membro: discord.Member, numero: int):
+    if not is_authorized(interaction):
+        await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
+        return
+
+    user_id = str(membro.id)
+    # Prendi gli ultimi N redeem ordinati per timestamp decrescente
+    redeems = list(redeemed_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(numero))
+
+    if not redeems:
+        await interaction.response.send_message("Nessun redeem trovato per questo utente.", ephemeral=True)
+        return
+
+    # Elimina i documenti uno per uno
+    deleted_count = 0
+    for redeem in redeems:
+        redeemed_collection.delete_one({"_id": redeem["_id"]})
+        deleted_count += 1
+
+    await interaction.response.send_message(
+        f"✅ Eliminati **{deleted_count}** redeem per {membro.display_name}.",
+        ephemeral=True
+    )
 
 @bot.tree.command(name="dinopic", description="Mostra l'immagine del dino dalla wiki di ARK")
 @app_commands.describe(nome="Nome della creatura (es: Ankylosaurus)")
