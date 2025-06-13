@@ -11,6 +11,8 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from discord import ButtonStyle
 import io
+import requests
+from bs4 import BeautifulSoup
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -1235,6 +1237,57 @@ async def dodo(interaction: discord.Interaction):
 
     embed.set_footer(text="Per ulteriori dettagli, contatta lo sviluppatore o usa il comando con attenzione.")
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@bot.tree.command(name="dino_info", description="Mostra info dettagliate su un dinosauro da ark.fandom.com")
+@app_commands.describe(nome="Nome del dinosauro da cercare (es. Ankylosaurus)")
+async def dino_info(interaction: Interaction, nome: str):
+    await interaction.response.defer()  # Tempo per fare scraping senza timeout
+
+    url = f"https://ark.fandom.com/wiki/{nome.capitalize()}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        await interaction.followup.send(f"Non ho trovato la pagina per '{nome}'.")
+        return
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    
+    # Proviamo a prendere la prima tabella 'wikitable' che spesso contiene le info principali
+    tabella = soup.find("table", {"class": "wikitable"})
+    if not tabella:
+        await interaction.followup.send("Non ho trovato la tabella con le informazioni.")
+        return
+
+    info = {}
+    # Cicla sulle righe per estrarre chiave e valore
+    for row in tabella.find_all("tr"):
+        th = row.find("th")
+        td = row.find("td")
+        if th and td:
+            key = th.get_text(strip=True)
+            value = td.get_text(strip=True)
+            info[key] = value
+
+    if not info:
+        await interaction.followup.send("Non sono riuscito a estrarre informazioni utili.")
+        return
+
+    embed = Embed(title=f"Info su {nome.capitalize()}", color=0x00ff00)
+    for k, v in info.items():
+        # Limita la lunghezza del campo per non superare i limiti Discord
+        if len(v) > 1024:
+            v = v[:1021] + "..."
+        embed.add_field(name=k, value=v, inline=False)
+
+    # Prova a prendere immagine (se presente)
+    # Di solito c'è un'immagine principale in un div con classe 'pi-image-collection'
+    img_div = soup.find("div", {"class": "pi-image-collection"})
+    if img_div:
+        img = img_div.find("img")
+        if img and img.has_attr("src"):
+            embed.set_thumbnail(url=img["src"])
+
+    await interaction.followup.send(embed=embed)
 
 # === AVVIO BOT ===
 @bot.event
