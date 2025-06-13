@@ -1020,18 +1020,18 @@ class UndoSelectView(View):
 
         options = []
         for i, entry in enumerate(self.entries):
-            # Testo da mostrare nella select, breve descrizione
+            # Testo da mostrare nella select, breve descrizione con segno punti
             if list_type == "achievement":
-                label = entry["achievement"]
+                label = entry.get("achievement", "achievement sconosciuto")
                 pts = entry.get("punti", 0)
-                desc = f"+{pts} pt"
+                desc = f"-{pts} pt"
             else:
                 label = entry.get("nome", "Redeem")
                 pts = entry.get("punti", 0)
                 desc = f"+{pts} pt"
 
             options.append(discord.SelectOption(
-                label=label[:100],  # limite discord
+                label=label[:100],  # limite Discord
                 description=desc,
                 value=str(i)  # indice nell'array
             ))
@@ -1043,7 +1043,7 @@ class UndoSelect(Select):
         super().__init__(placeholder="Scegli una entry da annullare...", options=options, min_values=1, max_values=1)
         self.parent_view = parent_view
 
-    async def callback(self, interaction: Interaction):
+    async def callback(self, interaction: discord.Interaction):
         idx = int(self.values[0])
         entry = self.parent_view.entries[idx]
 
@@ -1061,13 +1061,19 @@ class UndoSelect(Select):
 
         if self.parent_view.list_type == "achievement":
             # Undo achievement: tolgo i punti guadagnati
-            set_punti(user_id, punti_utente - punti_da_modificare)
+            nuovi_punti = max(0, punti_utente - punti_da_modificare)
+            set_punti(user_id, nuovi_punti)
+            segno = "-"
+            nome_entry = entry.get("achievement", "achievement sconosciuto")
         else:
             # Undo redeem: riaggiungo i punti tolti dal redeem
-            set_punti(user_id, punti_utente + punti_da_modificare)
+            nuovi_punti = punti_utente + punti_da_modificare
+            set_punti(user_id, nuovi_punti)
+            segno = "+"
+            nome_entry = entry.get("nome", "redeem sconosciuto")
 
         await interaction.response.send_message(
-            f"Entry '{self.values[0]}' annullata e {punti_da_modificare} punti aggiornati per l'utente.",
+            f"Entry '{nome_entry}' annullata.\nPunti modificati: {segno}{punti_da_modificare} (totale ora: {nuovi_punti}) per l'utente <@{user_id}>.",
             ephemeral=True
         )
         self.parent_view.stop()
