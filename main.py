@@ -1301,10 +1301,11 @@ async def patata(interaction: discord.Interaction):
     # Crea l'embed
     embed = discord.Embed(
         title="In memory of Patata",
-        description="11/09/2024",
+        description="https://youtu.be/EqQv6WtLLwY",
         color=discord.Color.blue()
     )
-    embed.set_image(url=image_url)
+    # embed.set_image(url=image_url)
+
 
     # Invia il messaggio con l'embed
     await interaction.response.send_message(embed=embed)
