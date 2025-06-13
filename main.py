@@ -960,7 +960,7 @@ class AchievementDropdownView(View):
             desc = format_achievements_table(self.current_achievements, self.current_category, self.ach_page, per_page=MAX_OPTIONS_PER_PAGE)
             await interaction.response.edit_message(content=desc, embed=None, view=self)
 
-async def send_paginated_embed(interaction, entries, title, per_page=10):
+async def send_paginated_embed(interaction: Interaction, entries, title, per_page=10):
     pages = [entries[i:i+per_page] for i in range(0, len(entries), per_page)]
     max_page = len(pages)
 
@@ -968,26 +968,41 @@ async def send_paginated_embed(interaction, entries, title, per_page=10):
         def __init__(self):
             super().__init__(timeout=180)
             self.page = 0
+            self.message = None
+
+            self.back_button = Button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary)
+            self.back_button.callback = self.go_back
+            self.add_item(self.back_button)
+
+            self.next_button = Button(label="➡️ Avanti", style=discord.ButtonStyle.secondary)
+            self.next_button.callback = self.go_next
+            self.add_item(self.next_button)
 
         async def update(self, interaction):
-            embed = Embed(title=title, description="\n".join(pages[self.page]), color=discord.Color.green())
+            embed = Embed(
+                title=title,
+                description="\n".join(pages[self.page]),
+                color=discord.Color.green()
+            )
             embed.set_footer(text=f"Pagina {self.page + 1} di {max_page}")
             await interaction.response.edit_message(embed=embed, view=self)
 
-        @Button(label="⬅️ Indietro", style=discord.ButtonStyle.secondary)
-        async def back(self, interaction, button):
+        async def go_back(self, interaction: Interaction):
             if self.page > 0:
                 self.page -= 1
                 await self.update(interaction)
 
-        @Button(label="➡️ Avanti", style=discord.ButtonStyle.secondary)
-        async def forward(self, interaction, button):
+        async def go_next(self, interaction: Interaction):
             if self.page < max_page - 1:
                 self.page += 1
                 await self.update(interaction)
 
     view = Paginator()
-    embed = Embed(title=title, description="\n".join(pages[0]), color=discord.Color.green())
+    embed = Embed(
+        title=title,
+        description="\n".join(pages[0]),
+        color=discord.Color.green()
+    )
     embed.set_footer(text=f"Pagina 1 di {max_page}")
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
