@@ -1312,9 +1312,9 @@ class DuelResolutionView(discord.ui.View):
         self.next_button.disabled = (max_pages <= 1 or self.page >= max_pages - 1)
 
         # Se cambio pagina resetto selezioni e risultato
-        self.duel_select.values = []
+        #self.duel_select.values = []
+        #self.result_select.values = []
         self.result_select.options = []
-        self.result_select.values = []
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user_id
