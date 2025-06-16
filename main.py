@@ -2856,12 +2856,12 @@ async def ark(interaction: discord.Interaction):
     url = "https://www.youtube.com/watch?v=4c09zYlR3aQ"  # o link alternativo
 
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'quiet': True,
-        'cookies': 'cookies.txt',  # 🟢 Qui specifichi i cookie
-        'noplaylist': True,
-        'default_search': 'ytsearch',
-        'outtmpl': 'downloads/%(title)s.%(ext)s'
+    'format': 'bestaudio/best',
+    'quiet': True,
+    'cookiefile': 'cookies.txt',  # <-- correggi qui
+    'noplaylist': True,
+    'default_search': 'ytsearch',
+    'outtmpl': 'downloads/%(title)s.%(ext)s'
     }
 
     with YoutubeDL(ydl_opts) as ydl:
