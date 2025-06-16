@@ -2892,9 +2892,10 @@ async def play(interaction: discord.Interaction, query: str):
     ydl_opts = {
     'format': 'bestaudio/best',
     'quiet': True,
-    'cookies': '/home/ubuntu/dodobot/cookies.txt',  # percorso assoluto
+    'cookiefile': 'cookies.txt',  # <-- correggi qui
     'noplaylist': True,
     'default_search': 'ytsearch',
+    'outtmpl': 'downloads/%(title)s.%(ext)s'
     }
 
     with YoutubeDL(ydl_opts) as ydl:
