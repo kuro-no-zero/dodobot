@@ -2580,7 +2580,7 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     )
     embed_basic.add_field(name="/dodo", value="🔍 Mostra la lista dei comandi disponibili", inline=False)
     embed_basic.add_field(name="/punti", value="💸 Mostra i punti di un utente", inline=False)
-    ed_basic.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti e achievement", inline=False)
+    embed_basic.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti e achievement", inline=False)
     embed_basic.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements", inline=False)
     embed_basic.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole e i comandi dei duelli 1vs1", inline=False)
     embeds.append(embed_basic)
