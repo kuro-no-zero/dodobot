@@ -2979,6 +2979,34 @@ async def stop(interaction: discord.Interaction):
     await vc.disconnect()
     await interaction.response.send_message("⏹️ Musica fermata e bot disconnesso dal canale.", ephemeral=True)
 
+@bot.tree.command(name="tribes", description="Mostra le tribe e i membri che ne fanno parte")
+async def tribes(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🏕️ Tribe e Membri",
+        description="Ecco la lista delle tribe e i loro membri",
+        color=discord.Color.blue()
+    )
+
+    for tribe, members in tribe_members.items():
+        member_names = []
+        for user_id in members:
+            membro = interaction.guild.get_member(user_id)
+            if membro:
+                member_names.append(membro.display_name)
+            else:
+                try:
+                    user = await bot.fetch_user(user_id)
+                    member_names.append(user.name)
+                except:
+                    member_names.append(f"Utente ID {user_id}")
+
+        # Unisci i nomi in una stringa separata da virgole
+        membri_str = ", ".join(member_names) if member_names else "Nessun membro"
+
+        embed.add_field(name=tribe, value=membri_str, inline=False)
+
+    await interaction.response.send_message(embed=embed)
+
 # === AVVIO BOT ===
 @bot.event
 async def on_ready():
