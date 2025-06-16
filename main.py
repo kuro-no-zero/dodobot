@@ -2871,7 +2871,70 @@ async def ark(interaction: discord.Interaction):
     source = FFmpegPCMAudio(audio_url)
     vc.play(source)
 
-    await interaction.followup.send("🎶 Riproducendo musica di ARK!", ephemeral=True)
+    await interaction.followup.send("🎶 TUTTO PRONTO, ALLACCIATE LE CINTURE IN PELLE DI SARCO DIO CANEEEE!", ephemeral=True)
+
+@bot.tree.command(name="play", description="Cerca e riproduci musica su YouTube")
+async def play(interaction: discord.Interaction, query: str):
+    await interaction.response.defer()
+
+    user = interaction.user
+    channel = user.voice.channel if user.voice else None
+    if not channel:
+        return await interaction.followup.send("❌ Devi essere in un canale vocale!", ephemeral=True)
+
+    # Connetti o prendi la voice client
+    vc = discord.utils.get(bot.voice_clients, guild=interaction.guild)
+    if not vc or not vc.is_connected():
+        vc = await channel.connect()
+    elif vc.channel != channel:
+        await vc.move_to(channel)
+
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'quiet': True,
+        'cookiefile': 'cookies.txt',
+        'noplaylist': True,
+        'default_search': 'ytsearch',
+    }
+
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(query, download=False)
+        url2play = info['entries'][0]['url'] if 'entries' in info else info['url']
+
+    source = FFmpegPCMAudio(url2play)
+    vc.play(source)
+
+    await interaction.followup.send(f"🎶 Sto riproducendo: **{info['entries'][0]['title'] if 'entries' in info else info['title']}**", ephemeral=True)
+
+
+@bot.tree.command(name="pause", description="Metti in pausa la musica")
+async def pause(interaction: discord.Interaction):
+    vc = discord.utils.get(bot.voice_clients, guild=interaction.guild)
+    if not vc or not vc.is_playing():
+        return await interaction.response.send_message("❌ Nessuna musica in riproduzione.", ephemeral=True)
+
+    vc.pause()
+    await interaction.response.send_message("⏸️ Musica messa in pausa.", ephemeral=True)
+
+
+@bot.tree.command(name="resume", description="Riprendi la musica in pausa")
+async def resume(interaction: discord.Interaction):
+    vc = discord.utils.get(bot.voice_clients, guild=interaction.guild)
+    if not vc or not vc.is_paused():
+        return await interaction.response.send_message("❌ La musica non è in pausa.", ephemeral=True)
+
+    vc.resume()
+    await interaction.response.send_message("▶️ Musica ripresa.", ephemeral=True)
+
+
+@bot.tree.command(name="stop", description="Ferma la musica ed esci dal canale")
+async def stop(interaction: discord.Interaction):
+    vc = discord.utils.get(bot.voice_clients, guild=interaction.guild)
+    if not vc or not vc.is_connected():
+        return await interaction.response.send_message("❌ Il bot non è connesso a nessun canale vocale.", ephemeral=True)
+
+    await vc.disconnect()
+    await interaction.response.send_message("⏹️ Musica fermata e bot disconnesso dal canale.", ephemeral=True)
 
 # === AVVIO BOT ===
 @bot.event
