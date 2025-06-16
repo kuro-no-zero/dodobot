@@ -2892,7 +2892,7 @@ async def play(interaction: discord.Interaction, query: str):
     ydl_opts = {
     'format': 'bestaudio/best',
     'quiet': True,
-    'cookies': 'cookies.txt',  # chiave corretta
+    'cookies': '/home/ubuntu/dodobot/cookies.txt',  # percorso assoluto
     'noplaylist': True,
     'default_search': 'ytsearch',
     }
