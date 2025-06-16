@@ -26,6 +26,8 @@ import pytz
 from discord import ui
 import yt_dlp
 import asyncio
+from discord import FFmpegPCMAudio
+from yt_dlp import YoutubeDL
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -2836,56 +2838,40 @@ async def resolve_duel(interaction: discord.Interaction):
 
     await interaction.followup.send("🎯 Seleziona un duello da risolvere:", ephemeral=True, view=view)
 
-@bot.tree.command(name="ark", description="Che l'avventura abbia inizio...")
+@bot.tree.command(name="ark", description="Riproduce la musica di ARK nel tuo canale vocale")
 async def ark(interaction: discord.Interaction):
-    # URL della musica del menu di ARK
-    url = "https://www.youtube.com/watch?v=4c09zYlR3aQ"
+    await interaction.response.defer(ephemeral=True)
 
-    # Ottieni il canale vocale dell'utente
-    if not interaction.user.voice or not interaction.user.voice.channel:
-        await interaction.response.send_message("❌ Devi essere in un canale vocale.", ephemeral=True)
-        return
+    user = interaction.user
+    channel = user.voice.channel if user.voice else None
 
-    channel = interaction.user.voice.channel
+    if not channel:
+        return await interaction.followup.send("❌ Devi essere in un canale vocale!", ephemeral=True)
 
-    # Connessione al canale
     try:
         vc = await channel.connect()
     except discord.ClientException:
-        await interaction.response.send_message("⚠️ Sono già connesso a un canale vocale.", ephemeral=True)
-        return
+        vc = discord.utils.get(bot.voice_clients, guild=interaction.guild)
 
-    await interaction.response.send_message("🎵 Allacciatevi le cinture in pelle di sarco!", ephemeral=False)
+    url = "https://www.youtube.com/watch?v=4c09zYlR3aQ"  # o link alternativo
 
-    # Scarica l'audio da YouTube
     ydl_opts = {
         'format': 'bestaudio/best',
         'quiet': True,
+        'cookies': 'cookies.txt',  # 🟢 Qui specifichi i cookie
         'noplaylist': True,
-        'default_search': 'auto',
-        'outtmpl': 'ark_audio.%(ext)s',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }]
+        'default_search': 'ytsearch',
+        'outtmpl': 'downloads/%(title)s.%(ext)s'
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        filename = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        audio_url = info['url']
 
-    # Riproduci l'audio
-    vc.play(discord.FFmpegPCMAudio(executable="ffmpeg", source=filename))
+    source = FFmpegPCMAudio(audio_url)
+    vc.play(source)
 
-    # Aspetta che la traccia finisca
-    while vc.is_playing():
-        await asyncio.sleep(1)
-
-    # Disconnetti e cancella il file
-    await vc.disconnect()
-    if os.path.exists(filename):
-        os.remove(filename)
+    await interaction.followup.send("🎶 Riproducendo musica di ARK!", ephemeral=True)
 
 # === AVVIO BOT ===
 @bot.event
