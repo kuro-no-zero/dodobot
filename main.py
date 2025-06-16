@@ -2580,7 +2580,7 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     )
     embed_basic.add_field(name="/dodo", value="🔍 Mostra la lista dei comandi disponibili", inline=False)
     embed_basic.add_field(name="/punti", value="💸 Mostra i punti di un utente", inline=False)
-    embed_basic.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti e achievement", inline=False)
+    ed_basic.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti e achievement", inline=False)
     embed_basic.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements", inline=False)
     embed_basic.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole e i comandi dei duelli 1vs1", inline=False)
     embeds.append(embed_basic)
@@ -2659,8 +2659,7 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
 
     # Invia tutti gli embed
     for embed in embeds:
-        await interaction.response.send_message(embed=embed, ephemeral=not (visibilita and visibilita.lower() == "public"))
-
+        await interaction.response.send_message(embeds=embeds, ephemeral=not (visibilita and visibilita.lower() == "public"))
 
 @bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
 @app_commands.describe(membro="Utente a cui rimuovere gli achievement", numero="Numero di achievement da eliminare")
