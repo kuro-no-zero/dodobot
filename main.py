@@ -2659,7 +2659,8 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
 
     # Invia tutti gli embed
     for embed in embeds:
-        await interaction.followup.send(embed=embed, ephemeral=not (visibilita and visibilita.lower() == "public"))
+        await interaction.response.send_message(embed=embed, ephemeral=not (visibilita and visibilita.lower() == "public"))
+
 
 @bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
 @app_commands.describe(membro="Utente a cui rimuovere gli achievement", numero="Numero di achievement da eliminare")
