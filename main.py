@@ -201,16 +201,16 @@ tribe_members = {
         284988139011964928, #dodo
         804262403394502677  #sara
     ],
-    "alessia_tribe": [
+    "pillow_tribe": [
         693906313729802301, #alessia
-        901090228792590346  #laura
+        901090228792590346, #laura
+        254590376201945090  #simo
     ],
     "lus_tribe": [
         285024740421402624  #lus
     ],
-    "simonik_tribe": [
-        522441364831469568, #nick
-        254590376201945090  #simo
+    "nick_tribe": [
+        522441364831469568 #nick
     ]
 }
 
@@ -2570,54 +2570,96 @@ async def clear_achievement_history(interaction: discord.Interaction):
 @bot.tree.command(name="dodo", description="Mostra la lista dei comandi disponibili")
 @app_commands.describe(visibilita="Scrivi 'public' per renderlo visibile a tutti, altrimenti sarà privato.")
 async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "private"] = None):
-    embed = Embed(
-        title="📜 Lista Comandi Disponibili",
-        description="Ecco un riepilogo di tutti i comandi disponibili con una breve descrizione.",
+    embeds = []
+
+    # Embed 1: Basic / Info
+    embed_basic = Embed(
+        title="📜 Lista Comandi - BASIC & INFO",
+        description="Comandi base e informativi",
         color=0x3498db
     )
+    embed_basic.add_field(name="/dodo", value="🔍 Mostra la lista dei comandi disponibili", inline=False)
+    embed_basic.add_field(name="/punti", value="💸 Mostra i punti di un utente", inline=False)
+    embed_basic.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti e achievement", inline=False)
+    embed_basic.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements", inline=False)
+    embed_basic.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole e i comandi dei duelli 1vs1", inline=False)
+    embeds.append(embed_basic)
 
-    # Comandi base e informativi
-    embed.add_field(name=" --> BASIC & INFO", value="", inline=False)
+    # Embed 2: 1vs1
+    embed_1vs1 = Embed(
+        title="⚔️ Comandi 1vs1",
+        description="Gestione e risoluzione dei duelli",
+        color=0x1abc9c
+    )
+    embed_1vs1.add_field(name="/duel", value="📅 Schedula un duello tra due utenti con evento", inline=False)
+    embed_1vs1.add_field(name="/resolve_duel", value="✅ Risolvi un duello", inline=False)
+    embed_1vs1.add_field(name="/duel_history", value="📜 Mostra la cronologia dei duelli schedulati", inline=False)
+    embed_1vs1.add_field(name="/duel_clear_history", value="🧹 Pulisce tutta la cronologia dei duelli (ADMIN)", inline=False)
+    embeds.append(embed_1vs1)
 
-    embed.add_field(name="/dodo", value="🔍 Lista dei comandi disponibili, l'hai appena usato!", inline=False)
-    embed.add_field(name="/punti", value="💸 Mostra i punti attuali di un utente.", inline=False)
-    embed.add_field(name="/classifica", value="🏅 Mostra la classifica dei punti degli utenti.", inline=False)
-    embed.add_field(name="/regole_achievement", value="📏 Spiega come funziona il sistema degli achievements di Dodo", inline=False)
-    embed.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole per le sfide 1vs1/tornei.", inline=False)
+    # Embed 3: Achievements
+    embed_achievements = Embed(
+        title="🏆 Comandi Achievements",
+        description="Gestione degli achievements",
+        color=0xf1c40f
+    )
+    embed_achievements.add_field(name="/lista_achievements", value="📋 Mostra gli achievements disponibili", inline=False)
+    embed_achievements.add_field(name="/redeem_achievement", value="🎯 Completa uno o più achievement", inline=False)
+    embed_achievements.add_field(name="/achievement_history", value="📜 Mostra gli achievement completati (ADMIN)", inline=False)
+    embed_achievements.add_field(name="/clear_achievement_history", value="🧹 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
+    embed_achievements.add_field(name="/clear_last_achievements", value="🧹 Elimina gli ultimi N achievement completati (ADMIN)", inline=False)
+    embed_achievements.add_field(name="/undo", value="↩️ Annulla un redeem o achievement (ADMIN)", inline=False)
+    embeds.append(embed_achievements)
 
-    # Comandi cazzari
-    embed.add_field(name="/patata", value="🥔 Se ti vuoi davvero male", inline=False)
+    # Embed 4: Dino Redeem
+    embed_dino = Embed(
+        title="🦕 Comandi Dino Redeem",
+        description="Gestione dei dinosauri da redeemare",
+        color=0xe67e22
+    )
+    embed_dino.add_field(name="/lista_dino", value="📜 Mostra i dino disponibili per il redeem", inline=False)
+    embed_dino.add_field(name="/redeem_dino", value="🦖 Effettivo redeem dei dino", inline=False)
+    embed_dino.add_field(name="/redeem_history", value="📜 Mostra il log dei redeem dinos (ADMIN)", inline=False)
+    embed_dino.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN)", inline=False)
+    embed_dino.add_field(name="/clear_last_redeems", value="🧹 Elimina gli ultimi N redeem di un utente (ADMIN)", inline=False)
+    embeds.append(embed_dino)
 
-    # Comandi redeem
-    embed.add_field(name=" --> COMANDI REDEEM DINO & ACHIEVEMENTS", value="", inline=False)
+    # Embed 5: Music
+    embed_music = Embed(
+        title="🎵 Comandi Music",
+        description="Controllo della musica in voice channel",
+        color=0x9b59b6
+    )
+    embed_music.add_field(name="/play", value="▶️ Cerca e riproduci musica su YouTube", inline=False)
+    embed_music.add_field(name="/pause", value="⏸️ Metti in pausa la musica", inline=False)
+    embed_music.add_field(name="/resume", value="▶️ Riprendi la musica in pausa", inline=False)
+    embed_music.add_field(name="/stop", value="⏹️ Ferma la musica ed esci dal canale", inline=False)
+    embed_music.add_field(name="/ark", value="🎶 Riproduce la musica di ARK nel tuo canale vocale", inline=False)
+    embeds.append(embed_music)
 
-    embed.add_field(name="/lista_dino", value="🦕 Mostra i dino disponibili per il redeem.", inline=False)
-    embed.add_field(name="/redeem_dino", value="🦖 Comando per l'effettivo redeem dei dino.", inline=False)
-    embed.add_field(name="/redeem_hisory", value="📜 Mostra il log dei redeem (ADMIN).", inline=False)
-    embed.add_field(name="/clear_redeem_history", value="🔥 Pulisce la lista dei redeem (ADMIN).", inline=False)
-    embed.add_field(name="/clear_last_redeems", value="🧹 Pulisce gli ultimi n redeems completati (ADMIN)", inline=False)
+    # Embed 6: Cazzate
+    embed_fun = Embed(
+        title="🤣 Comandi Cazzate",
+        description="Comandi per divertirsi (o perdere tempo)",
+        color=0xe74c3c
+    )
+    embed_fun.add_field(name="/patata", value="🥔 Inutile", inline=False)
+    embeds.append(embed_fun)
 
-    embed.add_field(name="/lista_achievements", value="📋 Mostra la lista degli achievement disponibili, con descrizioni e punti.", inline=False)
-    embed.add_field(name="/redeem_achievement", value="🏆 Completa uno o più achievement e guadagna punti.", inline=False)
-    embed.add_field(name="/achievement_history", value="📜 Mostra gli achievement completati dagli utenti (ADMIN)", inline=False)
-    embed.add_field(name="/clear_achievement_history", value="🔥 Pulisce la lista degli achievement completati (ADMIN)", inline=False)
-    embed.add_field(name="/clear_last_achievements", value="🧹 Pulisce gli ultimi n achievements completati (ADMIN)", inline=False)
+    # Embed 7: Admin
+    embed_admin = Embed(
+        title="⚠️ Comandi Admin",
+        description="Comandi riservati agli amministratori",
+        color=0xe74c3c
+    )
+    embed_admin.add_field(name="/aggiungi", value="➕ Aggiungi punti a un utente (ADMIN)", inline=False)
+    embed_admin.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN)", inline=False)
+    embed_admin.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN)", inline=False)
+    embeds.append(embed_admin)
 
-    # Comandi amministrativi
-    embed.add_field(name=" --> ⚠️COMANDI MOD⚠️", value="", inline=False)
-
-    embed.add_field(name="/aggiungi", value="➕ Aggiungi punti a un utente (ADMIN).", inline=False)
-    embed.add_field(name="/togli", value="➖ Togli punti a un utente (ADMIN).", inline=False)
-    embed.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN).", inline=False)
-    embed.add_field(name="/duel_clear_history", value="❗ Annulla ogni duello shcedulato (ADMIN).", inline=False)
-    embed.add_field(name="/undo", value="↩️ Annulla una o piu azioni (entries) fra le ultime 10 di un utente (ADMIN)", inline=False)
-
-    embed.set_footer(text="Per ulteriori dettagli, chiedi a kurous")
-    # Controlla la visibilità
-    if visibilita and visibilita.lower() == "public":
-        await interaction.response.send_message(embed=embed, ephemeral=False)
-    else:
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+    # Invia tutti gli embed
+    for embed in embeds:
+        await interaction.followup.send(embed=embed, ephemeral=not (visibilita and visibilita.lower() == "public"))
 
 @bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
 @app_commands.describe(membro="Utente a cui rimuovere gli achievement", numero="Numero di achievement da eliminare")
