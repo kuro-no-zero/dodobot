@@ -2890,11 +2890,11 @@ async def play(interaction: discord.Interaction, query: str):
         await vc.move_to(channel)
 
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'quiet': True,
-        'cookiefile': 'cookies.txt',
-        'noplaylist': True,
-        'default_search': 'ytsearch',
+    'format': 'bestaudio/best',
+    'quiet': True,
+    'cookies': 'cookies.txt',  # chiave corretta
+    'noplaylist': True,
+    'default_search': 'ytsearch',
     }
 
     with YoutubeDL(ydl_opts) as ydl:
