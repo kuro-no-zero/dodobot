@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import app_commands
 from discord import SelectOption
 from discord.ui import View, Button, Select
@@ -24,6 +24,8 @@ import base64
 import logging
 import pytz
 from discord import ui
+import yt_dlp
+import asyncio
 
 # === Lista degli ID dei ruoli autorizzati ===
 
@@ -2667,32 +2669,6 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
         ephemeral=True
     )
 
-# @bot.tree.command(name="dino_info", description="Mostra la descrizione base di un dinosauro di Ark")
-# @app_commands.describe(nome="Nome del dinosauro (es: Argentavis, Rex, Dodo)")
-# async def dino_info(interaction: discord.Interaction, nome: str):
-#     await interaction.response.defer()
-
-#     descrizione, url, image_url, error = get_dino_description(nome)
-#     if error:
-#         await interaction.followup.send(error, ephemeral=True)
-#         return
-
-#     print(f"[DEBUG] image_url: {image_url}")  # Per debug
-
-#     embed = discord.Embed(
-#         title=f"{nome.title()} - Ruoli",
-#         url=url,
-#         description=descrizione[:4096],
-#         color=discord.Color.green()
-#     )
-
-#     if is_valid_image_url(image_url):
-#         embed.set_image(url=image_url)
-#     else:
-#         embed.set_image(url="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")
-
-#     await interaction.followup.send(embed=embed, ephemeral=True)
-
 @bot.tree.command(name="undo", description="Annulla un redeem o achievement (ADMIN)")
 async def undo(interaction: discord.Interaction, utente: discord.User, lista: Literal["achievement", "redeem"] = None):
     if not is_authorized(interaction):
@@ -2860,6 +2836,57 @@ async def resolve_duel(interaction: discord.Interaction):
 
     await interaction.followup.send("🎯 Seleziona un duello da risolvere:", ephemeral=True, view=view)
 
+@bot.tree.command(name="ark", description="Che l'avventura abbia inizio...")
+async def ark(interaction: discord.Interaction):
+    # URL della musica del menu di ARK
+    url = "https://www.youtube.com/watch?v=4c09zYlR3aQ"
+
+    # Ottieni il canale vocale dell'utente
+    if not interaction.user.voice or not interaction.user.voice.channel:
+        await interaction.response.send_message("❌ Devi essere in un canale vocale.", ephemeral=True)
+        return
+
+    channel = interaction.user.voice.channel
+
+    # Connessione al canale
+    try:
+        vc = await channel.connect()
+    except discord.ClientException:
+        await interaction.response.send_message("⚠️ Sono già connesso a un canale vocale.", ephemeral=True)
+        return
+
+    await interaction.response.send_message("🎵 Allacciatevi le cinture in pelle di sarco!", ephemeral=False)
+
+    # Scarica l'audio da YouTube
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'quiet': True,
+        'noplaylist': True,
+        'default_search': 'auto',
+        'outtmpl': 'ark_audio.%(ext)s',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }]
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=True)
+        filename = ydl.prepare_filename(info).replace(".webm", ".mp3").replace(".m4a", ".mp3")
+
+    # Riproduci l'audio
+    vc.play(discord.FFmpegPCMAudio(executable="ffmpeg", source=filename))
+
+    # Aspetta che la traccia finisca
+    while vc.is_playing():
+        await asyncio.sleep(1)
+
+    # Disconnetti e cancella il file
+    await vc.disconnect()
+    if os.path.exists(filename):
+        os.remove(filename)
+
 # === AVVIO BOT ===
 @bot.event
 async def on_ready():
@@ -2867,3 +2894,29 @@ async def on_ready():
     print(f'Bot online come {bot.user}!')
 
 bot.run(TOKEN)
+
+# @bot.tree.command(name="dino_info", description="Mostra la descrizione base di un dinosauro di Ark")
+# @app_commands.describe(nome="Nome del dinosauro (es: Argentavis, Rex, Dodo)")
+# async def dino_info(interaction: discord.Interaction, nome: str):
+#     await interaction.response.defer()
+
+#     descrizione, url, image_url, error = get_dino_description(nome)
+#     if error:
+#         await interaction.followup.send(error, ephemeral=True)
+#         return
+
+#     print(f"[DEBUG] image_url: {image_url}")  # Per debug
+
+#     embed = discord.Embed(
+#         title=f"{nome.title()} - Ruoli",
+#         url=url,
+#         description=descrizione[:4096],
+#         color=discord.Color.green()
+#     )
+
+#     if is_valid_image_url(image_url):
+#         embed.set_image(url=image_url)
+#     else:
+#         embed.set_image(url="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg")
+
+#     await interaction.followup.send(embed=embed, ephemeral=True)
