@@ -2659,9 +2659,11 @@ async def clear_achievement_history(interaction: discord.Interaction):
 @bot.tree.command(name="dodo", description="Mostra la lista dei comandi disponibili")
 @app_commands.describe(visibilita="Scrivi 'public' per renderlo visibile a tutti, altrimenti sarà privato.")
 async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "private"] = None):
+    ephemeral_flag = not (visibilita and visibilita.lower() == "public")
+
+    # Prepara gli embed
     embeds = []
 
-    # Embed 1: Basic / Info
     embed_basic = Embed(
         title="📜 Lista Comandi - BASIC & INFO",
         description="Comandi base e informativi",
@@ -2674,7 +2676,6 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_basic.add_field(name="/regole_1vs1", value="⚔️ Mostra le regole e i comandi dei duelli 1vs1", inline=False)
     embeds.append(embed_basic)
 
-    # Embed 2: 1vs1
     embed_1vs1 = Embed(
         title="⚔️ Comandi 1vs1",
         description="Gestione e risoluzione dei duelli",
@@ -2686,7 +2687,6 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_1vs1.add_field(name="/duel_clear_history", value="🧹 Pulisce tutta la cronologia dei duelli (ADMIN)", inline=False)
     embeds.append(embed_1vs1)
 
-    # Embed 3: Achievements
     embed_achievements = Embed(
         title="🏆 Comandi achievements",
         description="Gestione degli achievements",
@@ -2700,7 +2700,6 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_achievements.add_field(name="/undo", value="↩️ Annulla un redeem o achievement (ADMIN)", inline=False)
     embeds.append(embed_achievements)
 
-    # Embed 4: Dino & Oggetti Redeem
     embed_dino = Embed(
         title="🦕 Redeem Dino & Oggetti",
         description="Gestione dei dino e degli oggetti da redeemare",
@@ -2710,12 +2709,11 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_dino.add_field(name="/redeem_dino", value="🦖 Effettivo redeem dei dino", inline=False)
     embed_dino.add_field(name="/lista_oggetti", value="📖 Mostra gli oggetti disponibili per il redeem", inline=False)
     embed_dino.add_field(name="/redeem_oggetti", value="📦 Effettivo redeem degli oggetti", inline=False)
-    embed_dino.add_field(name="/redeem_history", value="💾 Mostra il log dei redeem dinos (ADMIN)", inline=False)
+    embed_dino.add_field(name="/redeem_history", value="💾 Mostra il log dei redeem (ADMIN)", inline=False)
     embed_dino.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN)", inline=False)
     embed_dino.add_field(name="/clear_last_redeems", value="🧹 Elimina gli ultimi N redeem di un utente (ADMIN)", inline=False)
     embeds.append(embed_dino)
 
-    # Embed 5: Music
     embed_music = Embed(
         title="🎵 Comandi musicali",
         description="Controllo della musica in voice (TBF⚠️)",
@@ -2728,7 +2726,6 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_music.add_field(name="/ark", value="🎶 Riproduce la musica di ARK nel tuo canale vocale", inline=False)
     embeds.append(embed_music)
 
-    # Embed 6: Cazzate
     embed_fun = Embed(
         title="💀 Roba inutile",
         description="Comandi per perdere tempo",
@@ -2737,7 +2734,6 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_fun.add_field(name="/patata", value="🥔 Inutile", inline=False)
     embeds.append(embed_fun)
 
-    # Embed 7: Admin
     embed_admin = Embed(
         title="⚠️ Comandi Admin",
         description="Comandi riservati agli amministratori",
@@ -2748,9 +2744,8 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_admin.add_field(name="/clear_points", value="❌ Rimuove un utente dal conteggio punti (ADMIN)", inline=False)
     embeds.append(embed_admin)
 
-    # Invia tutti gli embed
-    for embed in embeds:
-        await interaction.response.send_message(embeds=embeds, ephemeral=not (visibilita and visibilita.lower() == "public"))
+    # ✅ Una sola risposta con tutti gli embed
+    await interaction.response.send_message(embeds=embeds, ephemeral=ephemeral_flag)
 
 @bot.tree.command(name="clear_last_achievements", description="Elimina gli ultimi N achievement completati da un utente (ADMIN)")
 @app_commands.describe(membro="Utente a cui rimuovere gli achievement", numero="Numero di achievement da eliminare")
