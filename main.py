@@ -2688,7 +2688,7 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
 
     # Embed 3: Achievements
     embed_achievements = Embed(
-        title="🏆 Comandi Achievements",
+        title="🏆 Comandi achievements",
         description="Gestione degli achievements",
         color=0xf1c40f
     )
@@ -2700,23 +2700,25 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
     embed_achievements.add_field(name="/undo", value="↩️ Annulla un redeem o achievement (ADMIN)", inline=False)
     embeds.append(embed_achievements)
 
-    # Embed 4: Dino Redeem
+    # Embed 4: Dino & Oggetti Redeem
     embed_dino = Embed(
-        title="🦕 Comandi Dino Redeem",
-        description="Gestione dei dinosauri da redeemare",
+        title="🦕 Redeem Dino & Oggetti",
+        description="Gestione dei dino e degli oggetti da redeemare",
         color=0xe67e22
     )
     embed_dino.add_field(name="/lista_dino", value="📜 Mostra i dino disponibili per il redeem", inline=False)
     embed_dino.add_field(name="/redeem_dino", value="🦖 Effettivo redeem dei dino", inline=False)
-    embed_dino.add_field(name="/redeem_history", value="📜 Mostra il log dei redeem dinos (ADMIN)", inline=False)
+    embed_dino.add_field(name="/lista_oggetti", value="📖 Mostra gli oggetti disponibili per il redeem", inline=False)
+    embed_dino.add_field(name="/redeem_oggetti", value="📦 Effettivo redeem degli oggetti", inline=False)
+    embed_dino.add_field(name="/redeem_history", value="💾 Mostra il log dei redeem dinos (ADMIN)", inline=False)
     embed_dino.add_field(name="/clear_redeem_history", value="🧹 Pulisce la lista dei redeem (ADMIN)", inline=False)
     embed_dino.add_field(name="/clear_last_redeems", value="🧹 Elimina gli ultimi N redeem di un utente (ADMIN)", inline=False)
     embeds.append(embed_dino)
 
     # Embed 5: Music
     embed_music = Embed(
-        title="🎵 Comandi Music",
-        description="Controllo della musica in voice channel",
+        title="🎵 Comandi musicali",
+        description="Controllo della musica in voice (TBF⚠️)",
         color=0x9b59b6
     )
     embed_music.add_field(name="/play", value="▶️ Cerca e riproduci musica su YouTube", inline=False)
@@ -2728,8 +2730,8 @@ async def dodo(interaction: discord.Interaction, visibilita: Literal["public", "
 
     # Embed 6: Cazzate
     embed_fun = Embed(
-        title="🤣 Comandi Cazzate",
-        description="Comandi per divertirsi (o perdere tempo)",
+        title="💀 Roba inutile",
+        description="Comandi per perdere tempo",
         color=0xe74c3c
     )
     embed_fun.add_field(name="/patata", value="🥔 Inutile", inline=False)
