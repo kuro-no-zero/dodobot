@@ -2410,41 +2410,44 @@ async def lista_dino(interaction: Interaction):
     view = DinoDropdownView(redeemable_dinos)
     await interaction.response.send_message(content=desc, view=view, ephemeral=True)
 
-@bot.tree.command(name="redeem_history", description="Mostra la cronologia dei redeem di un utente")
-@app_commands.describe(membro="Utente di cui vedere la cronologia")
-async def redeem_history(interaction: discord.Interaction, membro: discord.Member):
-    user_id = str(membro.id)
+@bot.tree.command(name="redeem_history", description="Mostra la cronologia globale dei redeem (ultimi 50)")
+async def redeem_history(interaction: discord.Interaction):
+    if not is_authorized(interaction):
+        await interaction.response.send_message("Non hai i permessi per vedere questa cronologia.", ephemeral=True)
+        return
 
     # Recupera da entrambe le collezioni
-    dino_redeems = list(redeemed_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(20))
-    item_redeems = list(redeemed_items_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(20))
+    dino_redeems = list(redeemed_collection.find().sort("timestamp", -1).limit(50))
+    item_redeems = list(redeemed_items_collection.find().sort("timestamp", -1).limit(50))
 
-    # Tagga le entry per differenziarle
+    # Tag e unione
     for r in dino_redeems:
         r["type"] = "Dino"
     for r in item_redeems:
         r["type"] = "Oggetto"
 
-    # Unisci ed ordina
     all_redeems = dino_redeems + item_redeems
     all_redeems.sort(key=lambda r: r["timestamp"], reverse=True)
+    all_redeems = all_redeems[:50]
 
     if not all_redeems:
-        await interaction.response.send_message("Nessun redeem trovato per questo utente.", ephemeral=True)
+        await interaction.response.send_message("Nessun redeem trovato nel database.", ephemeral=True)
         return
 
-    # Prepara risposta
+    # Format
     descr = ""
-    for r in all_redeems[:20]:
-        t = r["timestamp"].strftime("%Y‑%m‑%d %H:%M")
+    for r in all_redeems:
+        ts = r["timestamp"].strftime("%Y-%m-%d %H:%M")
         nome = r["nome"]
-        qt = r.get("quantita", "?")
-        descr += f"• **[{r['type']}]** {nome} ×{qt} ({t})\n"
+        qt = r.get("quantita", "-")
+        punti = r["punti"]
+        user = await interaction.client.fetch_user(int(r["user_id"]))
+        descr += f"• [{ts}] **{user.display_name}** ha riscattato **{nome}** ({r['type']}, {qt}x, {punti} pt)\n"
 
     embed = discord.Embed(
-        title=f"📜 Storico redeem di {membro.display_name}",
+        title="📜 Storico globale dei redeem (ultimi 50)",
         description=descr,
-        color=0x00ffcc
+        color=0xf1c40f
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
