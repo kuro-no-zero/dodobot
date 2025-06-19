@@ -193,6 +193,17 @@ redeemable_dinos = {
     }
 }
 
+redeemable_items = {
+    "Lingotti di metallo": {"quantita": 200, "punti": 100},
+    "Zolfo": {"quantita": 100, "punti": 100},
+    "Polvere da sparo": {"quantita": 300, "punti": 100},
+    "Perle nere": {"quantita": 50, "punti": 100},
+    "Pasta cementizia": {"quantita": 300, "punti": 100},
+    "Elettronica": {"quantita": 100, "punti": 100},
+    "Polimero": {"quantita": 100, "punti": 100},
+    "Elemento": {"quantita": 20, "punti": 100}
+}
+
 # === Lista Tribes ===
 
 tribe_members = {
@@ -1228,6 +1239,7 @@ punti_collection = db["punti"]         # Collezione per i punti
 redeemed_collection = db["redeemed"]   # Nuova collezione per tracciare i redeem
 achievements_collection = db["achievements"]
 duels_collection = db["duels"]
+redeemed_items_collection = db["redeemed_items"]
 
 # === FUNZIONI DB ===
 def get_punti(user_id):
@@ -1258,6 +1270,17 @@ def get_tribe_members(user_id: int) -> list[int]:
 def is_authorized(interaction: discord.Interaction) -> bool:
     """Verifica se l'utente ha uno dei ruoli autorizzati."""
     return any(role.id in AUTHORIZED_ROLE_IDS for role in interaction.user.roles)
+
+def format_item_table(items: dict) -> str:
+    header = f"| {'Oggetto':<20} | {'Qty':^7} | {'Punti':^6} |"
+    separator = f"|{'-'*22}|{'-'*9}|{'-'*8}|"
+    rows = [header, separator]
+    for nome, dati in items.items():
+        nome_fmt = nome[:20].ljust(20)
+        qty = str(dati["quantita"]).center(7)
+        punti = str(dati["punti"]).center(6)
+        rows.append(f"| {nome_fmt} | {qty} | {punti} |")
+    return "```\n" + "\n".join(rows) + "\n```"
 
 # === VIEW DUELLI ===
 
@@ -2122,6 +2145,56 @@ class UndoSelect(Select):
         )
         self.parent_view.stop()
 
+class ItemRedeemSelect(discord.ui.Select):
+    def __init__(self, user_id, items):
+        self.user_id = user_id
+        self.items = items
+        options = [
+            discord.SelectOption(
+                label=nome,
+                description=f"{dati['quantita']}x - {dati['punti']} punti",
+                value=nome
+            ) for nome, dati in sorted(items.items())
+        ]
+        super().__init__(
+            placeholder="Scegli un oggetto da riscattare...",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        item_name = self.values[0]
+        item_data = self.items[item_name]
+
+        punti_utente = get_punti(interaction.user.id)
+        if punti_utente < item_data["punti"]:
+            await interaction.response.send_message(
+                "Non hai abbastanza punti per riscattare questo oggetto.", ephemeral=True)
+            return
+
+        set_punti(interaction.user.id, punti_utente - item_data["punti"])
+
+        redeemed_items_collection.insert_one({
+            "_id": f"{interaction.user.id}_{item_name}_{interaction.id}",
+            "user_id": str(interaction.user.id),
+            "nome": item_name,
+            "quantita": item_data["quantita"],
+            "punti": item_data["punti"],
+            "timestamp": interaction.created_at
+        })
+
+        embed = discord.Embed(
+            title=f"{item_name} riscattato!",
+            description=f"**{interaction.user.display_name}** ha riscattato **{item_name}** x{item_data['quantita']} per {item_data['punti']} punti! 🎉",
+            color=0x00ff00
+        )
+        await interaction.response.send_message(embed=embed)
+
+class ItemRedeemView(discord.ui.View):
+    def __init__(self, user_id):
+        super().__init__(timeout=180)
+        self.add_item(ItemRedeemSelect(user_id, redeemable_items))
 # === SCRAPING ===
 
 def get_dino_description(nome_dino: str):
@@ -2358,19 +2431,15 @@ async def redeem_history(interaction: discord.Interaction):
 
     await send_paginated_embed(interaction, entries, "📋 Log Redeem")
 
-@bot.tree.command(name="clear_redeem_history", description="Pulisce la lista dei redeem (ADMIN)")
+@bot.tree.command(name="clear_redeem_history", description="Svuota la cronologia dei redeem")
 async def clear_redeem_history(interaction: discord.Interaction):
     if not is_authorized(interaction):
         await interaction.response.send_message("Non hai i permessi per eseguire questo comando.", ephemeral=True)
         return
 
-    result = redeemed_collection.delete_many({})  # Cancella tutti i record
-    deleted = result.deleted_count
-
-    await interaction.response.send_message(
-        f"✅ Eliminati **{deleted}** record di redeem.",
-        ephemeral=True
-    )
+    deleted1 = redeemed_collection.delete_many({})
+    deleted2 = redeemed_items_collection.delete_many({})
+    await interaction.response.send_message(f"✅ Cronologia redeem cancellata (Dino: {deleted1.deleted_count}, Oggetti: {deleted2.deleted_count})")
 
 @bot.tree.command(name="patata", description="Inutile")
 async def patata(interaction: discord.Interaction):
@@ -2695,17 +2764,22 @@ async def clear_last_redeems(interaction: discord.Interaction, membro: discord.M
         return
 
     user_id = str(membro.id)
-    # Prendi gli ultimi N redeem ordinati per timestamp decrescente
-    redeems = list(redeemed_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(numero))
 
-    if not redeems:
-        await interaction.response.send_message("Nessun redeem trovato per questo utente.", ephemeral=True)
-        return
+    # Ottieni i redeem da entrambe le collezioni
+    dino_redeems = list(redeemed_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(numero))
+    item_redeems = list(redeemed_items_collection.find({"user_id": user_id}).sort("timestamp", -1).limit(numero))
 
-    # Elimina i documenti uno per uno
+    # Unisci e ordina tutti i redeem per timestamp
+    all_redeems = dino_redeems + item_redeems
+    all_redeems.sort(key=lambda r: r["timestamp"], reverse=True)
+
+    # Prendi solo i primi N totali
+    to_delete = all_redeems[:numero]
+
     deleted_count = 0
-    for redeem in redeems:
-        redeemed_collection.delete_one({"_id": redeem["_id"]})
+    for redeem in to_delete:
+        collection = redeemed_collection if "quantita" not in redeem else redeemed_items_collection
+        collection.delete_one({"_id": redeem["_id"]})
         deleted_count += 1
 
     await interaction.response.send_message(
@@ -3007,6 +3081,13 @@ async def tribes(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed)
 
+@bot.tree.command(name="lista_oggetti", description="Mostra la lista degli oggetti disponibili per il redeem")
+async def lista_oggetti(interaction: discord.Interaction):
+    await interaction.response.send_message(format_item_table(redeemable_items))
+
+@bot.tree.command(name="redeem_oggetti", description="Riscatta un oggetto con i tuoi punti")
+async def redeem_oggetti(interaction: discord.Interaction):
+    await interaction.response.send_message(view=ItemRedeemView(interaction.user.id), ephemeral=True)
 # === AVVIO BOT ===
 @bot.event
 async def on_ready():
