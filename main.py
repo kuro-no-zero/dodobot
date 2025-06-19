@@ -2347,7 +2347,7 @@ async def classifica(interaction: discord.Interaction, tipo: Literal["generale",
     top = punti_collection.find().sort("punti", -1).limit(10)
     embed = discord.Embed(
         title="🏆 Classifica Generale",
-        description="Ecco i top 10 per **punti** e **achievement** sbloccati!",
+        description="Ecco la lista dei survivors in ordine di **punti**!",
         color=discord.Color.gold()
     )
 
@@ -2373,7 +2373,7 @@ async def classifica(interaction: discord.Interaction, tipo: Literal["generale",
 
         medaglia = medaglie.get(posizione, f"#{posizione}")
         embed.add_field(
-            name=f"{medaglia} {nome}",
+            name=f"{medaglia} - {nome} -",
             value=f"✨ **{punti}** punti",
             inline=False
         )
