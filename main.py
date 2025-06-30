@@ -36,161 +36,176 @@ AUTHORIZED_ROLE_IDS = [1380464896520486922, 1380514524871786607]
 # === Lista Dinos ===
 
 redeemable_dinos = {
+    # ————————— ARK ────────────────
     "Blood Crystal Wyvern": {
-        "livello": 115, 
-        "punti": 300, 
+        "livello": 115,
+        "punti": 300,
         "img": "https://i.ebayimg.com/00/s/OTAwWDE2MDA=/z/gV0AAOSwLpNjFBVI/$_57.JPG?set_id=8800005007"
     },
     "Bloodstalker": {
-        "livello": 150, 
-        "punti": 150, 
+        "livello": 150,
+        "punti": 150,
         "img": "https://ark.wiki.gg/images/thumb/0/09/Mod_Ark_Eternal_Elemental_Poison_Bloodstalker_Image.jpg/1120px-Mod_Ark_Eternal_Elemental_Poison_Bloodstalker_Image.jpg?5d28dd"
     },
     "Ember Crystal Wyvern": {
-        "livello": 115, 
-        "punti": 300, 
+        "livello": 115,
+        "punti": 300,
         "img": "https://i.ytimg.com/vi/jKOerbUz1Hg/maxresdefault.jpg"
     },
     "Enforcer": {
-        "livello": 150, 
-        "punti": 100, 
+        "livello": 150,
+        "punti": 100,
         "img": "https://pbs.twimg.com/media/Eknf-gkW0AYZ7L6?format=jpg&name=large"
     },
-    "Managarmr": {
-        "livello": 150, 
-        "punti": 320, 
-        "img": "https://i.ytimg.com/vi/TbVFs6y9ilg/maxresdefault.jpg"
-    },
     "Noglin": {
-        "livello": 150, 
-        "punti": 450, 
+        "livello": 150,
+        "punti": 450,
         "img": "https://i.ytimg.com/vi/YeYQfVg1YZs/maxresdefault.jpg"
     },
     "Phoenix": {
-        "livello": 150, 
-        "punti": 300, 
+        "livello": 150,
+        "punti": 300,
         "img": "https://steamuserimages-a.akamaihd.net/ugc/856103154384245641/0CB31FB17AB3D46BF1DCC9854DF7D05664C12B54/"
     },
     "Reaper-King": {
-        "livello": 150, 
-        "punti": 400, 
+        "livello": 150,
+        "punti": 400,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/c/c6/Mod_Primal_Fear_Apex_Reaper_King_Image.jpg/revision/latest?cb=20190103234958"
     },
     "Tek Stryder (random)": {
-        "livello": 150, 
-        "punti": 270, 
+        "livello": 150,
+        "punti": 270,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/3/31/Tek_Stryder_image.png/revision/latest?cb=20210604204304"
     },
     "Tropical Crystal Wyvern": {
-        "livello": 115, 
-        "punti": 300, 
+        "livello": 115,
+        "punti": 300,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/7/7c/Crystal_Wyvern_Image.jpg/revision/latest?cb=20200614011556"
     },
     "Voidwyrm": {
-        "livello": 115, 
-        "punti": 400, 
+        "livello": 115,
+        "punti": 400,
         "img": "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2021/09/ark-survival-evolved-voidwyrm.jpg"
     },
     "Zombie-Wyvern": {
-        "livello": 115, 
-        "punti": 350, 
+        "livello": 115,
+        "punti": 350,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/3/30/FearEvolved2_ZombieWyvern.jpg/revision/latest?cb=20161028192348"
     },
     "Rock Drake": {
-        "livello": 115, 
-        "punti": 300, 
+        "livello": 115,
+        "punti": 300,
         "img": "https://i.ebayimg.com/images/g/eowAAOSwBAlnRjAZ/s-l1200.png"
     },
     "Andrewsarchus": {
-        "livello": 150, 
-        "punti": 170, 
+        "livello": 150,
+        "punti": 170,
         "img": "https://progametalk.com/wp-content/uploads/2022/06/AKANDREW-1.png"
     },
     "Desmodus": {
-        "livello": 150, 
-        "punti": 270, 
+        "livello": 150,
+        "punti": 270,
         "img": "https://clan.fastly.steamstatic.com/images/8729288/e43a622433366d5965501ddb9a031465e093a2d7.png"
     },
     "Fjordhawk": {
-        "livello": 150, 
-        "punti": 100, 
+        "livello": 150,
+        "punti": 100,
         "img": "https://static1.srcdn.com/wordpress/wp-content/uploads/2025/02/fjordhawk-sitting-on-white-snow-from-ark-survival-ascended.jpg"
     },
     "Deinonychus": {
-        "livello": 75, 
-        "punti": 200, 
+        "livello": 75,
+        "punti": 200,
         "img": "https://ark.wiki.gg/images/thumb/2/29/Mod_Ark_Eternal_Elemental_Ice_DeinoNychus_Image.jpg/1008px-Mod_Ark_Eternal_Elemental_Ice_DeinoNychus_Image.jpg?79bb0e"
     },
     "Gacha (Random)": {
-        "livello": 150, 
-        "punti": 150, 
+        "livello": 150,
+        "punti": 150,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/e/ef/GachaThumbnail.png/revision/latest?cb=20181017121726"
     },
     "Gasbags": {
-        "livello": 150, 
-        "punti": 100, 
+        "livello": 150,
+        "punti": 100,
         "img": "https://static.deltiasgaming.com/2024/12/Gasbag-Ark-Survival-Ascended.png"
     },
     "Velonasaur": {
-        "livello": 150, 
-        "punti": 170, 
+        "livello": 150,
+        "punti": 170,
         "img": "https://www.ruletheark.com/media/2018/11/ark-velonasaur.png"
     },
-    "Desert Titan": {
-        "livello": "-", 
-        "punti": 1000, 
-        "img": "https://pbs.twimg.com/media/FlJ48rcWQAIL4Nm?format=jpg&name=4096x4096"
-    },
-    "Forest Titan": {
-        "livello": "-", 
-        "punti": 900, 
-        "img": "https://images.steamusercontent.com/ugc/781854647701046233/E4D7CE7954493D5AA3D7AB789B9572D54CA4DEBB/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
-    },
-    "Ice Titan": {
-        "livello": "-", 
-        "punti": 1200, 
-        "img": "https://images.steamusercontent.com/ugc/796491253696633468/F9C76ADA2C49B384F43A03BA136C55C8D779E5FA/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
-    },
     "Bulbdog": {
-        "livello": 150, 
-        "punti": 30, 
+        "livello": 150,
+        "punti": 30,
         "img": "https://www.ruletheark.com/media/2018/01/pug.png"
     },
     "Featherlight": {
-        "livello": 150, 
-        "punti": 30, 
+        "livello": 150,
+        "punti": 30,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/6/64/Mod_Primal_Fear_Fabled_Featherlight_Image.jpg/revision/latest/scale-to-width-down/1200?cb=20190225211224"
     },
     "Glowtail": {
-        "livello": 150, 
-        "punti": 30, 
+        "livello": 150,
+        "punti": 30,
         "img": "https://www.ruletheark.com/media/2018/04/lantern_lizard.jpg"
     },
     "Shinehorn": {
-        "livello": 150, 
-        "punti": 30, 
+        "livello": 150,
+        "punti": 30,
         "img": "https://ark.wiki.gg/images/thumb/9/90/Pris_shinehorn.png/1120px-Pris_shinehorn.png?cba0ed"
     },
     "Karkinos": {
-        "livello": 150, 
-        "punti": 250, 
+        "livello": 150,
+        "punti": 250,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/7/7b/Mod_Primal_Fear_Apex_Karkinos_Image.jpg/revision/latest?cb=20190103233928"
     },
     "Roll Rat": {
-        "livello": 150, 
-        "punti": 150, 
+        "livello": 150,
+        "punti": 150,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/5/50/Saddled_Roll_rat.png/revision/latest?cb=20201008181841"
     },
     "Shadowmane": {
-        "livello": 150, 
-        "punti": 350, 
-        "img": "https://images.saymedia-content.com/.image/ar_4:3%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:eco%2Cw_1200/MTgyODA2ODAzMzQ2NzYxMDU2/ark-survival-evolved-the-ultimate-hunter-shadowmane.jpg"
+        "livello": 150,
+        "punti": 350,
+        "img": "https://images.saymedia-content.com/.image/ar_4:3,c_fill,cs_srgb,fl_progressive,q_auto:eco,w_1200/MTgyODA2ODAzMzQ2NzYxMDU2/ark-survival-evolved-the-ultimate-hunter-shadowmane.jpg"
     },
     "Megachelon": {
-        "livello": 150, 
-        "punti": 150, 
+        "livello": 150,
+        "punti": 150,
         "img": "https://static.wikia.nocookie.net/arksurvivalevolved_gamepedia/images/4/48/Genesis_3.jpg/revision/latest/scale-to-width-down/1120?cb=20190807211131"
-    }
+    },
+
+    # ————————— Monster Hunter ────────────────
+    "Nergigante":              {"livello": 150, "punti": 950, "img": ""},
+    "Glavenus":                {"livello": 150, "punti": 700, "img": ""},
+    "Tigrex":                  {"livello": 150, "punti": 650, "img": ""},
+    "Diablos":                 {"livello": 150, "punti": 600, "img": ""},
+    "Black Diablos":           {"livello": 150, "punti": 650, "img": ""},
+    "Tobi-kadachi":            {"livello": 150, "punti": 450, "img": ""},
+    "Anjanath":                {"livello": 150, "punti": 550, "img": ""},
+    "Barroth":                 {"livello": 150, "punti": 350, "img": ""},
+    "Great Jagras":            {"livello": 150, "punti": 250, "img": ""},
+    "Viper Tobi-kadachi":      {"livello": 150, "punti": 550, "img": ""},
+    "Kirin":                   {"livello": 150, "punti": 1000, "img": ""},
+    "Rajang":                  {"livello": 150, "punti": 750, "img": ""},
+    "Nargacuga":               {"livello": 150, "punti": 650, "img": ""},
+    "Rathalos":                {"livello": 150, "punti": 500, "img": ""},
+    "Azure Rathalos":          {"livello": 150, "punti": 600, "img": ""},
+    "Rathian":                 {"livello": 150, "punti": 550, "img": ""},
+    "Pink Rathian":            {"livello": 150, "punti": 650, "img": ""},
+    "Legiana":                 {"livello": 150, "punti": 700, "img": ""},
+    "Zinogre":                 {"livello": 150, "punti": 750, "img": ""},
+    "Stygian Zinogre":         {"livello": 150, "punti": 900, "img": ""},
+    "Odogaron":                {"livello": 150, "punti": 500, "img": ""},
+    "Ebony Odogaron":          {"livello": 150, "punti": 600, "img": ""},
+    "Vaal Hazak":              {"livello": 150, "punti": 1600, "img": ""},
+    "Kulu Ya-ku":              {"livello": 150, "punti": 250, "img": ""},
+    "Tzitzi-Ya-Ku":            {"livello": 150, "punti": 250, "img": ""},
+    "Brute Tigrex":            {"livello": 150, "punti": 750, "img": ""},
+    "Jyuratodus":              {"livello": 150, "punti": 450, "img": ""},
+    "Beotodus":               {"livello": 150, "punti": 500, "img": ""},
+    "Lavasioth":               {"livello": 150, "punti": 550, "img": ""},
+    "Dodogama":                {"livello": 150, "punti": 400, "img": ""},
+    "Uragaan":                 {"livello": 150, "punti": 500, "img": ""},
+    "Velkhana":                {"livello": 150, "punti": 1600, "img": ""}
 }
 
 redeemable_items = {
